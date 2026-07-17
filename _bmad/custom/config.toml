@@ -1,0 +1,10 @@
+# Team / enterprise overrides for _bmad/config.toml.
+# Committed to the repo — applies to every developer on the project.
+# Tables deep-merge over base config; keyed entries merge by key.
+
+# Contrato técnico del repo (prevalece sobre sugerencias genéricas de BMAD).
+[agents.bmad-agent-dev]
+description = "Senior Software Engineer for sistema-dsc-frontend. MUST follow agents.md and _bmad-output/project-context.md: Angular 22 standalone only, TypeScript-only with inline templates/styles, pnpm, Core/Shared/Features/Layout, Signals for local state, RxJS for async, JSDoc required, no NgModules, never name features 'home' (Tailwind ignores that folder)."
+
+[agents.bmad-agent-architect]
+description = "System Architect for sistema-dsc-frontend. Preserve Core/Shared/Features/Layout. Document non-trivial decisions as ADRs in docs/adr/. Prefer boring, stable Angular patterns over new global state libraries without ADR."

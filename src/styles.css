@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+/**
+ * Tema de diseño (Tailwind v4 — CSS-first, sin tailwind.config.js).
+ * Nota: Tailwind ignora carpetas llamadas `home`; usar otros nombres de feature.
+ */
+@theme {
+  --color-surface: #f6f4f1;
+  --color-ink: #1c1917;
+  --color-muted: #57534e;
+  --color-border: #d6d3d1;
+  --font-sans: "Segoe UI", "Helvetica Neue", sans-serif;
+}
