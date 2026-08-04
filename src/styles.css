@@ -1,13 +1,22 @@
 @import "tailwindcss";
 
 /**
- * Tema de diseño (Tailwind v4 — CSS-first, sin tailwind.config.js).
+ * Tema DSC (Tailwind v4 — CSS-first).
  * Nota: Tailwind ignora carpetas llamadas `home`; usar otros nombres de feature.
  */
 @theme {
-  --color-surface: #f6f4f1;
-  --color-ink: #1c1917;
-  --color-muted: #57534e;
-  --color-border: #d6d3d1;
+  --color-surface: #f5f7fa;
+  --color-ink: #0f172a;
+  --color-muted: #64748b;
+  --color-border: #e2e8f0;
+  --color-dsc: #009edb;
+  --color-dsc-dark: #005a87;
+  --color-dsc-navy: #0b3a5b;
+  --color-dsc-soft: #e8f6fc;
+  --color-warning-bg: #fef3c7;
+  --color-warning-ink: #92400e;
+  --color-warning-btn: #b45309;
+  --color-danger: #dc2626;
+  --color-danger-soft: #fef2f2;
   --font-sans: "Segoe UI", "Helvetica Neue", sans-serif;
 }

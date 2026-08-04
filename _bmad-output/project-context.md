@@ -36,6 +36,8 @@ Alias: `@core/*`, `@shared/*`, `@features/*`, `@layout/*`.
 1. `agents.md`
 2. `.cloude/system-prompt.md`
 3. Skill Angular: `.cloude/angular-developer/SKILL.md` (equipo / Claude Code)
+4. Seguimiento: `docs/seguimiento.md`
+5. Feature en curso (si aplica): `docs/features/`
 
 ## Flujo BMAD sugerido (brownfield)
 

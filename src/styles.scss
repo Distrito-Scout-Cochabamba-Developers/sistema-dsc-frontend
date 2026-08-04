@@ -1,6 +1,6 @@
 /**
- * Estilos globales complementarios (SCSS).
- * Tailwind vive en `styles.css`; aquí solo reglas de layout base que no son utilidades.
+ * Tokens de diseño globales complementarios (SCSS).
+ * Tailwind vive en `styles.css`.
  */
 html,
 body {
@@ -10,6 +10,6 @@ body {
 body {
   margin: 0;
   font-family: var(--font-sans, "Segoe UI", "Helvetica Neue", sans-serif);
-  background: var(--color-surface, #f6f4f1);
-  color: var(--color-ink, #1c1917);
+  background: var(--color-surface, #f5f7fa);
+  color: var(--color-ink, #0f172a);
 }

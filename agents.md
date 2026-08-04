@@ -169,6 +169,7 @@ Antes de escribir código, el agente debe haber leído:
 2. `.cloude/system-prompt.md`
 3. El `README.md` (arquitectura y convenciones)
 4. `_bmad-output/project-context.md` (si el flujo es BMAD)
+5. `docs/seguimiento.md` para saber qué está hecho y qué falta
 
 Para guía técnica de Angular por tema (signals, forms, DI, HTTP, routing, performance, testing, etc.), consultar la skill compartida `.cloude/angular-developer/SKILL.md` y sus `references/` (versión para Claude Code / equipo). Quienes usen Cursor pueden mantener una copia local en `.cursor/skills/angular-developer/` (ignorada por Git). Ante conflicto, este contrato prevalece sobre la skill y sobre BMAD.
 
