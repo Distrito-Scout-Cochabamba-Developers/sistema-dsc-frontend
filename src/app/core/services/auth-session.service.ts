@@ -39,4 +39,17 @@ export class AuthSessionService {
   restoreDemoSession(): void {
     this.sessionState.set(MOCK_SESSION);
   }
+
+  /**
+   * Alterna la sesión demo: cierra si hay una activa, la restaura si no.
+   * Encapsula la decisión de sesión para que consumidores (ej. el shell)
+   * no tengan que conocer la regla de negocio.
+   */
+  toggleDemoSession(): void {
+    if (this.isAuthenticated()) {
+      this.clearSession();
+      return;
+    }
+    this.restoreDemoSession();
+  }
 }

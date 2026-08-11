@@ -12,8 +12,8 @@
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
-          "style": "scss",
-          "inlineTemplate": true,
+          "style": "none",
+          "inlineTemplate": false,
           "inlineStyle": true,
           "changeDetection": "OnPush"
         },
@@ -41,8 +41,7 @@
               }
             ],
             "styles": [
-              "src/styles.css",
-              "src/styles.scss"
+              "src/styles.css"
             ]
           },
           "configurations": {

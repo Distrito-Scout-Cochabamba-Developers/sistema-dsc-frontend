@@ -1,22 +1,51 @@
 @import "tailwindcss";
 
-/**
- * Tema DSC (Tailwind v4 — CSS-first).
- * Nota: Tailwind ignora carpetas llamadas `home`; usar otros nombres de feature.
- */
 @theme {
-  --color-surface: #f5f7fa;
+  /* Paleta de marca (fuente de verdad: sistema de diseño DSC) */
+  --color-surface: #f8fafc;
+  --color-elevated: #ffffff; /* tarjetas/inputs/header sobre `surface` */
   --color-ink: #0f172a;
   --color-muted: #64748b;
   --color-border: #e2e8f0;
-  --color-dsc: #009edb;
+  --color-dsc: #009ee2;
   --color-dsc-dark: #005a87;
   --color-dsc-navy: #0b3a5b;
   --color-dsc-soft: #e8f6fc;
+  --color-secondary: #fac101;
+  --color-secondary-dark: #a17a00;
+  --color-secondary-soft: #fef3c7;
   --color-warning-bg: #fef3c7;
   --color-warning-ink: #92400e;
   --color-warning-btn: #b45309;
   --color-danger: #dc2626;
   --color-danger-soft: #fef2f2;
   --font-sans: "Segoe UI", "Helvetica Neue", sans-serif;
+
+  --text-headline-xl: 2rem; /* 32px mobile */
+  --text-headline-xl--line-height: 1.15;
+  --text-headline-xl-desktop: 3rem; /* 48px desktop */
+  --text-headline-xl-desktop--line-height: 1.1;
+
+  --text-headline-lg: 1.5rem; /* 24px mobile */
+  --text-headline-lg--line-height: 1.2;
+  --text-headline-lg-desktop: 2.25rem; /* 36px desktop */
+  --text-headline-lg-desktop--line-height: 1.15;
+
+  --text-body: 1rem; /* 16px */
+  --text-body--line-height: 1.6;
+
+  --text-caption: 0.625rem; /* 10px — badges/insignias pequeñas */
+  --text-caption--line-height: 1;
+}
+
+html,
+body {
+  block-size: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--color-surface);
+  color: var(--color-ink);
 }

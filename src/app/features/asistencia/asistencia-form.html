@@ -1,0 +1,164 @@
+@if (auth.session(); as profile) {
+  <aside
+    class="mb-6 flex flex-col gap-3 rounded-2xl bg-warning-bg px-4 py-3 text-warning-ink sm:flex-row sm:items-center sm:justify-between"
+  >
+    <div class="flex items-start gap-3">
+      <span
+        class="mt-0.5 grid size-9 shrink-0 place-items-center rounded-full bg-warning-btn/20 text-sm font-bold"
+        aria-hidden="true"
+      >
+        👤
+      </span>
+      <div class="text-sm">
+        <p>
+          Has iniciado sesión como:
+          <strong>{{ profile.displayName }}</strong>
+        </p>
+        <p class="mt-0.5 text-warning-ink/80">
+          Confirma tu asistencia para acreditar esta formación. Puedes
+          editar el teléfono si es necesario.
+        </p>
+      </div>
+    </div>
+    <button
+      type="button"
+      class="shrink-0 rounded-lg bg-warning-btn px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
+      (click)="onChangeProfile()"
+    >
+      Cambiar Perfil
+    </button>
+  </aside>
+}
+
+<form
+  class="rounded-2xl border border-border bg-elevated p-5 shadow-md md:p-7"
+  (submit)="onSubmit($event)"
+  novalidate
+>
+  <div class="space-y-5">
+    <div>
+      <label class="mb-1.5 block text-sm font-semibold text-ink" for="ci">
+        Carnet de Identidad (CI)
+      </label>
+      <div class="relative">
+        <input
+          id="ci"
+          type="text"
+          inputmode="numeric"
+          autocomplete="off"
+          placeholder="Solo números"
+          class="w-full rounded-xl border border-border bg-elevated px-4 py-3 pr-12 text-ink outline-none ring-dsc/30 placeholder:text-muted/60 focus:ring-2"
+          [class.border-danger]="showCiError()"
+          [attr.aria-invalid]="showCiError()"
+          aria-describedby="ci-hint"
+          [formField]="registroForm.ci"
+          (blur)="touchedCi.set(true)"
+        />
+        @if (ciStatus() === 'loading') {
+          <span
+            class="absolute top-1/2 right-3 size-5 -translate-y-1/2 animate-spin rounded-full border-2 border-dsc border-t-transparent"
+            aria-label="Buscando perfil"
+          ></span>
+        }
+      </div>
+      @if (showCiError()) {
+        <p id="ci-hint" class="mt-1.5 text-sm text-danger">
+          Ingresa un CI numérico válido (7 a 10 dígitos).
+        </p>
+      } @else if (ciStatus() === 'found') {
+        <p id="ci-hint" class="mt-1.5 text-sm font-medium text-dsc">
+          ✓ Perfil encontrado. Datos autocompletados
+        </p>
+      } @else if (ciStatus() === 'not-found') {
+        <p id="ci-hint" class="mt-1.5 text-sm text-muted">
+          CI no encontrado en el distrito. Completa tus datos para un
+          registro parcial.
+        </p>
+      }
+    </div>
+
+    <div>
+      <label class="mb-1.5 block text-sm font-semibold text-ink" for="fullName">
+        Nombre Completo
+      </label>
+      <input
+        id="fullName"
+        type="text"
+        autocomplete="name"
+        class="w-full rounded-xl border border-border bg-elevated px-4 py-3 text-ink outline-none ring-dsc/30 focus:ring-2"
+        [class.border-danger]="showNameError()"
+        [attr.aria-invalid]="showNameError()"
+        [attr.aria-describedby]="showNameError() ? 'fullName-hint' : null"
+        [formField]="registroForm.fullName"
+        (blur)="touchedName.set(true)"
+      />
+      @if (showNameError()) {
+        <p id="fullName-hint" class="mt-1.5 text-sm text-danger">Este campo es obligatorio</p>
+      }
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div>
+        <label class="mb-1.5 block text-sm font-semibold text-ink" for="extension">
+          Extensión (Departamento)
+        </label>
+        <select
+          id="extension"
+          class="w-full rounded-xl border border-border bg-elevated px-4 py-3 text-ink outline-none ring-dsc/30 focus:ring-2"
+          [class.border-danger]="showExtensionError()"
+          [attr.aria-invalid]="showExtensionError()"
+          [attr.aria-describedby]="showExtensionError() ? 'extension-hint' : null"
+          [formField]="registroForm.extension"
+          (blur)="touchedExtension.set(true)"
+        >
+          <option value="">Selecciona…</option>
+          @for (ext of extensions; track ext.code) {
+            <option [value]="ext.code">{{ ext.label }}</option>
+          }
+        </select>
+        @if (showExtensionError()) {
+          <p id="extension-hint" class="mt-1.5 text-sm text-danger">Este campo es obligatorio</p>
+        }
+      </div>
+
+      <div>
+        <label class="mb-1.5 block text-sm font-semibold text-ink" for="phone">
+          Teléfono de contacto (Móvil)
+        </label>
+        <input
+          id="phone"
+          type="tel"
+          inputmode="numeric"
+          autocomplete="tel"
+          placeholder="Ej. 70000000"
+          class="w-full rounded-xl border border-border bg-elevated px-4 py-3 text-ink outline-none ring-dsc/30 placeholder:text-muted/60 focus:ring-2"
+          [class.border-danger]="showPhoneError()"
+          [attr.aria-invalid]="showPhoneError()"
+          [attr.aria-describedby]="showPhoneError() ? 'phone-hint' : null"
+          [formField]="registroForm.phone"
+          (blur)="touchedPhone.set(true)"
+        />
+        @if (showPhoneError()) {
+          <p id="phone-hint" class="mt-1.5 text-sm text-danger">
+            Ingresa un móvil de 8 dígitos.
+          </p>
+        }
+      </div>
+    </div>
+
+    @if (submitError()) {
+      <p class="rounded-lg bg-danger-soft px-3 py-2 text-sm text-danger" role="alert">
+        {{ submitError() }}
+      </p>
+    }
+
+    <button
+      type="submit"
+      class="flex w-full items-center justify-center gap-2 rounded-xl bg-dsc px-4 py-3.5 text-sm font-bold text-white transition hover:bg-dsc-dark disabled:cursor-not-allowed disabled:opacity-60"
+      [disabled]="submitting()"
+    >
+      <span aria-hidden="true">👤✓</span>
+      {{ submitting() ? 'Registrando…' : 'Registrar Asistencia' }}
+    </button>
+  </div>
+</form>

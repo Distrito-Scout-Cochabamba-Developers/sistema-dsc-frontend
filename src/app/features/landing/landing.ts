@@ -15,10 +15,10 @@ import { RouterLink } from '@angular/router';
       >
         SISTEMA DSC
       </p>
-      <h1 class="m-0 text-3xl font-bold tracking-tight text-ink md:text-4xl">
+      <h1 class="m-0 text-headline-xl font-bold tracking-tight text-ink md:text-headline-xl-desktop">
         {{ title() }}
       </h1>
-      <p class="m-0 max-w-xl leading-relaxed text-muted">
+      <p class="m-0 max-w-xl text-body text-muted">
         {{ subtitle() }}
       </p>
       <a
@@ -29,7 +29,7 @@ import { RouterLink } from '@angular/router';
       </a>
       <p class="text-xs text-muted">
         Deep link de ejemplo:
-        <code class="rounded bg-white px-1.5 py-0.5 text-dsc-dark">
+        <code class="rounded bg-elevated px-1.5 py-0.5 text-dsc-dark">
           /asistencia/mod-liderazgo-20241024
         </code>
       </p>

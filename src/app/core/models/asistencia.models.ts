@@ -1,4 +1,22 @@
 /**
+ * Código de extensión (departamento) de Bolivia. Cerrado a los 9 departamentos
+ * reales — ver preguntas abiertas del ADR 0002 sobre si esto debe migrar a un
+ * catálogo servido por API.
+ */
+export type DepartamentoCode = 'LP' | 'CB' | 'SC' | 'OR' | 'PT' | 'TJ' | 'CH' | 'BE' | 'PD';
+
+/**
+ * Estado de un registro de asistencia.
+ *
+ * @remarks
+ * Modelo provisional del frontend (ver ADR 0002, pregunta abierta #2): el
+ * ciclo real de regularización por Secretaría (`FR-SEC-02/03`) probablemente
+ * necesite más estados (ej. `'regularizado'`); esto no está decidido con el
+ * backend todavía.
+ */
+export type EstadoRegistroAsistencia = 'completo' | 'parcial';
+
+/**
  * Perfil de dirigente autenticado (sesión de aplicación).
  */
 export interface DirigenteSession {
@@ -6,7 +24,7 @@ export interface DirigenteSession {
   readonly displayName: string;
   readonly fullName: string;
   readonly ci: string;
-  readonly extension: string;
+  readonly extension: DepartamentoCode;
   readonly phone: string;
 }
 
@@ -16,7 +34,7 @@ export interface DirigenteSession {
 export interface AdultoDistrito {
   readonly ci: string;
   readonly fullName: string;
-  readonly extension: string;
+  readonly extension: DepartamentoCode;
   readonly phone: string;
 }
 
@@ -24,7 +42,7 @@ export interface AdultoDistrito {
  * Extensiones de CI (departamentos de Bolivia).
  */
 export interface CiExtensionOption {
-  readonly code: string;
+  readonly code: DepartamentoCode;
   readonly label: string;
 }
 
@@ -49,10 +67,9 @@ export interface RegistroAsistenciaPayload {
   readonly sessionId: string;
   readonly ci: string;
   readonly fullName: string;
-  readonly extension: string;
+  readonly extension: DepartamentoCode;
   readonly phone: string;
-  /** `true` si el adulto no existía en el directorio y se registra de forma parcial. */
-  readonly partialRegistration: boolean;
+  readonly estado: EstadoRegistroAsistencia;
 }
 
 /**
@@ -64,5 +81,5 @@ export interface RegistroAsistenciaResult {
   readonly moduleSummary: string;
   readonly sessionDate: string;
   readonly sessionTime: string;
-  readonly partialRegistration: boolean;
+  readonly estado: EstadoRegistroAsistencia;
 }

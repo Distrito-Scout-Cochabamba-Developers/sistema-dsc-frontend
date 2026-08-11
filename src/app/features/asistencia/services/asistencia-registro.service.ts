@@ -34,7 +34,7 @@ export class AsistenciaRegistroService {
           moduleSummary: sesion.moduleName,
           sessionDate: sesion.dateLabel,
           sessionTime: sesion.timeLabel,
-          partialRegistration: payload.partialRegistration,
+          estado: payload.estado,
         };
 
         return of(result).pipe(delay(600));
