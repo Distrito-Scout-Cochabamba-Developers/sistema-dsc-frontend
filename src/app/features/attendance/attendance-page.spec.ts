@@ -3,7 +3,7 @@ import { provideRouter } from '@angular/router';
 
 import { AuthSessionService } from '@core/services/auth-session.service';
 
-import { AsistenciaPage } from './asistencia-page';
+import { AttendancePage } from './attendance-page';
 
 const SESSION_ID = 'mod-liderazgo-20241024';
 
@@ -12,7 +12,7 @@ function wait(ms: number): Promise<void> {
 }
 
 function createComponent(sessionId: string) {
-  const fixture = TestBed.createComponent(AsistenciaPage);
+  const fixture = TestBed.createComponent(AttendancePage);
   fixture.componentRef.setInput('sessionId', sessionId);
   fixture.detectChanges();
   return fixture;
@@ -32,10 +32,10 @@ function setInputValue(
   el.dispatchEvent(new Event('input'));
 }
 
-describe('AsistenciaPage', () => {
+describe('AttendancePage', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AsistenciaPage],
+      imports: [AttendancePage],
       providers: [provideRouter([])],
     }).compileComponents();
   });

@@ -4,9 +4,9 @@
  */
 import { Injectable, computed, signal } from '@angular/core';
 
-import type { DirigenteSession } from '@core/models/asistencia.models';
+import type { LeaderSession } from '@core/models/attendance.models';
 
-const MOCK_SESSION: DirigenteSession = {
+const MOCK_SESSION: LeaderSession = {
   id: 'dir-001',
   displayName: 'Dir. Juan Pérez',
   fullName: 'Juan Pérez Mendoza',
@@ -18,7 +18,7 @@ const MOCK_SESSION: DirigenteSession = {
 @Injectable({ providedIn: 'root' })
 export class AuthSessionService {
   /** Sesión actual; `null` si el dirigente no está autenticado. */
-  private readonly sessionState = signal<DirigenteSession | null>(MOCK_SESSION);
+  private readonly sessionState = signal<LeaderSession | null>(MOCK_SESSION);
 
   /** Perfil autenticado o `null`. */
   readonly session = this.sessionState.asReadonly();

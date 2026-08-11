@@ -1,7 +1,7 @@
 /**
  * Opciones de extensión de CI (departamentos de Bolivia).
  */
-import type { CiExtensionOption, DepartamentoCode } from '@core/models/asistencia.models';
+import type { CiExtensionOption, DepartmentCode } from '@core/models/attendance.models';
 
 export const CI_EXTENSIONS: readonly CiExtensionOption[] = [
   { code: 'LP', label: 'La Paz' },
@@ -45,6 +45,6 @@ export function isValidBoliviaMobile(value: string): boolean {
  *
  * @param value - Valor del campo de extensión, aún sin validar.
  */
-export function isValidDepartamentoCode(value: string): value is DepartamentoCode {
+export function isValidDepartmentCode(value: string): value is DepartmentCode {
   return CI_EXTENSIONS.some((ext) => ext.code === value);
 }

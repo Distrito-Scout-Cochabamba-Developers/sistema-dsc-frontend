@@ -5,11 +5,11 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import type { RegistroAsistenciaResult } from '@core/models/asistencia.models';
+import type { AttendanceRegistrationResult } from '@core/models/attendance.models';
 import { SummaryItem, SummaryList } from '@shared/components/summary-list';
 
 @Component({
-  selector: 'app-asistencia-success',
+  selector: 'app-attendance-success',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, SummaryList],
   template: `
@@ -43,9 +43,9 @@ import { SummaryItem, SummaryList } from '@shared/components/summary-list';
     </section>
   `,
 })
-export class AsistenciaSuccess {
+export class AttendanceSuccess {
   /** Confirmación devuelta por el registro de asistencia. */
-  readonly result = input.required<RegistroAsistenciaResult>();
+  readonly result = input.required<AttendanceRegistrationResult>();
 
   protected readonly summaryItems = computed<SummaryItem[]>(() => {
     const r = this.result();

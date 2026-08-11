@@ -13,8 +13,8 @@ export const routes: Routes = [
   {
     path: 'asistencia',
     loadChildren: () =>
-      import('@features/asistencia/asistencia.routes').then(
-        (m) => m.ASISTENCIA_ROUTES,
+      import('@features/attendance/attendance.routes').then(
+        (m) => m.ATTENDANCE_ROUTES,
       ),
   },
   {

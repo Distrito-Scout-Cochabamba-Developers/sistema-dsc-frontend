@@ -5,9 +5,9 @@
 import { Injectable } from '@angular/core';
 import { Observable, delay, of } from 'rxjs';
 
-import type { AdultoDistrito, ModuloSesion } from '@core/models/asistencia.models';
+import type { DistrictAdult, ModuleSession } from '@core/models/attendance.models';
 
-const MOCK_ADULTOS: readonly AdultoDistrito[] = [
+const MOCK_ADULTS: readonly DistrictAdult[] = [
   {
     ci: '12345678',
     fullName: 'Juan Pérez Mendoza',
@@ -22,7 +22,7 @@ const MOCK_ADULTOS: readonly AdultoDistrito[] = [
   },
 ];
 
-const MOCK_SESIONES: Record<string, ModuloSesion> = {
+const MOCK_SESSIONS: Record<string, ModuleSession> = {
   'mod-liderazgo-20241024': {
     sessionId: 'mod-liderazgo-20241024',
     moduleTitle: 'Registro de Participantes',
@@ -38,16 +38,16 @@ const MOCK_SESIONES: Record<string, ModuloSesion> = {
 };
 
 @Injectable({ providedIn: 'root' })
-export class AdultosDirectoryService {
+export class AdultDirectoryService {
   /**
    * Busca un adulto por CI en el directorio distrital (mock).
    *
    * @param ci - Carnet de identidad numérico.
    * @returns Observable con el adulto o `null` si no existe.
    */
-  lookupByCi(ci: string): Observable<AdultoDistrito | null> {
+  lookupByCi(ci: string): Observable<DistrictAdult | null> {
     const normalized = ci.trim();
-    const found = MOCK_ADULTOS.find((adulto) => adulto.ci === normalized) ?? null;
+    const found = MOCK_ADULTS.find((adult) => adult.ci === normalized) ?? null;
     return of(found).pipe(delay(450));
   }
 
@@ -56,8 +56,8 @@ export class AdultosDirectoryService {
    *
    * @param sessionId - Identificador de sesión del QR o link directo.
    */
-  getModuloSesion(sessionId: string): Observable<ModuloSesion | null> {
-    const sesion = MOCK_SESIONES[sessionId] ?? null;
-    return of(sesion).pipe(delay(150));
+  getModuleSession(sessionId: string): Observable<ModuleSession | null> {
+    const session = MOCK_SESSIONS[sessionId] ?? null;
+    return of(session).pipe(delay(150));
   }
 }

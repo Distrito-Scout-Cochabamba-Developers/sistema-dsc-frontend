@@ -6,14 +6,14 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, delay, map, of, switchMap } from 'rxjs';
 
 import type {
-  RegistroAsistenciaPayload,
-  RegistroAsistenciaResult,
-} from '@core/models/asistencia.models';
-import { AdultosDirectoryService } from '@core/services/adultos-directory.service';
+  AttendanceRegistrationPayload,
+  AttendanceRegistrationResult,
+} from '@core/models/attendance.models';
+import { AdultDirectoryService } from '@core/services/adult-directory.service';
 
 @Injectable({ providedIn: 'root' })
-export class AsistenciaRegistroService {
-  private readonly directory = inject(AdultosDirectoryService);
+export class AttendanceRegistrationService {
+  private readonly directory = inject(AdultDirectoryService);
 
   /**
    * Registra asistencia a la sesión indicada (mock).
@@ -21,19 +21,19 @@ export class AsistenciaRegistroService {
    * @param payload - Datos del formulario validados en UI.
    * @returns Confirmación con resumen del módulo.
    */
-  register(payload: RegistroAsistenciaPayload): Observable<RegistroAsistenciaResult> {
-    return this.directory.getModuloSesion(payload.sessionId).pipe(
-      switchMap((sesion) => {
-        if (!sesion) {
+  register(payload: AttendanceRegistrationPayload): Observable<AttendanceRegistrationResult> {
+    return this.directory.getModuleSession(payload.sessionId).pipe(
+      switchMap((session) => {
+        if (!session) {
           throw new Error(`Sesión no encontrada: ${payload.sessionId}`);
         }
 
-        const result: RegistroAsistenciaResult = {
+        const result: AttendanceRegistrationResult = {
           registrationId: `reg-${payload.ci}-${Date.now()}`,
           participantName: payload.fullName,
-          moduleSummary: sesion.moduleName,
-          sessionDate: sesion.dateLabel,
-          sessionTime: sesion.timeLabel,
+          moduleSummary: session.moduleName,
+          sessionDate: session.dateLabel,
+          sessionTime: session.timeLabel,
           estado: payload.estado,
         };
 

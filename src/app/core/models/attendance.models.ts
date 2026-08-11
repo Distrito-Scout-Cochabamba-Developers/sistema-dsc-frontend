@@ -3,7 +3,7 @@
  * reales — ver preguntas abiertas del ADR 0002 sobre si esto debe migrar a un
  * catálogo servido por API.
  */
-export type DepartamentoCode = 'LP' | 'CB' | 'SC' | 'OR' | 'PT' | 'TJ' | 'CH' | 'BE' | 'PD';
+export type DepartmentCode = 'LP' | 'CB' | 'SC' | 'OR' | 'PT' | 'TJ' | 'CH' | 'BE' | 'PD';
 
 /**
  * Estado de un registro de asistencia.
@@ -14,27 +14,27 @@ export type DepartamentoCode = 'LP' | 'CB' | 'SC' | 'OR' | 'PT' | 'TJ' | 'CH' | 
  * necesite más estados (ej. `'regularizado'`); esto no está decidido con el
  * backend todavía.
  */
-export type EstadoRegistroAsistencia = 'completo' | 'parcial';
+export type AttendanceRegistrationStatus = 'completo' | 'parcial';
 
 /**
  * Perfil de dirigente autenticado (sesión de aplicación).
  */
-export interface DirigenteSession {
+export interface LeaderSession {
   readonly id: string;
   readonly displayName: string;
   readonly fullName: string;
   readonly ci: string;
-  readonly extension: DepartamentoCode;
+  readonly extension: DepartmentCode;
   readonly phone: string;
 }
 
 /**
  * Adulto del directorio distrital (lookup por CI).
  */
-export interface AdultoDistrito {
+export interface DistrictAdult {
   readonly ci: string;
   readonly fullName: string;
-  readonly extension: DepartamentoCode;
+  readonly extension: DepartmentCode;
   readonly phone: string;
 }
 
@@ -42,14 +42,14 @@ export interface AdultoDistrito {
  * Extensiones de CI (departamentos de Bolivia).
  */
 export interface CiExtensionOption {
-  readonly code: DepartamentoCode;
+  readonly code: DepartmentCode;
   readonly label: string;
 }
 
 /**
  * Sesión de módulo de formación (objetivo del QR / deep link).
  */
-export interface ModuloSesion {
+export interface ModuleSession {
   readonly sessionId: string;
   readonly moduleTitle: string;
   readonly moduleName: string;
@@ -63,23 +63,23 @@ export interface ModuloSesion {
 /**
  * Payload de registro de asistencia (frontend; contrato futuro con API).
  */
-export interface RegistroAsistenciaPayload {
+export interface AttendanceRegistrationPayload {
   readonly sessionId: string;
   readonly ci: string;
   readonly fullName: string;
-  readonly extension: DepartamentoCode;
+  readonly extension: DepartmentCode;
   readonly phone: string;
-  readonly estado: EstadoRegistroAsistencia;
+  readonly estado: AttendanceRegistrationStatus;
 }
 
 /**
  * Confirmación de asistencia registrada.
  */
-export interface RegistroAsistenciaResult {
+export interface AttendanceRegistrationResult {
   readonly registrationId: string;
   readonly participantName: string;
   readonly moduleSummary: string;
   readonly sessionDate: string;
   readonly sessionTime: string;
-  readonly estado: EstadoRegistroAsistencia;
+  readonly estado: AttendanceRegistrationStatus;
 }

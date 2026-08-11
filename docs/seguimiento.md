@@ -53,9 +53,9 @@ Detalle: [features/asistencia-registro.md](./features/asistencia-registro.md)
 | A-10 | Conectar registro a API real | Pendiente | Reemplazar `AsistenciaRegistroService` |
 | A-11 | Auth real (login / token / sesión) | Pendiente | Hoy toggle demo en navbar |
 | A-12 | Generación/consumo de QR de sesión (backend o admin) | Pendiente | Frontend solo consume el deep link |
-| A-13 | Tests unitarios de la página / validaciones | Pendiente | Solo hay `app.spec.ts` básico |
+| A-13 | Tests unitarios de la página / validaciones | Hecho | `asistencia-page.spec.ts`, 11/11 tests (sesión inválida, autocompletado, registro parcial, validaciones CI/teléfono, flujo de éxito) |
 | A-14 | Estados de error de red / retry UX | Pendiente | Tras API |
-| A-15 | Accesibilidad (ARIA labels, foco, contraste) | Pendiente | Revisar con auditoria |
+| A-15 | Accesibilidad (ARIA labels, foco, contraste) | En curso | `aria-invalid`/`aria-describedby` en los 4 campos del formulario; falta auditoría de contraste/foco completa |
 
 ---
 
@@ -63,7 +63,7 @@ Detalle: [features/asistencia-registro.md](./features/asistencia-registro.md)
 
 | ID | Ítem | Estado | Dependencia |
 | -- | ---- | ------ | ----------- |
-| B-01 | Contrato OpenAPI / DTOs de adultos y asistencia | Pendiente | Backend / producto |
+| B-01 | Contrato OpenAPI / DTOs de adultos y asistencia | En curso | Propuesta documentada en [ADR 0002](./adr/0002-contrato-api-asumido-registro-asistencia.md); falta validación del Architect backend |
 | B-02 | `HttpClient` + interceptores (auth, errores) | Pendiente | Tras B-01 |
 | B-03 | Environments (`apiBaseUrl` dev/prod) | Pendiente | — |
 | B-04 | Manejo de errores HTTP tipados | Pendiente | B-02 |
@@ -92,7 +92,7 @@ Detalle: [features/asistencia-registro.md](./features/asistencia-registro.md)
 | Q-02 | CI (build + test en PR) | Pendiente | — |
 | Q-03 | Coverage mínimo en features críticas | Pendiente | — |
 | Q-04 | Instalar `uv` (recomendado por BMAD) | Pendiente | Opcional para workflows Python |
-| Q-05 | Primer ADR formal (mocks vs API) | Pendiente | Plantilla en `docs/adr/` |
+| Q-05 | Primer ADR formal (mocks vs API) | Hecho | [ADR 0001](./adr/0001-mocks-frontend-antes-de-api.md), [ADR 0002](./adr/0002-contrato-api-asumido-registro-asistencia.md), [ADR 0003](./adr/0003-templates-separados-y-convenciones-v20.md) |
 
 ---
 

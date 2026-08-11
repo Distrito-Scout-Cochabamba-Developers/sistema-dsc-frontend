@@ -51,7 +51,7 @@
           [class.border-danger]="showCiError()"
           [attr.aria-invalid]="showCiError()"
           aria-describedby="ci-hint"
-          [formField]="registroForm.ci"
+          [formField]="attendanceForm.ci"
           (blur)="touchedCi.set(true)"
         />
         @if (ciStatus() === 'loading') {
@@ -89,7 +89,7 @@
         [class.border-danger]="showNameError()"
         [attr.aria-invalid]="showNameError()"
         [attr.aria-describedby]="showNameError() ? 'fullName-hint' : null"
-        [formField]="registroForm.fullName"
+        [formField]="attendanceForm.fullName"
         (blur)="touchedName.set(true)"
       />
       @if (showNameError()) {
@@ -108,7 +108,7 @@
           [class.border-danger]="showExtensionError()"
           [attr.aria-invalid]="showExtensionError()"
           [attr.aria-describedby]="showExtensionError() ? 'extension-hint' : null"
-          [formField]="registroForm.extension"
+          [formField]="attendanceForm.extension"
           (blur)="touchedExtension.set(true)"
         >
           <option value="">Selecciona…</option>
@@ -135,7 +135,7 @@
           [class.border-danger]="showPhoneError()"
           [attr.aria-invalid]="showPhoneError()"
           [attr.aria-describedby]="showPhoneError() ? 'phone-hint' : null"
-          [formField]="registroForm.phone"
+          [formField]="attendanceForm.phone"
           (blur)="touchedPhone.set(true)"
         />
         @if (showPhoneError()) {

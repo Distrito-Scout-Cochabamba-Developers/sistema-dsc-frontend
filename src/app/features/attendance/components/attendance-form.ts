@@ -2,7 +2,7 @@
  * Formulario de registro de asistencia: campos, validación, autocompletado
  * por CI y envío. Encapsula todo el estado propio del formulario (incluida
  * la insignia de sesión activa, porque "Cambiar Perfil" resetea ese mismo
- * modelo) para mantener `AsistenciaPage` como puro orquestador.
+ * modelo) para mantener `AttendancePage` como puro orquestador.
  */
 import {
   ChangeDetectionStrategy,
@@ -19,20 +19,20 @@ import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { FormField, form, pattern, required, submit } from '@angular/forms/signals';
 import { debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs';
 
-import type { ModuloSesion, RegistroAsistenciaResult } from '@core/models/asistencia.models';
-import { AdultosDirectoryService } from '@core/services/adultos-directory.service';
+import type { ModuleSession, AttendanceRegistrationResult } from '@core/models/attendance.models';
+import { AdultDirectoryService } from '@core/services/adult-directory.service';
 import { AuthSessionService } from '@core/services/auth-session.service';
 import {
   BOLIVIA_MOBILE_PATTERN,
   CI_EXTENSIONS,
   CI_NUMBER_PATTERN,
   isValidCiNumber,
-  isValidDepartamentoCode,
+  isValidDepartmentCode,
 } from '@core/utils/ci.utils';
 
-import { AsistenciaRegistroService } from './services/asistencia-registro.service';
+import { AttendanceRegistrationService } from '../services/attendance-registration.service';
 
-interface RegistroFormModel {
+interface AttendanceFormModel {
   ci: string;
   fullName: string;
   extension: string;
@@ -42,21 +42,21 @@ interface RegistroFormModel {
 type CiLookupStatus = 'idle' | 'loading' | 'found' | 'not-found' | 'invalid';
 
 @Component({
-  selector: 'app-asistencia-form',
+  selector: 'app-attendance-form',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormField],
-  templateUrl: './asistencia-form.html',
+  templateUrl: './attendance-form.html',
 })
-export class AsistenciaForm {
+export class AttendanceForm {
   /** Sesión del módulo a la que se registra la asistencia. */
-  readonly sesion = input.required<ModuloSesion>();
+  readonly session = input.required<ModuleSession>();
 
   /** Emite la confirmación cuando el registro se completa con éxito. */
-  readonly registered = output<RegistroAsistenciaResult>();
+  readonly registered = output<AttendanceRegistrationResult>();
 
   private readonly destroyRef = inject(DestroyRef);
-  private readonly directory = inject(AdultosDirectoryService);
-  private readonly registroApi = inject(AsistenciaRegistroService);
+  private readonly directory = inject(AdultDirectoryService);
+  private readonly registrationApi = inject(AttendanceRegistrationService);
   protected readonly auth = inject(AuthSessionService);
 
   /** Extensiones de CI disponibles. */
@@ -73,14 +73,14 @@ export class AsistenciaForm {
   protected readonly touchedExtension = signal(false);
   protected readonly touchedPhone = signal(false);
 
-  protected readonly registroModel = signal<RegistroFormModel>({
+  protected readonly attendanceModel = signal<AttendanceFormModel>({
     ci: '',
     fullName: '',
     extension: '',
     phone: '',
   });
 
-  protected readonly registroForm = form(this.registroModel, (p) => {
+  protected readonly attendanceForm = form(this.attendanceModel, (p) => {
     required(p.ci, { message: 'CI obligatorio' });
     pattern(p.ci, CI_NUMBER_PATTERN, { message: 'CI numérico inválido' });
     required(p.fullName, { message: 'Nombre obligatorio' });
@@ -92,19 +92,19 @@ export class AsistenciaForm {
   protected readonly showCiError = computed(
     () =>
       this.touchedCi() &&
-      (this.registroForm.ci().invalid() || this.ciStatus() === 'invalid'),
+      (this.attendanceForm.ci().invalid() || this.ciStatus() === 'invalid'),
   );
 
   protected readonly showNameError = computed(
-    () => this.touchedName() && this.registroForm.fullName().invalid(),
+    () => this.touchedName() && this.attendanceForm.fullName().invalid(),
   );
 
   protected readonly showExtensionError = computed(
-    () => this.touchedExtension() && this.registroForm.extension().invalid(),
+    () => this.touchedExtension() && this.attendanceForm.extension().invalid(),
   );
 
   protected readonly showPhoneError = computed(
-    () => this.touchedPhone() && this.registroForm.phone().invalid(),
+    () => this.touchedPhone() && this.attendanceForm.phone().invalid(),
   );
 
   constructor() {
@@ -119,7 +119,7 @@ export class AsistenciaForm {
       if (!profile) {
         return;
       }
-      this.registroModel.set({
+      this.attendanceModel.set({
         ci: profile.ci,
         fullName: profile.fullName,
         extension: profile.extension,
@@ -132,7 +132,7 @@ export class AsistenciaForm {
 
   /** Busca en el directorio distrital cada vez que el CI ingresado es válido. */
   private watchCiLookup(): void {
-    toObservable(computed(() => this.registroModel().ci))
+    toObservable(computed(() => this.attendanceModel().ci))
       .pipe(
         debounceTime(400),
         distinctUntilChanged(),
@@ -150,19 +150,19 @@ export class AsistenciaForm {
         switchMap((ci) => this.directory.lookupByCi(ci)),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe((adulto) => {
-        if (!adulto) {
+      .subscribe((adult) => {
+        if (!adult) {
           this.ciStatus.set('not-found');
           this.partialFromDirectory.set(true);
           return;
         }
         this.ciStatus.set('found');
         this.partialFromDirectory.set(false);
-        this.registroModel.update((current) => ({
+        this.attendanceModel.update((current) => ({
           ...current,
-          fullName: adulto.fullName,
-          extension: adulto.extension,
-          phone: current.phone || adulto.phone,
+          fullName: adult.fullName,
+          extension: adult.extension,
+          phone: current.phone || adult.phone,
         }));
       });
   }
@@ -172,7 +172,7 @@ export class AsistenciaForm {
    */
   protected onChangeProfile(): void {
     this.auth.clearSession();
-    this.registroModel.set({
+    this.attendanceModel.set({
       ci: '',
       fullName: '',
       extension: '',
@@ -199,11 +199,11 @@ export class AsistenciaForm {
     this.touchedPhone.set(true);
     this.submitError.set('');
 
-    void submit(this.registroForm, async () => {
-      const model = this.registroModel();
-      const sesion = this.sesion();
+    void submit(this.attendanceForm, async () => {
+      const model = this.attendanceModel();
+      const session = this.session();
 
-      if (!isValidDepartamentoCode(model.extension)) {
+      if (!isValidDepartmentCode(model.extension)) {
         this.submitError.set('Selecciona una extensión (departamento) válida.');
         return;
       }
@@ -211,10 +211,10 @@ export class AsistenciaForm {
 
       this.submitting.set(true);
       try {
-        const result = await new Promise<RegistroAsistenciaResult>((resolve, reject) => {
-          this.registroApi
+        const result = await new Promise<AttendanceRegistrationResult>((resolve, reject) => {
+          this.registrationApi
             .register({
-              sessionId: sesion.sessionId,
+              sessionId: session.sessionId,
               ci: model.ci.trim(),
               fullName: model.fullName.trim(),
               extension,
