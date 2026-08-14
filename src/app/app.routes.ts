@@ -11,6 +11,13 @@ export const routes: Routes = [
       import('@features/landing/landing.routes').then((m) => m.LANDING_ROUTES),
   },
   {
+    path: 'asistencia',
+    loadChildren: () =>
+      import('@features/attendance/attendance.routes').then(
+        (m) => m.ATTENDANCE_ROUTES,
+      ),
+  },
+  {
     path: '**',
     redirectTo: '',
   },

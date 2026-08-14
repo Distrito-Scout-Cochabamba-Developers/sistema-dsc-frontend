@@ -16,7 +16,8 @@ Este contrato alinea a todos los contribuidores con una arquitectura Angular ent
 | --------- | -------- |
 | Framework | Angular **22+**, **Standalone Components** por defecto |
 | Lenguaje | **TypeScript-only** (`allowJs: false`); sin `.js` de aplicación |
-| Estilos | **Tailwind CSS v4** (utilidades en templates) + `src/styles.css` / `src/styles.scss`; componentes sin `*.html` |
+| Estilos | **Tailwind CSS v4** (utilidades en templates) + `src/styles.css` global; sin `*.css` por componente salvo necesidad real |
+| Template | **Inline si ≤50 líneas; `templateUrl` a `.html` propio si supera 50** (ver [ADR 0003](./docs/adr/0003-templates-separados-y-convenciones-v20.md)) |
 | TypeScript | Modo **estricto** + `strictTemplates` obligatorio |
 | Enrutamiento | `Router` con **lazy loading** de features |
 | UI en core | **Prohibida** |
@@ -25,7 +26,8 @@ Este contrato alinea a todos los contribuidores con una arquitectura Angular ent
 
 - **NgModules** (`NgModule`, `*Module.ts` de aplicación): no crear, no restaurar, no sugerir.
 - Añadir archivos **JavaScript** de producto o tooling (usar `.ts`).
-- Crear `templateUrl` / `styleUrl` hacia `.html`/`.scss` de componente (salvo ADR).
+- Template inline en un componente cuyo template supera 50 líneas: extraer a `.html` propio vía `templateUrl` (ver [ADR 0003](./docs/adr/0003-templates-separados-y-convenciones-v20.md)).
+- Crear `styleUrl`/`*.css` de componente sin necesidad real (Tailwind ya cubre el 100% de los casos actuales).
 - Desactivar el modo estricto de TypeScript sin ADR aprobado.
 - Colocar componentes, templates o estilos de UI dentro de `core/`.
 - Acoplar `shared/` a lógica de negocio o a imports de `features/`.
@@ -169,6 +171,7 @@ Antes de escribir código, el agente debe haber leído:
 2. `.cloude/system-prompt.md`
 3. El `README.md` (arquitectura y convenciones)
 4. `_bmad-output/project-context.md` (si el flujo es BMAD)
+5. `docs/seguimiento.md` para saber qué está hecho y qué falta
 
 Para guía técnica de Angular por tema (signals, forms, DI, HTTP, routing, performance, testing, etc.), consultar la skill compartida `.cloude/angular-developer/SKILL.md` y sus `references/` (versión para Claude Code / equipo). Quienes usen Cursor pueden mantener una copia local en `.cursor/skills/angular-developer/` (ignorada por Git). Ante conflicto, este contrato prevalece sobre la skill y sobre BMAD.
 
@@ -198,13 +201,13 @@ Primera acción recomendada: invocar `bmad-help`.
 ## 7. Checklist previo a un PR / entrega de agente
 
 - [ ] Sin NgModules nuevos ni archivos `.js` de aplicación
-- [ ] Componentes con `template`/`styles` inline (TypeScript-only)
+- [ ] Template inline si ≤50 líneas; `templateUrl` a `.html` propio si supera 50. Sin `.css` de componente salvo necesidad real
 - [ ] Archivo en la capa correcta (`core` / `shared` / `features` / `layout`)
 - [ ] Feature nueva con lazy loading
 - [ ] Estado local con Signals; asincronía con RxJS
 - [ ] JSDoc en toda entidad nueva pública o compleja
 - [ ] Decisiones no triviales documentadas (inline y/o ADR)
-- [ ] SCSS global solo en `styles.scss`; sin romper strict TypeScript
+- [ ] Estilos globales solo en `styles.css`; sin romper strict TypeScript
 - [ ] No se alteró la arquitectura de carpetas sin ADR
 
 ---

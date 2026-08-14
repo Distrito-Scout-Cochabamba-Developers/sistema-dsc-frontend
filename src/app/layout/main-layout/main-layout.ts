@@ -1,26 +1,27 @@
 /**
- * Shell estructural de la aplicación (navbar + área de contenido).
- * Sin lógica de negocio; solo composición de layout y `router-outlet`.
+ * Shell DSC: navbar, contenido y footer alineados al diseño de asistencia.
+ * Sin lógica de negocio; solo composición estructural.
  */
-import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+
+import { AuthSessionService } from '@core/services/auth-session.service';
+import { DscLogoBadge } from '@shared/components/dsc-logo-badge';
+import { FooterLinkGroup } from '@shared/components/footer-link-group';
 
 @Component({
   selector: 'app-main-layout',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, RouterOutlet],
-  template: `
-    <div class="grid min-h-dvh grid-rows-[auto_1fr_auto] bg-surface text-ink">
-      <header class="border-b border-border px-6 py-4">
-        <a class="font-bold tracking-wide text-ink no-underline" routerLink="/">Sistema DSC</a>
-      </header>
-      <main class="p-6">
-        <router-outlet />
-      </main>
-      <footer class="border-t border-border px-6 py-4 text-sm text-muted">
-        <span>Sistema DSC Frontend</span>
-      </footer>
-    </div>
-  `,
+  imports: [RouterLink, RouterLinkActive, RouterOutlet, DscLogoBadge, FooterLinkGroup],
+  templateUrl: './main-layout.html',
 })
-export class MainLayout {}
+export class MainLayout {
+  /** Sesión mock para demostrar login / logout en el shell. */
+  protected readonly auth = inject(AuthSessionService);
+
+  protected readonly currentYear = new Date().getFullYear();
+
+  protected onAuthClick(): void {
+    this.auth.toggleDemoSession();
+  }
+}

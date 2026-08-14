@@ -55,10 +55,13 @@ Norma del repositorio:
 src/app/
 ├── core/           # Singletons (guards, interceptors, services, tokens) — sin UI
 ├── shared/         # Dumb components, directives, pipes, utils
-├── features/       # Dominios lazy-loaded (ej. home/)
+├── features/       # Dominios lazy-loaded (ej. asistencia/)
 ├── layout/         # Shell (main-layout)
-└── docs/           # Documentación técnica de apoyo
+└── docs/           # Documentación técnica de apoyo embebida
+docs/               # Documentación de proyecto (seguimiento, features, ADRs)
 docs/adr/           # Architecture Decision Records
+docs/seguimiento.md # Tablero de avance (hecho / pendiente)
+docs/features/      # Documentación por feature
 ```
 
 ### Alias TypeScript
@@ -81,7 +84,7 @@ docs/adr/           # Architecture Decision Records
 2. TypeScript `strict` + `strictTemplates`.
 3. JSDoc obligatorio en servicios, componentes, interfaces públicas y funciones complejas.
 4. Features con `loadChildren` / `loadComponent`.
-5. Agentes: leer `agents.md`, `.cloude/system-prompt.md` y `_bmad-output/project-context.md` antes de codificar.
+5. Agentes: leer `agents.md`, `.cloude/system-prompt.md`, `_bmad-output/project-context.md` y `docs/seguimiento.md` antes de codificar.
 
 ## BMAD Method
 
@@ -115,6 +118,9 @@ Arranque: en Claude Code o Cursor, invocar **`bmad-help`**.
 | Archivo | Rol |
 | ------- | --- |
 | [`agents.md`](./agents.md) | Contrato de desarrollo (prevalece) |
+| [`docs/seguimiento.md`](./docs/seguimiento.md) | Tablero hecho / pendiente |
+| [`docs/features/asistencia-registro.md`](./docs/features/asistencia-registro.md) | Feature registro de asistencia |
+| [`docs/`](./docs/README.md) | Índice de documentación técnica |
 | [`_bmad-output/project-context.md`](./_bmad-output/project-context.md) | Contexto BMAD / brownfield |
 | [`.cloude/system-prompt.md`](./.cloude/system-prompt.md) | System prompt obligatorio |
 | [`.cloude/angular-developer/`](./.cloude/angular-developer/SKILL.md) | Skill de Angular compartida |
