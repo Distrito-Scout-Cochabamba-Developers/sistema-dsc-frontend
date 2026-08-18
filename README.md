@@ -34,6 +34,14 @@ pnpm start       # http://localhost:4200/
 | `pnpm test` | Unit tests (Vitest) |
 | `pnpm structure` | Crea/verifica carpetas Core/Shared/Features/Layout/docs (`scripts/setup-app-structure.mts`) |
 
+## API en desarrollo
+
+`pnpm start` proxifica `/api` a `http://localhost:5090`. La API no declara CORS.
+
+Deep link: http://localhost:4200/asistencia/mod-liderazgo-20241024
+
+El código debe existir como `training_module.code`. Ver [docs/features/asistencia-backend-gaps.md](./docs/features/asistencia-backend-gaps.md).
+
 ## TypeScript-only
 
 Norma del repositorio:

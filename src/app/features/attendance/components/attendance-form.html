@@ -74,6 +74,15 @@
           CI no encontrado en el distrito. Completa tus datos para un
           registro parcial.
         </p>
+      } @else if (ciStatus() === 'error') {
+        <p id="ci-hint" class="mt-1.5 text-sm text-danger">{{ lookupError() }}</p>
+        <button
+          type="button"
+          class="mt-2 text-sm font-semibold text-dsc underline"
+          (click)="retryLookup()"
+        >
+          Reintentar búsqueda
+        </button>
       }
     </div>
 
@@ -147,15 +156,25 @@
     </div>
 
     @if (submitError()) {
-      <p class="rounded-lg bg-danger-soft px-3 py-2 text-sm text-danger" role="alert">
-        {{ submitError() }}
-      </p>
+      <div class="rounded-lg bg-danger-soft px-3 py-2 text-sm text-danger" role="alert">
+        <p>{{ submitError() }}</p>
+        @if (submitRetryable()) {
+          <button
+            type="button"
+            class="mt-2 font-semibold text-dsc-dark underline"
+            (click)="retrySubmit()"
+          >
+            Reintentar registro
+          </button>
+        }
+      </div>
     }
 
     <button
       type="submit"
       class="flex w-full items-center justify-center gap-2 rounded-xl bg-dsc px-4 py-3.5 text-sm font-bold text-white transition hover:bg-dsc-dark disabled:cursor-not-allowed disabled:opacity-60"
       [disabled]="submitting()"
+      [attr.aria-busy]="submitting()"
     >
       <span aria-hidden="true">👤✓</span>
       {{ submitting() ? 'Registrando…' : 'Registrar Asistencia' }}

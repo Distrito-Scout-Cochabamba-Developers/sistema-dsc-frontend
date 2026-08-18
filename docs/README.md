@@ -6,6 +6,8 @@
 | --------- | --------- |
 | [seguimiento.md](./seguimiento.md) | **Seguimiento**: hecho, en curso y pendiente |
 | [features/asistencia-registro.md](./features/asistencia-registro.md) | Feature de registro de asistencia (frontend) |
+| [features/contrato-api-asistencia.md](./features/contrato-api-asistencia.md) | Contrato HTTP lookup + register |
+| [features/asistencia-backend-gaps.md](./features/asistencia-backend-gaps.md) | Límites de la API actual |
 | [adr/](./adr/) | Architecture Decision Records |
 
 ## Contratos fuera de `docs/`

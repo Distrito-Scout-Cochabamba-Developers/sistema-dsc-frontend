@@ -42,6 +42,6 @@ export class Landing {
 
   /** Texto de apoyo de la vista inicial. */
   protected readonly subtitle = signal(
-    'Frontend Angular standalone para formación scout. Prueba el registro de asistencia a módulos.',
+        'Registro digital de asistencia a módulos. Requiere la API DSC en marcha para lookup y persistencia.',
   );
 }

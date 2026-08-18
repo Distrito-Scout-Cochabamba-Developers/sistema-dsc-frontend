@@ -20,8 +20,14 @@ export class AuthSessionService {
   /** Sesión actual; `null` si el dirigente no está autenticado. */
   private readonly sessionState = signal<LeaderSession | null>(MOCK_SESSION);
 
+  /** JWT real cuando el backend lo emita. */
+  private readonly tokenState = signal<string | null>(null);
+
   /** Perfil autenticado o `null`. */
   readonly session = this.sessionState.asReadonly();
+
+  /** Token Bearer opcional para el interceptor. */
+  readonly accessToken = this.tokenState.asReadonly();
 
   /** Indica si hay sesión activa. */
   readonly isAuthenticated = computed(() => this.sessionState() !== null);
@@ -31,6 +37,7 @@ export class AuthSessionService {
    */
   clearSession(): void {
     this.sessionState.set(null);
+    this.tokenState.set(null);
   }
 
   /**
@@ -38,6 +45,7 @@ export class AuthSessionService {
    */
   restoreDemoSession(): void {
     this.sessionState.set(MOCK_SESSION);
+    this.tokenState.set(null);
   }
 
   /**

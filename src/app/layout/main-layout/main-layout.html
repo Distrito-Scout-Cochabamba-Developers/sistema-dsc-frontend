@@ -1,4 +1,10 @@
 <div class="grid min-h-dvh grid-rows-[auto_1fr_auto] bg-surface text-ink">
+  <a
+    href="#contenido-principal"
+    class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-dsc focus:px-3 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
+  >
+    Saltar al contenido
+  </a>
   <header class="sticky top-0 z-20 border-b border-border bg-elevated/95 backdrop-blur">
     <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 md:px-6">
       <a class="flex items-center gap-2 no-underline" routerLink="/">
@@ -34,13 +40,18 @@
         type="button"
         class="rounded-lg bg-dsc-navy px-4 py-2 text-sm font-semibold text-white transition hover:bg-dsc-dark"
         (click)="onAuthClick()"
+        [attr.aria-label]="
+          auth.isAuthenticated()
+            ? 'Cerrar sesión de demostración'
+            : 'Iniciar sesión de demostración (sin API de auth)'
+        "
       >
         {{ auth.isAuthenticated() ? 'Cerrar sesión' : 'Iniciar Sesión' }}
       </button>
     </div>
   </header>
 
-  <main class="min-w-0">
+  <main id="contenido-principal" class="min-w-0" tabindex="-1">
     <router-outlet />
   </main>
 
