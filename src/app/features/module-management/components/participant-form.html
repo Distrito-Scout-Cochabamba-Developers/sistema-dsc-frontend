@@ -1,0 +1,75 @@
+<form
+  class="rounded-2xl border border-border bg-elevated p-5 shadow-md"
+  (submit)="onSubmit($event)"
+  novalidate
+>
+  <h2 class="mb-4 text-lg font-bold text-ink">Añadir participante</h2>
+  @if (disabled()) {
+    <p class="mb-6 rounded-2xl bg-warning-bg px-4 py-3 text-warning-ink">
+      Este módulo tiene la inscripción cerrada. No se pueden añadir participantes.
+    </p>
+  }
+
+  <fieldset [disabled]="disabled()" class="space-y-4 disabled:opacity-50">
+    <div>
+      <label class="mb-1.5 block text-sm font-semibold text-ink" for="ci">Carnet de Identidad (CI)</label>
+      <input
+        id="ci"
+        type="text"
+        inputmode="numeric"
+        placeholder="Solo números"
+        class="w-full rounded-xl border border-border bg-elevated px-4 py-3 text-ink outline-none ring-dsc/30 placeholder:text-muted/60 focus:ring-2"
+        [class.border-danger]="showCiError()"
+        [attr.aria-invalid]="showCiError()"
+        [formField]="participantForm.ci"
+        (blur)="onCiBlur()"
+      />
+      @if (showCiError()) {
+        <p class="mt-1.5 text-sm text-danger">Ingresa un CI numérico válido.</p>
+      } @else if (foundExisting()) {
+        <p class="mt-1.5 text-sm font-medium text-dsc">✓ Dirigente ya registrado. Se agregará a este módulo.</p>
+      }
+    </div>
+
+    <div>
+      <label class="mb-1.5 block text-sm font-semibold text-ink" for="fullName">Nombre Completo</label>
+      <input
+        id="fullName"
+        type="text"
+        class="w-full rounded-xl border border-border bg-elevated px-4 py-3 text-ink outline-none ring-dsc/30 focus:ring-2 read-only:opacity-60"
+        [class.border-danger]="showNameError()"
+        [attr.aria-invalid]="showNameError()"
+        [formField]="participantForm.fullName"
+        (blur)="touchedName.set(true)"
+      />
+      @if (showNameError()) {
+        <p class="mt-1.5 text-sm text-danger">Este campo es obligatorio</p>
+      }
+    </div>
+
+    <div>
+      <label class="mb-1.5 block text-sm font-semibold text-ink" for="phone">Teléfono de contacto (Móvil)</label>
+      <input
+        id="phone"
+        type="tel"
+        inputmode="numeric"
+        placeholder="Ej. 70000000"
+        class="w-full rounded-xl border border-border bg-elevated px-4 py-3 text-ink outline-none ring-dsc/30 placeholder:text-muted/60 focus:ring-2 read-only:opacity-60"
+        [class.border-danger]="showPhoneError()"
+        [attr.aria-invalid]="showPhoneError()"
+        [formField]="participantForm.phone"
+        (blur)="touchedPhone.set(true)"
+      />
+      @if (showPhoneError()) {
+        <p class="mt-1.5 text-sm text-danger">Ingresa un móvil de 8 dígitos.</p>
+      }
+    </div>
+
+    <button
+      type="submit"
+      class="flex w-full items-center justify-center gap-2 rounded-xl bg-dsc px-4 py-3.5 text-sm font-bold text-white transition hover:bg-dsc-dark"
+    >
+      Añadir participante
+    </button>
+  </fieldset>
+</form>

@@ -38,6 +38,13 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'secretaria',
+    loadChildren: () =>
+      import('@features/module-management/module-management.routes').then(
+        (m) => m.MODULE_MANAGEMENT_ROUTES,
+      ),
+  },
+  {
     path: '**',
     redirectTo: '',
   },

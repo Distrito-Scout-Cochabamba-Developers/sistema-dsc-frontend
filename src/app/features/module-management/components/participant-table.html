@@ -1,0 +1,92 @@
+<div class="rounded-2xl border border-border bg-elevated shadow-md">
+  <h2 class="p-5 pb-0 text-lg font-bold text-ink">Participantes</h2>
+
+  <div class="mt-4 overflow-hidden rounded-b-2xl">
+    <table class="w-full text-left text-sm">
+      <thead class="bg-dsc-soft text-xs font-semibold text-dsc-dark">
+        <tr>
+          <th class="px-4 py-3">CI</th>
+          <th class="px-4 py-3">Nombre</th>
+          <th class="px-4 py-3">Teléfono</th>
+          <th class="px-4 py-3">Asistió</th>
+          <th class="px-4 py-3"></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (record of participants(); track record.enrollmentId) {
+          @if (editingId() === record.enrollmentId) {
+            <tr class="border-t border-border">
+              <td class="px-4 py-2">
+                <input
+                  class="w-full rounded-lg border border-border px-2 py-1 text-ink"
+                  [value]="draft().ci"
+                  (input)="draft.set({ ...draft(), ci: $any($event.target).value })"
+                />
+              </td>
+              <td class="px-4 py-2">
+                <input
+                  class="w-full rounded-lg border border-border px-2 py-1 text-ink"
+                  [value]="draft().fullName"
+                  (input)="draft.set({ ...draft(), fullName: $any($event.target).value })"
+                />
+              </td>
+              <td class="px-4 py-2">
+                <input
+                  class="w-full rounded-lg border border-border px-2 py-1 text-ink"
+                  [value]="draft().phone"
+                  (input)="draft.set({ ...draft(), phone: $any($event.target).value })"
+                />
+              </td>
+              <td class="px-4 py-2 text-muted">{{ record.attended ? 'Sí' : 'No' }}</td>
+              <td class="px-4 py-2 text-right">
+                <button
+                  type="button"
+                  class="mr-2 text-sm font-semibold text-dsc underline"
+                  (click)="saveEdit(record.enrollmentId)"
+                >
+                  Guardar
+                </button>
+                <button type="button" class="text-sm text-muted underline" (click)="cancelEdit()">Cancelar</button>
+              </td>
+            </tr>
+            @if (draftError()) {
+              <tr>
+                <td colspan="5" class="px-4 pb-2 text-sm text-danger">{{ draftError() }}</td>
+              </tr>
+            }
+          } @else {
+            <tr class="border-t border-border">
+              <td class="px-4 py-2 text-ink">{{ record.ci }}</td>
+              <td class="px-4 py-2 text-ink">{{ record.fullName }}</td>
+              <td class="px-4 py-2 text-ink">{{ record.phone }}</td>
+              <td class="px-4 py-2">
+                <button
+                  type="button"
+                  class="text-sm font-semibold text-dsc underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-50"
+                  [disabled]="disabled()"
+                  (click)="toggleAttended(record)"
+                >
+                  {{ record.attended ? 'Sí' : 'No' }}
+                </button>
+              </td>
+              <td class="px-4 py-2 text-right">
+                <button
+                  type="button"
+                  class="text-sm font-semibold text-dsc underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-50"
+                  [disabled]="disabled()"
+                  (click)="startEdit(record)"
+                >
+                  Corregir
+                </button>
+              </td>
+            </tr>
+          }
+        } @empty {
+          <tr>
+            <td colspan="5" class="px-4 py-6 text-center text-muted">Aún no hay participantes en este módulo.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
