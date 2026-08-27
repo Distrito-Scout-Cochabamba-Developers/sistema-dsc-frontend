@@ -1,15 +1,17 @@
 /**
  * Bootstrap de la aplicación Angular (raíz).
- * Compone únicamente el shell de layout; las páginas viven en `features/` vía lazy loading.
+ * El outlet elige entre login a pantalla completa y el shell DSC.
  */
-import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { MainLayout } from '@layout/main-layout/main-layout';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+
+import { AuthSessionService } from '@core/services/auth-session.service';
 
 @Component({
   selector: 'app-root',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MainLayout],
-  template: `<app-main-layout />`,
+  imports: [RouterOutlet],
+  template: `<router-outlet />`,
   styles: `
     :host {
       display: block;
@@ -17,4 +19,8 @@ import { MainLayout } from '@layout/main-layout/main-layout';
     }
   `,
 })
-export class App {}
+export class App {
+  constructor() {
+    inject(AuthSessionService).hydrateFromServer();
+  }
+}
