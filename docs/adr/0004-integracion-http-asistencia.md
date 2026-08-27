@@ -15,7 +15,7 @@ El backend ya expone `GET api/attendance/lookup-ci/{ci}` y `POST api/attendance/
 - Proxy local `/api` → `http://localhost:5090` porque la API no declara CORS.
 - `sessionToken` = `TrainingModule.Code` (token de la ruta).
 - Metadatos de sesión: presentación local (no hay GET de convocatoria).
-- Auth: interceptor listo; el toggle del navbar sigue siendo demo (sin JWT).
+- Auth: interceptor listo para Bearer (sin uso); la sesión real usa cookie (ADR 0005).
 
 ## Consecuencias
 

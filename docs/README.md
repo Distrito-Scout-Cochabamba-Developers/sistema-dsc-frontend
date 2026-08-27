@@ -5,6 +5,8 @@
 | Documento | Contenido |
 | --------- | --------- |
 | [seguimiento.md](./seguimiento.md) | **Seguimiento**: hecho, en curso y pendiente |
+| [features/auth-login.md](./features/auth-login.md) | Pantalla de login y dónde poner el emblema |
+| [features/auth-backend-gaps.md](./features/auth-backend-gaps.md) | Límites de auth en la API actual |
 | [features/asistencia-registro.md](./features/asistencia-registro.md) | Feature de registro de asistencia (frontend) |
 | [features/contrato-api-asistencia.md](./features/contrato-api-asistencia.md) | Contrato HTTP lookup + register |
 | [features/asistencia-backend-gaps.md](./features/asistencia-backend-gaps.md) | Límites de la API actual |
