@@ -1,7 +1,7 @@
 # Seguimiento del proyecto
 
-- **Última actualización:** 2026-08-04
-- **Estado general:** Scaffold Angular listo; primera feature de dominio (`asistencia`) en UI mock sin backend.
+- **Última actualización:** 2026-08-18
+- **Estado general:** Feature `attendance` conectada a lookup y POST de la API DSC. Auth, CORS y GET de sesión siguen pendientes en backend.
 
 Este archivo es el tablero de seguimiento. Márcalo al avanzar (cambia `Pendiente` → `En curso` → `Hecho`).
 
@@ -37,25 +37,25 @@ Este archivo es el tablero de seguimiento. Márcalo al avanzar (cambia `Pendient
 
 User story: *Como Dirigente Scout (Participante), quiero registrar mi asistencia a un módulo ingresando mis datos desde el dispositivo…*
 
-Detalle: [features/asistencia-registro.md](./features/asistencia-registro.md)
+Detalle: [features/asistencia-registro.md](./features/asistencia-registro.md) · Contrato: [features/contrato-api-asistencia.md](./features/contrato-api-asistencia.md) · Gaps: [features/asistencia-backend-gaps.md](./features/asistencia-backend-gaps.md)
 
 | ID | Criterio / tarea | Estado | Notas |
 | -- | ---------------- | ------ | ----- |
 | A-01 | UI alineada al diseño (navbar, form, sidebar, footer) | Hecho | Ruta `/asistencia/:sessionId` |
 | A-02 | Acceso por link directo / QR (param `sessionId`) | Hecho | Demo: `mod-liderazgo-20241024` |
 | A-03 | Campos obligatorios: Nombre, CI, Extensión, Teléfono | Hecho | Signal Forms |
-| A-04 | Validación numérica de CI (7–10 dígitos) | Hecho | Mock en frontend |
-| A-05 | Autocomplete de nombre si CI existe en directorio | Hecho | Mock: `12345678`, `87654321` |
-| A-06 | Mensaje de éxito con resumen del módulo | Hecho | Pantalla de confirmación |
-| A-07 | Prefill si dirigente autenticado | Hecho | `AuthSessionService` mock |
-| A-08 | Registro parcial si no está en el sistema | Hecho | Flag `partialRegistration` |
-| A-09 | Conectar lookup CI a API real | Pendiente | Reemplazar `AdultosDirectoryService` |
-| A-10 | Conectar registro a API real | Pendiente | Reemplazar `AsistenciaRegistroService` |
-| A-11 | Auth real (login / token / sesión) | Pendiente | Hoy toggle demo en navbar |
-| A-12 | Generación/consumo de QR de sesión (backend o admin) | Pendiente | Frontend solo consume el deep link |
-| A-13 | Tests unitarios de la página / validaciones | Hecho | `asistencia-page.spec.ts`, 11/11 tests (sesión inválida, autocompletado, registro parcial, validaciones CI/teléfono, flujo de éxito) |
-| A-14 | Estados de error de red / retry UX | Pendiente | Tras API |
-| A-15 | Accesibilidad (ARIA labels, foco, contraste) | En curso | `aria-invalid`/`aria-describedby` en los 4 campos del formulario; falta auditoría de contraste/foco completa |
+| A-04 | Validación numérica de CI (7–10 dígitos) | Hecho | UI 7–10; API acepta 4–10 |
+| A-05 | Autocomplete de nombre si CI existe en directorio | Hecho | `GET api/attendance/lookup-ci/{ci}` |
+| A-06 | Mensaje de éxito con resumen del módulo | Hecho | `ModuleAttendanceResultDto` |
+| A-07 | Prefill si dirigente autenticado | Hecho | Solo perfil demo del navbar (sin JWT) |
+| A-08 | Registro parcial si no está en el sistema | Hecho | 404 lookup + `isPartialRegistration` |
+| A-09 | Conectar lookup CI a API real | Hecho | `AdultDirectoryService` |
+| A-10 | Conectar registro a API real | Hecho | `AttendanceRegistrationService` |
+| A-11 | Auth real (login / token / sesión) | Bloqueado | La API no expone login/JWT. Interceptor Bearer listo. Toggle demo. |
+| A-12 | Generación/consumo de QR de sesión | En curso | **Consumo hecho** (deep link + QR local). **Generación admin bloqueada**. |
+| A-13 | Tests unitarios de la página / validaciones | Hecho | Página + HTTP + utils |
+| A-14 | Estados de error de red / retry UX | Hecho | Problem Details, retry GET 5xx, botones Reintentar |
+| A-15 | Accesibilidad (ARIA labels, foco, contraste) | Hecho | Labels, `aria-invalid`, skip link, foco al primer error |
 
 ---
 
@@ -63,11 +63,11 @@ Detalle: [features/asistencia-registro.md](./features/asistencia-registro.md)
 
 | ID | Ítem | Estado | Dependencia |
 | -- | ---- | ------ | ----------- |
-| B-01 | Contrato OpenAPI / DTOs de adultos y asistencia | En curso | Propuesta documentada en [ADR 0002](./adr/0002-contrato-api-asumido-registro-asistencia.md); falta validación del Architect backend |
-| B-02 | `HttpClient` + interceptores (auth, errores) | Pendiente | Tras B-01 |
-| B-03 | Environments (`apiBaseUrl` dev/prod) | Pendiente | — |
-| B-04 | Manejo de errores HTTP tipados | Pendiente | B-02 |
-| B-05 | CORS / cookies / refresh token (según diseño) | Pendiente | Backend |
+| B-01 | Contrato OpenAPI / DTOs de adultos y asistencia | Hecho | Contrato real documentado; OpenAPI en Development del backend no genera cliente |
+| B-02 | `HttpClient` + interceptores (auth, errores) | Hecho | `withFetch`, `authInterceptor`, `httpRetryInterceptor` |
+| B-03 | Environments (`apiBaseUrl` dev/prod) | Hecho | `src/environments` + proxy local |
+| B-04 | Manejo de errores HTTP tipados | Hecho | RFC 7807 `detail` + `status === 0` |
+| B-05 | CORS / cookies / refresh token (según diseño) | Bloqueado | **CORS no está en `Program.cs`**. Dev: proxy. No hay cookies ni refresh. |
 
 ---
 
@@ -92,11 +92,13 @@ Detalle: [features/asistencia-registro.md](./features/asistencia-registro.md)
 | Q-02 | CI (build + test en PR) | Pendiente | — |
 | Q-03 | Coverage mínimo en features críticas | Pendiente | — |
 | Q-04 | Instalar `uv` (recomendado por BMAD) | Pendiente | Opcional para workflows Python |
-| Q-05 | Primer ADR formal (mocks vs API) | Hecho | [ADR 0001](./adr/0001-mocks-frontend-antes-de-api.md), [ADR 0002](./adr/0002-contrato-api-asumido-registro-asistencia.md), [ADR 0003](./adr/0003-templates-separados-y-convenciones-v20.md) |
+| Q-05 | Primer ADR formal (mocks vs API) | Hecho | ADR 0001–0004 |
 
 ---
 
 ## Cómo probar lo actual
+
+Arrancar la API (`http://localhost:5090`) y el frontend:
 
 ```bash
 pnpm install
@@ -104,16 +106,20 @@ pnpm start
 ```
 
 - Inicio: http://localhost:4200/
-- Registro demo: http://localhost:4200/asistencia/mod-liderazgo-20241024
-- CI con autocomplete: `12345678` o `87654321`
-- CI desconocido: cualquier otro numérico válido → registro parcial
-- Auth demo: botón **Iniciar Sesión** / **Cerrar sesión** en el navbar
+- Registro: http://localhost:4200/asistencia/mod-liderazgo-20241024
+- Proxy `/api` → `:5090` (la API no tiene CORS)
+- CI conocido: el que exista en `person.id_card`
+- CI desconocido: 7–10 dígitos → registro parcial si existe el `TrainingModule.Code`
+- Duplicado → 409
+- Auth demo: navbar (no llama a la API)
+
+Si el POST da 404, falta `training_module.code = mod-liderazgo-20241024`.
 
 ---
 
-## Próximo paso sugerido
+## Próximo paso sugerido (backend / producto)
 
-1. Definir contrato API con backend (B-01).
-2. Sustituir mocks de `AdultosDirectoryService` y `AsistenciaRegistroService` (A-09, A-10).
-3. Añadir tests de la feature `asistencia` (A-13).
-4. Abrir PRD/epic BMAD si el alcance crece (`bmad-help` / `bmad-create-prd`).
+1. CORS o reverse proxy same-origin (B-05).
+2. GET de sesión/convocatoria y semilla del módulo demo.
+3. Definir si el QR usa `Code` o `QrToken`.
+4. Login real (A-11 / P-04).

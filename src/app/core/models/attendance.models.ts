@@ -54,14 +54,14 @@ export interface ModuleSession {
   readonly moduleTitle: string;
   readonly moduleName: string;
   readonly description: string;
-  readonly dateLabel: string;
-  readonly timeLabel: string;
+  readonly dateLabel?: string;
+  readonly timeLabel?: string;
   readonly imageAlt: string;
   readonly imageUrl: string;
 }
 
 /**
- * Payload de registro de asistencia (frontend; contrato futuro con API).
+ * Payload de registro de asistencia enviado desde el formulario.
  */
 export interface AttendanceRegistrationPayload {
   readonly sessionId: string;
@@ -69,7 +69,6 @@ export interface AttendanceRegistrationPayload {
   readonly fullName: string;
   readonly extension: DepartmentCode;
   readonly phone: string;
-  readonly estado: AttendanceRegistrationStatus;
 }
 
 /**
