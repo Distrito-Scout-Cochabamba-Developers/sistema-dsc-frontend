@@ -1,0 +1,63 @@
+<header class="sticky top-0 z-20 border-b border-border bg-elevated/95 backdrop-blur">
+  <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 md:px-6">
+    <a
+      class="text-xl font-bold tracking-tight text-dsc-navy no-underline"
+      routerLink="/"
+      aria-label="Ir al inicio de DSC"
+    >
+      DSC
+    </a>
+
+    <nav class="hidden items-center gap-6 text-sm font-medium md:flex" aria-label="Principal">
+      <a
+        routerLink="/"
+        routerLinkActive="border-dsc text-dsc"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="border-b-2 border-transparent pb-1 text-ink no-underline transition hover:text-dsc"
+      >
+        Inicio
+      </a>
+      <span class="border-b-2 border-transparent pb-1 text-muted/60" aria-disabled="true"
+        >Calendario</span
+      >
+      <a
+        routerLink="/kardex"
+        routerLinkActive="border-dsc text-dsc"
+        class="border-b-2 border-transparent pb-1 text-ink no-underline transition hover:text-dsc"
+      >
+        Kardex
+      </a>
+      <span class="border-b-2 border-transparent pb-1 text-muted/60" aria-disabled="true"
+        >Mapa</span
+      >
+      <span class="border-b-2 border-transparent pb-1 text-muted/60" aria-disabled="true"
+        >Próximos Eventos</span
+      >
+    </nav>
+
+    <button
+      type="button"
+      class="rounded-lg bg-dsc px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-dsc-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dsc"
+      (click)="onAuthClick()"
+    >
+      {{ isAuthenticated() ? 'Cerrar sesión' : 'Iniciar Sesión' }}
+    </button>
+  </div>
+  <nav
+    data-testid="mobile-navigation"
+    class="mx-auto flex max-w-6xl items-center gap-5 overflow-x-auto border-t border-border px-4 py-2 text-sm font-medium md:hidden"
+    aria-label="Principal móvil"
+  >
+    <a
+      routerLink="/"
+      routerLinkActive="text-dsc"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="shrink-0 text-ink no-underline"
+    >
+      Inicio
+    </a>
+    <a routerLink="/kardex" routerLinkActive="text-dsc" class="shrink-0 text-ink no-underline">
+      Kardex
+    </a>
+  </nav>
+</header>

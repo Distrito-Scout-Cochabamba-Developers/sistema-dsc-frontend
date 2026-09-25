@@ -12,6 +12,14 @@
 .pnpm-store/
 home/
 
+# Codebase Memory (índice local opcional, no versionar)
+.codebase-memory/
+
+# Documentación local generada por Codex (no versionar)
+/_bmad-output/implementation-artifacts/spec-install-codebase-memory-index-project.md
+/_bmad-output/implementation-artifacts/spec-kardex-detail-dotnet-contract.md
+/docs/features/kardex-dirigentes.md
+
 # Node
 /node_modules
 npm-debug.log

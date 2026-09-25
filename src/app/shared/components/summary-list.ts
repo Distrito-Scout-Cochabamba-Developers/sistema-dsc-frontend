@@ -20,7 +20,7 @@ export interface SummaryItem {
         <div class="flex justify-between gap-4">
           <dt class="text-muted">{{ item.label }}</dt>
           <dd class="font-semibold text-ink">{{ item.value }}</dd>
-        </div>
+        </div>   
       }
       <ng-content />
     </dl>

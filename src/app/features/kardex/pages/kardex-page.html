@@ -1,0 +1,218 @@
+<section class="min-h-full bg-surface">
+  <div class="mx-auto max-w-6xl px-4 pb-16 pt-8 md:px-6 md:pt-10">
+    <header class="mb-10">
+      <h1
+        class="m-0 text-headline-xl font-bold tracking-tight text-ink md:text-headline-xl-desktop"
+      >
+        Kardex de Dirigentes
+      </h1>
+      <p class="mt-2 text-body text-muted">Gestión y consulta de perfiles de dirigentes.</p>
+    </header>
+
+    <div class="mb-10 rounded-xl bg-elevated p-5 shadow-[0_12px_32px_rgba(0,158,226,0.10)] md:p-6">
+      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <label class="grid gap-2 text-sm font-semibold text-slate-600">
+          <span>Buscar Dirigente</span>
+          <span class="relative">
+            <svg
+              class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-4-4" />
+            </svg>
+            <input
+              type="search"
+              class="h-10 w-full rounded-lg border border-slate-300 bg-white pl-10 pr-3 font-normal text-ink outline-none transition placeholder:text-muted/80 focus:border-dsc focus:ring-2 focus:ring-dsc/15"
+              placeholder="Nombre del dirigente..."
+              [value]="searchTerm()"
+              (input)="updateSearch($event)"
+            />
+          </span>
+        </label>
+
+        <label class="grid gap-2 text-sm font-semibold text-slate-600">
+          <span>Grupo Scout</span>
+          <select
+            class="h-10 w-full rounded-lg border border-slate-300 bg-white px-3 font-normal text-ink outline-none transition focus:border-dsc focus:ring-2 focus:ring-dsc/15"
+            [value]="selectedGroup()"
+            [disabled]="filterState().kind !== 'ready'"
+            (change)="updateGroup($event)"
+          >
+            <option value="">Todos los Grupos</option>
+            @for (group of filterOptions().scoutGroups; track group) {
+              <option [value]="group">{{ group }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="grid gap-2 text-sm font-semibold text-slate-600">
+          <span>Rama</span>
+          <select
+            class="h-10 w-full rounded-lg border border-slate-300 bg-white px-3 font-normal text-ink outline-none transition focus:border-dsc focus:ring-2 focus:ring-dsc/15"
+            [value]="selectedBranch()"
+            [disabled]="filterState().kind !== 'ready'"
+            (change)="updateBranch($event)"
+          >
+            <option value="">Todas las Ramas</option>
+            @for (branch of filterOptions().branches; track branch) {
+              <option [value]="branch">{{ branch }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="grid gap-2 text-sm font-semibold text-slate-600">
+          <span>Nivel de Formación</span>
+          <select
+            class="h-10 w-full rounded-lg border border-slate-300 bg-white px-3 font-normal text-ink outline-none transition focus:border-dsc focus:ring-2 focus:ring-dsc/15"
+            [value]="selectedTrainingLevel()"
+            [disabled]="filterState().kind !== 'ready'"
+            (change)="updateTrainingLevel($event)"
+          >
+            <option value="">Todos los Niveles</option>
+            @for (level of filterOptions().trainingLevels; track level) {
+              <option [value]="level">{{ level }}</option>
+            }
+          </select>
+        </label>
+      </div>
+
+      @if (filterState().kind === 'error') {
+        <div
+          class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-900"
+          role="alert"
+        >
+          <span>No pudimos cargar los filtros. Puedes buscar por nombre o reintentar.</span>
+          <button
+            data-testid="retry-filters"
+            type="button"
+            class="font-semibold text-dsc hover:text-dsc-dark"
+            (click)="retry()"
+          >
+            Reintentar
+          </button>
+        </div>
+      }
+
+      @let directoryState = state();
+      <div class="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-muted">
+        @if (directoryState.kind === 'ready') {
+          <span>Mostrando {{ directoryState.leaders.length }} dirigentes</span>
+        } @else {
+          <span aria-live="polite">Consulta de dirigentes</span>
+        }
+        <button
+          type="button"
+          class="font-semibold text-dsc transition hover:text-dsc-dark"
+          (click)="clearFilters()"
+        >
+          Limpiar filtros
+        </button>
+      </div>
+    </div>
+
+    @switch (directoryState.kind) {
+      @case ('loading') {
+        <div
+          class="rounded-xl border border-border bg-elevated px-6 py-12 text-center"
+          role="status"
+        >
+          <p class="font-semibold text-ink">Cargando dirigentes</p>
+          <p class="mt-2 text-sm text-muted">Estamos consultando el directorio.</p>
+        </div>
+      }
+      @case ('error') {
+        <div
+          class="rounded-xl border border-red-200 bg-elevated px-6 py-12 text-center"
+          role="alert"
+        >
+          <p class="font-semibold text-ink">No pudimos cargar el directorio</p>
+          <p class="mt-2 text-sm text-muted">Intenta nuevamente en unos momentos.</p>
+          <button
+            data-testid="retry-directory"
+            type="button"
+            class="mt-5 rounded-lg bg-dsc px-4 py-2 text-sm font-semibold text-white hover:bg-dsc-dark"
+            (click)="retry()"
+          >
+            Reintentar
+          </button>
+        </div>
+      }
+      @case ('ready') {
+        @if (directoryState.leaders.length > 0) {
+          <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            @for (leader of directoryState.leaders; track trackByLeader($index, leader)) {
+              <article
+                class="flex min-h-[258px] flex-col rounded-xl border border-border bg-elevated p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+              >
+                <div class="flex items-center gap-4">
+                  @if (leader.avatarUrl) {
+                    <img
+                      class="size-14 rounded-full object-cover"
+                      [src]="leader.avatarUrl"
+                      [alt]="'Foto de ' + leader.fullName"
+                    />
+                  } @else {
+                    <div
+                      class="grid size-14 place-items-center rounded-full text-sm font-bold"
+                      [class]="avatarClass(leader.accent)"
+                      aria-hidden="true"
+                    >
+                      {{ leader.initials }}
+                    </div>
+                  }
+                  <div class="min-w-0">
+                    <h2 class="truncate text-base font-bold text-ink">{{ leader.fullName }}</h2>
+                    <p class="mt-0.5 text-xs text-muted">CI: {{ leader.ci }}</p>
+                  </div>
+                </div>
+
+                <dl class="mt-5 grid gap-2 border-t border-border pt-4 text-sm">
+                  <div class="flex items-start justify-between gap-3">
+                    <dt class="font-semibold text-muted">Cargo:</dt>
+                    <dd class="text-right text-ink">{{ leader.role }}</dd>
+                  </div>
+                  <div class="flex items-start justify-between gap-3">
+                    <dt class="font-semibold text-muted">Grupo:</dt>
+                    <dd class="text-right text-ink">{{ leader.scoutGroup }}</dd>
+                  </div>
+                </dl>
+
+                <span
+                  class="mt-4 inline-flex w-fit rounded-full px-3 py-1 text-[0.6875rem] font-semibold"
+                  [class]="badgeClass(leader.accent)"
+                  >{{ leader.trainingLevel }}</span
+                >
+                <a
+                  [routerLink]="['/kardex', leader.id]"
+                  class="mt-auto pt-5 text-sm font-bold text-dsc no-underline transition hover:text-dsc-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dsc"
+                  >Ver Ficha Completa</a
+                >
+              </article>
+            }
+          </div>
+        } @else {
+          <div
+            class="rounded-xl border border-dashed border-border bg-elevated px-6 py-12 text-center"
+          >
+            <p class="font-semibold text-ink">No encontramos dirigentes con esos filtros.</p>
+            <p class="mt-2 text-sm text-muted">
+              Prueba con otro nombre, CI, grupo o nivel de formación.
+            </p>
+            <button
+              type="button"
+              class="mt-5 rounded-lg bg-dsc px-4 py-2 text-sm font-semibold text-white hover:bg-dsc-dark"
+              (click)="clearFilters()"
+            >
+              Limpiar filtros
+            </button>
+          </div>
+        }
+      }
+    }
+  </div>
+</section>

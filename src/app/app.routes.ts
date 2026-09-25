@@ -18,6 +18,11 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'kardex',
+    loadChildren: () =>
+      import('@features/kardex/kardex.routes').then((m) => m.KARDEX_ROUTES),
+  },
+  {
     path: '**',
     redirectTo: '',
   },
