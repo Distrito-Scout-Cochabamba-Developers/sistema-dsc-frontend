@@ -1,16 +1,15 @@
 /**
- * Directorio de adultos: lookup por CI contra la API y vista de sesión desde el token de la URL.
+ * Directorio de adultos: lookup por CI contra la API.
  */
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of, throwError } from 'rxjs';
 
 import type { ScoutLeaderApiDto } from '@core/models/attendance-api.models';
-import type { DepartmentCode, DistrictAdult, ModuleSession } from '@core/models/attendance.models';
+import type { DepartmentCode, DistrictAdult } from '@core/models/attendance.models';
 import { apiUrl } from '@core/utils/api-url.utils';
 import { isValidDepartmentCode } from '@core/utils/ci.utils';
 import { joinPersonName } from '@core/utils/person-name.utils';
-import { buildModuleSessionView } from '@core/utils/session-presentation.utils';
 
 @Injectable({ providedIn: 'root' })
 export class AdultDirectoryService {
@@ -44,15 +43,6 @@ export class AdultDirectoryService {
           return throwError(() => error);
         }),
       );
-  }
-
-  /**
-   * Vista de sesión para el deep link. No hay GET de sesión en el backend.
-   *
-   * @param sessionId - `TrainingModule.Code`.
-   */
-  getModuleSession(sessionId: string): Observable<ModuleSession | null> {
-    return of(buildModuleSessionView(sessionId));
   }
 
   /**

@@ -1,9 +1,9 @@
 # Feature: Registro de asistencia a módulo
 
-- **Estado:** Integrado con lookup y POST de la API; auth y GET de sesión pendientes en backend
-- **Ruta:** `/asistencia/:sessionId`
+- **Estado:** Catálogo en `/modulos` (GET API). El formulario de asistencia solo se abre al elegir un módulo. Login **completado**. Registro **según rol** pendiente de API.
+- **Rutas:** `/modulos` → `/asistencia/:sessionId`
 - **Demo:** `/asistencia/mod-liderazgo-20241024`
-- **Última actualización:** 2026-08-18
+- **Última actualización:** 2026-10-16
 
 ## User story
 
@@ -16,20 +16,18 @@ src/app/
 ├── core/
 │   ├── models/attendance.models.ts
 │   ├── models/attendance-api.models.ts
-│   ├── interceptors/
-│   └── services/adult-directory.service.ts
-├── features/attendance/
-│   ├── attendance-page.ts
-│   ├── components/attendance-form.ts
-│   └── services/attendance-registration.service.ts
+│   └── services/training-modules.service.ts
+├── features/modules/          # listado; click → /asistencia/:code
+├── features/attendance/       # formulario (no se muestra en el catálogo)
 └── layout/main-layout/
 ```
 
-Ver [contrato-api-asistencia.md](./contrato-api-asistencia.md) y [asistencia-backend-gaps.md](./asistencia-backend-gaps.md).
+Listado: [modulos-catalogo.md](./modulos-catalogo.md). Contrato: [contrato-api-asistencia.md](./contrato-api-asistencia.md). Gaps: [asistencia-backend-gaps.md](./asistencia-backend-gaps.md).
 
 ## Pendiente fuera de este frontend
 
-- [ ] Auth real (no hay API de login)
-- [ ] GET de sesión / convocatoria
+- [x] Auth real (login + cookie + `/me`) — ver [auth-login.md](./auth-login.md)
+- [x] GET de catálogo / módulo por código (`GET /api/attendance/modules`)
 - [ ] QR generado por admin
 - [ ] CORS o reverse proxy en producción
+- [ ] Registro a módulos según rol (admin/secretaría vs. autoinscripción) — ver [asistencia-registro-por-rol.md](./asistencia-registro-por-rol.md)

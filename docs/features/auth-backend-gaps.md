@@ -11,7 +11,9 @@ El frontend **no modifica** el backend. Lo que falta queda aquí.
 | No hay Google / OAuth | El botón del mockup no puede autenticar | Botón deshabilitado | IdP + callback |
 | No hay registro público | «Regístrate» no tiene destino | Botón deshabilitado | `POST /api/auth/register` (si producto lo pide) |
 | No hay recuperación de contraseña | «Olvidé mi contraseña» inerte | Botón deshabilitado | Flujo de reset |
-| `/me` no trae CI, nombre completo ni teléfono | Asistencia no puede prellenar el formulario | Banner de sesión; el dirigente escribe el CI | Ampliar `UserProfileDto` o lookup por `userId` |
+| `/me` no trae CI, nombre completo ni teléfono | Un usuario normal no puede autocompletar su ficha al inscribirse a un módulo | Banner de sesión; el dirigente escribe el CI | Ampliar `UserProfileDto` o `GET /me/person` (ver [asistencia-registro-por-rol.md](./asistencia-registro-por-rol.md)) |
+| Catálogo `role` vacío; JWT sin roles reales | No se distingue admin/secretaría vs. dirigente | `roles: []` en el usuario local | Sembrar roles y asignarlos |
+| Asistencia anónima | La UI no puede imponer “solo yo” | N/A (hace falta API) | `[Authorize]` + regla por rol en `register` |
 | Contraseña en claro en infra (hasher de desarrollo) | Riesgo de seguridad, no de UI | N/A | Hash real (fuera de este repo frontend) |
 | Centro de ayuda / legales | Links del mockup sin destino | Deshabilitados | CMS o URLs estáticas |
 
@@ -21,4 +23,5 @@ El frontend **no modifica** el backend. Lo que falta queda aquí.
 2. ¿«Recuérdame» debe cambiar la duración de la cookie?
 3. ¿Google es requisito de producto o solo del mockup?
 4. ¿El registro de cuentas es público o solo administración?
-5. ¿`/me` debe incluir datos de dirigente (CI) para prefill de asistencia?
+5. ¿`/me` debe incluir datos de dirigente (CI) para prefill de asistencia? **Sí, para el usuario normal** (regla en [asistencia-registro-por-rol.md](./asistencia-registro-por-rol.md)).
+6. Códigos de rol definitivos: ¿`ADMIN` / `SECRETARIA` / `DIRIGENTE`?

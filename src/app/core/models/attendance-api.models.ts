@@ -35,6 +35,16 @@ export interface ModuleAttendanceResultApiDto {
   readonly isPartialRegistration: boolean;
 }
 
+/** `GET api/attendance/modules` y `GET api/attendance/modules/{code}`. */
+export interface TrainingModuleApiDto {
+  readonly id: number;
+  readonly code: string;
+  readonly name: string;
+  readonly description: string | null;
+  readonly moduleTypeCode: string;
+  readonly moduleTypeName: string;
+}
+
 /** RFC 7807 Problem Details. */
 export interface ProblemDetailsApi {
   readonly type?: string;
