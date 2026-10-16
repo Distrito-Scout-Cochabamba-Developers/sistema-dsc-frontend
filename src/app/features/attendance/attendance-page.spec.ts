@@ -72,14 +72,22 @@ describe('AttendancePage', () => {
     expect(fixture.nativeElement.querySelector('#ci')).toBeTruthy();
   });
 
-  it('precompleta el formulario si el dirigente ya está autenticado', async () => {
+  it('muestra el perfil autenticado sin prellenar CI (la API no envía datos de dirigente)', async () => {
+    TestBed.inject(AuthSessionService).applyAuthenticatedProfile({
+      id: 1,
+      username: 'jperez',
+      email: 'jperez@dsc.org',
+      roles: [],
+      displayName: 'jperez',
+    });
     const fixture = createComponent(SESSION_ID);
     await wait(50);
     fixture.detectChanges();
 
     const ciInput = fixture.nativeElement.querySelector('#ci') as HTMLInputElement;
-    expect(ciInput.value).toBe('12345678');
+    expect(ciInput.value).toBe('');
     expect(textOf(fixture)).toContain('Has iniciado sesión como');
+    expect(textOf(fixture)).toContain('jperez');
   });
 
   it('autocompleta nombre y extensión al ingresar un CI existente en el directorio (sin sesión activa)', async () => {

@@ -36,18 +36,24 @@
         </span>
       </nav>
 
-      <button
-        type="button"
-        class="rounded-lg bg-dsc-navy px-4 py-2 text-sm font-semibold text-white transition hover:bg-dsc-dark"
-        (click)="onAuthClick()"
-        [attr.aria-label]="
-          auth.isAuthenticated()
-            ? 'Cerrar sesión de demostración'
-            : 'Iniciar sesión de demostración (sin API de auth)'
-        "
-      >
-        {{ auth.isAuthenticated() ? 'Cerrar sesión' : 'Iniciar Sesión' }}
-      </button>
+      @if (auth.isAuthenticated()) {
+        <button
+          type="button"
+          class="rounded-lg bg-dsc-navy px-4 py-2 text-sm font-semibold text-white transition hover:bg-dsc-dark"
+          (click)="onLogout()"
+          aria-label="Cerrar sesión"
+        >
+          Cerrar sesión
+        </button>
+      } @else {
+        <a
+          class="rounded-lg bg-dsc-navy px-4 py-2 text-sm font-semibold text-white no-underline transition hover:bg-dsc-dark"
+          routerLink="/auth/login"
+          [queryParams]="{ returnUrl: router.url }"
+        >
+          Iniciar Sesión
+        </a>
+      }
     </div>
   </header>
 

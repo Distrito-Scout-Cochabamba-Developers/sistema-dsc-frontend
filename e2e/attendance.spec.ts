@@ -31,7 +31,6 @@ test('flujo de registro digital de asistencia', async ({ page }) => {
   await page.goto(SESSION_PATH);
 
   await test.step('exige Nombre, CI, Extensión y Teléfono', async () => {
-    await page.getByRole('button', { name: 'Cambiar Perfil' }).click(); // limpia el prellenado
     await expect(page.locator('#ci')).toHaveValue('');
 
     await page.getByRole('button', { name: 'Registrar Asistencia' }).click();

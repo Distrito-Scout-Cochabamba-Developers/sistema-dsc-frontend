@@ -1,63 +1,82 @@
 /**
- * Sesión mock de autenticación del dirigente.
- * Sustituir por integración real (JWT / cookies) cuando exista backend.
+ * Sesión de autenticación de la aplicación.
+ * El JWT vive en cookie HttpOnly; aquí solo se guarda el perfil.
  */
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { catchError, of, tap } from 'rxjs';
 
-import type { LeaderSession } from '@core/models/attendance.models';
+import { toAuthUserProfile, type AuthUserProfile } from '@core/models/auth.models';
+import { AuthApiService } from '@core/services/auth-api.service';
 
-const MOCK_SESSION: LeaderSession = {
-  id: 'dir-001',
-  displayName: 'Dir. Juan Pérez',
-  fullName: 'Juan Pérez Mendoza',
-  ci: '12345678',
-  extension: 'LP',
-  phone: '70000000',
-};
+export type AuthHydrationStatus = 'idle' | 'pending' | 'ready';
 
 @Injectable({ providedIn: 'root' })
 export class AuthSessionService {
-  /** Sesión actual; `null` si el dirigente no está autenticado. */
-  private readonly sessionState = signal<LeaderSession | null>(MOCK_SESSION);
+  private readonly api = inject(AuthApiService);
 
-  /** JWT real cuando el backend lo emita. */
-  private readonly tokenState = signal<string | null>(null);
+  /** Perfil actual; `null` si no hay sesión. */
+  private readonly sessionState = signal<AuthUserProfile | null>(null);
+
+  /** Estado de la hidratación desde cookie (`GET /api/auth/me`). */
+  private readonly hydrationState = signal<AuthHydrationStatus>('idle');
 
   /** Perfil autenticado o `null`. */
   readonly session = this.sessionState.asReadonly();
 
-  /** Token Bearer opcional para el interceptor. */
+  /** `idle` hasta el primer hydrate; `ready` cuando ya se consultó `/me` o se hizo login. */
+  readonly hydrationStatus = this.hydrationState.asReadonly();
+
+  /**
+   * Reservado por si un flujo futuro entrega JWT en JSON.
+   * El login actual usa cookie: el interceptor no envía Bearer.
+   */
+  private readonly tokenState = signal<string | null>(null);
   readonly accessToken = this.tokenState.asReadonly();
 
   /** Indica si hay sesión activa. */
   readonly isAuthenticated = computed(() => this.sessionState() !== null);
 
   /**
-   * Simula cierre / cambio de perfil (frontend-only).
+   * Consulta `/api/auth/me` para restaurar la sesión desde la cookie.
+   * Un 401 deja la sesión vacía; no bloquea el arranque.
+   */
+  hydrateFromServer(): void {
+    if (this.hydrationState() !== 'idle') {
+      return;
+    }
+
+    this.hydrationState.set('pending');
+    this.api
+      .getCurrentUser()
+      .pipe(
+        tap((dto) => {
+          this.sessionState.set(toAuthUserProfile(dto));
+          this.hydrationState.set('ready');
+        }),
+        catchError(() => {
+          this.sessionState.set(null);
+          this.hydrationState.set('ready');
+          return of(null);
+        }),
+      )
+      .subscribe();
+  }
+
+  /**
+   * Guarda el perfil tras un login exitoso.
+   *
+   * @param profile - Perfil devuelto por la API.
+   */
+  applyAuthenticatedProfile(profile: AuthUserProfile): void {
+    this.sessionState.set(profile);
+    this.hydrationState.set('ready');
+  }
+
+  /**
+   * Cierra la sesión en el cliente.
+   * No puede borrar la cookie HttpOnly: no hay endpoint de logout.
    */
   clearSession(): void {
     this.sessionState.set(null);
-    this.tokenState.set(null);
-  }
-
-  /**
-   * Simula login con el perfil mock del demo.
-   */
-  restoreDemoSession(): void {
-    this.sessionState.set(MOCK_SESSION);
-    this.tokenState.set(null);
-  }
-
-  /**
-   * Alterna la sesión demo: cierra si hay una activa, la restaura si no.
-   * Encapsula la decisión de sesión para que consumidores (ej. el shell)
-   * no tengan que conocer la regla de negocio.
-   */
-  toggleDemoSession(): void {
-    if (this.isAuthenticated()) {
-      this.clearSession();
-      return;
-    }
-    this.restoreDemoSession();
   }
 }
