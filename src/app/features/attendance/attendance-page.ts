@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { switchMap } from 'rxjs';
+import { catchError, of, switchMap } from 'rxjs';
 
 import type { ModuleSession, AttendanceRegistrationResult } from '@core/models/attendance.models';
-import { AdultDirectoryService } from '@core/services/adult-directory.service';
+import { TrainingModulesService } from '@core/services/training-modules.service';
 import { attendanceQrImageUrl } from '@core/utils/session-presentation.utils';
 import { StateCard } from '@shared/components/state-card';
 
@@ -24,7 +24,7 @@ export class AttendancePage {
   readonly sessionId = input.required<string>();
 
   private readonly destroyRef = inject(DestroyRef);
-  private readonly directory = inject(AdultDirectoryService);
+  private readonly modules = inject(TrainingModulesService);
 
   protected readonly session = signal<ModuleSession | null>(null);
   protected readonly loadError = signal(false);
@@ -43,7 +43,9 @@ export class AttendancePage {
   constructor() {
     toObservable(this.sessionId)
       .pipe(
-        switchMap((id) => this.directory.getModuleSession(id)),
+        switchMap((id) =>
+          this.modules.getModuleSession(id).pipe(catchError(() => of(null))),
+        ),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((session) => {

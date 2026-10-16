@@ -48,9 +48,11 @@ App en http://localhost:4200. Detalle en el README de esa carpeta.
 
 `pnpm start` proxifica `/api` a `http://localhost:5090`. La API no declara CORS.
 
+Catálogo: http://localhost:4200/modulos (el formulario se abre al elegir un módulo).
+
 Deep link: http://localhost:4200/asistencia/mod-liderazgo-20241024
 
-El código debe existir como `training_module.code`. Ver [docs/features/asistencia-backend-gaps.md](./docs/features/asistencia-backend-gaps.md).
+El código debe existir como `training_module.code`. En Docker se siembra con `docker/seed-dev-modules.sql`. Ver [docs/features/asistencia-backend-gaps.md](./docs/features/asistencia-backend-gaps.md).
 
 ## TypeScript-only
 
@@ -137,6 +139,7 @@ Arranque: en Claude Code o Cursor, invocar **`bmad-help`**.
 | ------- | --- |
 | [`agents.md`](./agents.md) | Contrato de desarrollo (prevalece) |
 | [`docs/seguimiento.md`](./docs/seguimiento.md) | Tablero hecho / pendiente |
+| [`docs/features/modulos-catalogo.md`](./docs/features/modulos-catalogo.md) | Listado `/modulos` y enlace al formulario |
 | [`docs/features/asistencia-registro.md`](./docs/features/asistencia-registro.md) | Feature registro de asistencia |
 | [`docs/`](./docs/README.md) | Índice de documentación técnica |
 | [`_bmad-output/project-context.md`](./_bmad-output/project-context.md) | Contexto BMAD / brownfield |

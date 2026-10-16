@@ -1,5 +1,6 @@
 # Login y sesión (frontend)
 
+- **Estado:** Completado (correo + contraseña + cookie HttpOnly + `/me`)
 - **Ruta:** `/auth/login` (alias `/login`)
 - **Emblema:** `public/assets/branding/distrito-cochabamba-emblem.png` → URL `/assets/branding/distrito-cochabamba-emblem.png`
 - **Marca DSC (cuadrícula):** `public/assets/branding/dsc-grid-mark.svg` → `/assets/branding/dsc-grid-mark.svg`
@@ -37,4 +38,15 @@ La API **no** devuelve el JWT en JSON. El frontend envía `withCredentials: true
 - Google, registro, «olvidé contraseña», centro de ayuda: visibles y **deshabilitados**.
 - «Recuérdame» es solo UI: la cookie dura 60 minutos fijos en backend.
 
-Detalle de gaps: [auth-backend-gaps.md](./auth-backend-gaps.md).
+## Completado
+
+El flujo de login **está entregado** en frontend y conectado a la API existente:
+
+- pantalla a diseño en `/auth/login`;
+- `POST /api/auth/login/email` + cookie `access_token`;
+- hidratación con `GET /api/auth/me`;
+- navbar real (ya no hay toggle demo).
+
+Pendiente de API (no bloquea el login): logout, Google, registro de cuenta, «Recuérdame», CI en `/me`. Ver [auth-backend-gaps.md](./auth-backend-gaps.md).
+
+El registro a módulos **según rol** (admin/secretaría vs. autoinscripción) no forma parte del login; está en [asistencia-registro-por-rol.md](./asistencia-registro-por-rol.md).

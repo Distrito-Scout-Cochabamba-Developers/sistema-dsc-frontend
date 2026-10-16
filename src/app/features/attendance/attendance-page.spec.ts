@@ -10,6 +10,21 @@ import { AttendancePage } from './attendance-page';
 
 const SESSION_ID = 'mod-liderazgo-20241024';
 
+const MODULE_DTO = {
+  id: 1,
+  code: SESSION_ID,
+  name: 'Módulo de Liderazgo y Servicio',
+  description: 'Formación de liderazgo',
+  moduleTypeCode: 'AE',
+  moduleTypeName: 'Adultos en el Escultismo',
+};
+
+function flushModuleMeta(http: HttpTestingController): void {
+  http.expectOne((request) => request.url.includes(`/api/attendance/modules/${SESSION_ID}`)).flush(
+    MODULE_DTO,
+  );
+}
+
 function wait(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -52,6 +67,7 @@ describe('AttendancePage', () => {
 
   it('debe crearse', () => {
     const fixture = createComponent(SESSION_ID);
+    flushModuleMeta(http);
     expect(fixture.componentInstance).toBeTruthy();
   });
 
@@ -63,8 +79,21 @@ describe('AttendancePage', () => {
     expect(textOf(fixture)).toContain('Sesión no válida');
   });
 
+  it('muestra "Sesión no válida" cuando el módulo no existe en la API', async () => {
+    const fixture = createComponent(SESSION_ID);
+    http
+      .expectOne((request) => request.url.includes(`/api/attendance/modules/${SESSION_ID}`))
+      .flush({ detail: 'no encontrado' }, { status: 404, statusText: 'Not Found' });
+    await wait(50);
+    fixture.detectChanges();
+
+    expect(textOf(fixture)).toContain('Sesión no válida');
+    expect(fixture.nativeElement.querySelector('#ci')).toBeNull();
+  });
+
   it('muestra el formulario con los datos de la sesión cuando el sessionId es válido', async () => {
     const fixture = createComponent(SESSION_ID);
+    flushModuleMeta(http);
     await wait(50);
     fixture.detectChanges();
 
@@ -81,6 +110,7 @@ describe('AttendancePage', () => {
       displayName: 'jperez',
     });
     const fixture = createComponent(SESSION_ID);
+    flushModuleMeta(http);
     await wait(50);
     fixture.detectChanges();
 
@@ -93,6 +123,7 @@ describe('AttendancePage', () => {
   it('autocompleta nombre y extensión al ingresar un CI existente en el directorio (sin sesión activa)', async () => {
     TestBed.inject(AuthSessionService).clearSession();
     const fixture = createComponent(SESSION_ID);
+    flushModuleMeta(http);
     await wait(50);
     fixture.detectChanges();
 
@@ -121,6 +152,7 @@ describe('AttendancePage', () => {
   it('ofrece registro parcial cuando el CI no existe en el directorio', async () => {
     TestBed.inject(AuthSessionService).clearSession();
     const fixture = createComponent(SESSION_ID);
+    flushModuleMeta(http);
     await wait(50);
     fixture.detectChanges();
 
@@ -138,6 +170,7 @@ describe('AttendancePage', () => {
   it('valida que el CI debe ser numérico', async () => {
     TestBed.inject(AuthSessionService).clearSession();
     const fixture = createComponent(SESSION_ID);
+    flushModuleMeta(http);
     await wait(50);
     fixture.detectChanges();
 
@@ -154,6 +187,7 @@ describe('AttendancePage', () => {
   it('valida que el teléfono debe tener 8 dígitos', async () => {
     TestBed.inject(AuthSessionService).clearSession();
     const fixture = createComponent(SESSION_ID);
+    flushModuleMeta(http);
     await wait(50);
     fixture.detectChanges();
 
@@ -170,6 +204,7 @@ describe('AttendancePage', () => {
   it('completa el flujo de registro parcial y muestra la pantalla de éxito', async () => {
     TestBed.inject(AuthSessionService).clearSession();
     const fixture = createComponent(SESSION_ID);
+    flushModuleMeta(http);
     await wait(50);
     fixture.detectChanges();
 

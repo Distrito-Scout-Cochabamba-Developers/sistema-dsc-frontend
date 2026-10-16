@@ -26,6 +26,11 @@ export const routes: Routes = [
           import('@features/landing/landing.routes').then((m) => m.LANDING_ROUTES),
       },
       {
+        path: 'modulos',
+        loadChildren: () =>
+          import('@features/modules/modules.routes').then((m) => m.MODULES_ROUTES),
+      },
+      {
         path: 'asistencia',
         loadChildren: () =>
           import('@features/attendance/attendance.routes').then((m) => m.ATTENDANCE_ROUTES),
