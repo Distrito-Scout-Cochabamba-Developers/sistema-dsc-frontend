@@ -16,15 +16,15 @@ import { FooterLinkGroup } from '@shared/components/footer-link-group';
   templateUrl: './main-layout.html',
 })
 export class MainLayout {
-  /** Sesión real hidratada desde cookie o login. */
+  /** Sesión real hidratada desde JWT (storage + `/me`) o login. */
   protected readonly auth = inject(AuthSessionService);
   protected readonly router = inject(Router);
 
   protected readonly currentYear = new Date().getFullYear();
 
   /**
-   * Cierra la sesión en el cliente.
-   * La cookie HttpOnly permanece hasta que exista logout en la API.
+   * Cierra la sesión en el cliente (borra el JWT local).
+   * El token sigue válido en el servidor hasta `exp`; no hay logout en la API.
    */
   protected onLogout(): void {
     this.auth.clearSession();

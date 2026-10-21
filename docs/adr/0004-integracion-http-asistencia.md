@@ -15,7 +15,7 @@ El backend ya expone `GET api/attendance/lookup-ci/{ci}` y `POST api/attendance/
 - Proxy local `/api` → `http://localhost:5090` porque la API no declara CORS.
 - `sessionToken` = `TrainingModule.Code` (token de la ruta).
 - Metadatos de sesión: en 2026-08 se resolvían en el cliente. Sustituido por [0006](./0006-catalogo-modulos-desde-api.md) (`GET /api/attendance/modules/{code}`).
-- Auth: interceptor listo para Bearer (sin uso); la sesión real usa cookie (ADR 0005).
+- Auth: sustituido por [0007](./0007-sesion-jwt-bearer.md) (JWT en body + Bearer). ADR 0005 queda deprecated.
 
 ## Consecuencias
 

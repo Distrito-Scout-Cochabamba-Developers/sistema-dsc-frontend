@@ -52,8 +52,8 @@
 
       <form class="mt-8 space-y-5" (submit)="onSubmit($event)" novalidate>
         <div>
-          <label class="mb-1.5 block text-sm font-medium text-ink" for="email">
-            Correo electrónico
+          <label class="mb-1.5 block text-sm font-medium text-ink" for="identifier">
+            Usuario o correo
           </label>
           <div class="relative">
             <span
@@ -66,21 +66,21 @@
               </svg>
             </span>
             <input
-              id="email"
-              type="email"
-              autocomplete="email"
-              placeholder="juanrobles@gmail.com"
+              id="identifier"
+              type="text"
+              autocomplete="username"
+              placeholder="pablo.rocha o correo"
               class="w-full rounded-md border border-border bg-elevated py-3 pr-3 pl-11 text-sm text-ink outline-none ring-dsc/30 placeholder:text-muted/70 focus:ring-2"
-              [class.border-danger]="showEmailError()"
-              [attr.aria-invalid]="showEmailError()"
-              [attr.aria-describedby]="showEmailError() ? 'email-hint' : null"
-              [formField]="loginForm.email"
-              (blur)="touchedEmail.set(true)"
+              [class.border-danger]="showIdentifierError()"
+              [attr.aria-invalid]="showIdentifierError()"
+              [attr.aria-describedby]="showIdentifierError() ? 'identifier-hint' : null"
+              [formField]="loginForm.identifier"
+              (blur)="touchedIdentifier.set(true)"
             />
           </div>
-          @if (showEmailError()) {
-            <p id="email-hint" class="mt-1.5 text-sm text-danger">
-              {{ loginForm.email().errors()[0]?.message }}
+          @if (showIdentifierError()) {
+            <p id="identifier-hint" class="mt-1.5 text-sm text-danger">
+              {{ loginForm.identifier().errors()[0]?.message }}
             </p>
           }
         </div>

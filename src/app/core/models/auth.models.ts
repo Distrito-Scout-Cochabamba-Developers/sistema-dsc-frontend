@@ -4,6 +4,7 @@
  */
 export interface AuthUserProfile {
   readonly id: number;
+  readonly personId: number;
   readonly username: string;
   readonly email: string;
   readonly roles: readonly string[];
@@ -18,6 +19,7 @@ export interface AuthUserProfile {
  */
 export function toAuthUserProfile(dto: {
   readonly id: number;
+  readonly personId?: number;
   readonly username: string;
   readonly email: string;
   readonly roles: readonly string[] | null;
@@ -25,6 +27,7 @@ export function toAuthUserProfile(dto: {
   const username = dto.username?.trim() ?? '';
   return {
     id: dto.id,
+    personId: dto.personId ?? 0,
     username,
     email: dto.email,
     roles: dto.roles ?? [],

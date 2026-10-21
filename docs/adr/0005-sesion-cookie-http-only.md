@@ -1,6 +1,6 @@
 # 0005. Sesión por cookie HttpOnly (login)
 
-- Estado: Accepted
+- Estado: Deprecated (sustituido por [0007](./0007-sesion-jwt-bearer.md))
 - Fecha: 2026-08-26
 - Decisores: Equipo frontend DSC
 - Relacionado: [0004](./0004-integracion-http-asistencia.md)

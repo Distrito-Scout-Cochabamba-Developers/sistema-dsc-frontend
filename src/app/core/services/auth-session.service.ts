@@ -1,12 +1,16 @@
 /**
  * Sesión de autenticación de la aplicación.
- * El JWT vive en cookie HttpOnly; aquí solo se guarda el perfil.
+ * Expone `currentUser`, `isAuthenticated` y `roles` como Signals.
+ * El JWT se guarda en Web Storage para que el interceptor envíe Bearer.
  */
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { catchError, of, tap } from 'rxjs';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { Observable, catchError, filter, map, of, take, tap } from 'rxjs';
 
+import type { LoginResponseApiDto } from '@core/models/auth-api.models';
 import { toAuthUserProfile, type AuthUserProfile } from '@core/models/auth.models';
 import { AuthApiService } from '@core/services/auth-api.service';
+import { clearStoredAuth, readStoredAuth, writeStoredAuth } from '@core/utils/auth-token.storage';
 
 export type AuthHydrationStatus = 'idle' | 'pending' | 'ready';
 
@@ -17,34 +21,47 @@ export class AuthSessionService {
   /** Perfil actual; `null` si no hay sesión. */
   private readonly sessionState = signal<AuthUserProfile | null>(null);
 
-  /** Estado de la hidratación desde cookie (`GET /api/auth/me`). */
+  /** Hidratación desde storage + `GET /api/v1/auth/me`. */
   private readonly hydrationState = signal<AuthHydrationStatus>('idle');
 
-  /** Perfil autenticado o `null`. */
-  readonly session = this.sessionState.asReadonly();
+  private readonly tokenState = signal<string | null>(null);
 
-  /** `idle` hasta el primer hydrate; `ready` cuando ya se consultó `/me` o se hizo login. */
-  readonly hydrationStatus = this.hydrationState.asReadonly();
+  /** Perfil autenticado o `null`. */
+  readonly currentUser = this.sessionState.asReadonly();
 
   /**
-   * Reservado por si un flujo futuro entrega JWT en JSON.
-   * El login actual usa cookie: el interceptor no envía Bearer.
+   * Alias de `currentUser` para pantallas que ya leían `session()`.
    */
-  private readonly tokenState = signal<string | null>(null);
+  readonly session = this.currentUser;
+
+  /** JWT en memoria (el interceptor lo lee). */
   readonly accessToken = this.tokenState.asReadonly();
 
-  /** Indica si hay sesión activa. */
+  /** `idle` hasta el primer hydrate. */
+  readonly hydrationStatus = this.hydrationState.asReadonly();
+
+  /** Indica si hay perfil en sesión. */
   readonly isAuthenticated = computed(() => this.sessionState() !== null);
 
+  /** Códigos de rol del usuario actual. */
+  readonly roles = computed(() => this.sessionState()?.roles ?? []);
+
   /**
-   * Consulta `/api/auth/me` para restaurar la sesión desde la cookie.
-   * Un 401 deja la sesión vacía; no bloquea el arranque.
+   * Restaura el JWT del storage y, si existe, valida el perfil con `/me`.
+   * Sin token no llama a la API.
    */
   hydrateFromServer(): void {
     if (this.hydrationState() !== 'idle') {
       return;
     }
 
+    const stored = readStoredAuth();
+    if (!stored) {
+      this.hydrationState.set('ready');
+      return;
+    }
+
+    this.tokenState.set(stored.token);
     this.hydrationState.set('pending');
     this.api
       .getCurrentUser()
@@ -54,7 +71,7 @@ export class AuthSessionService {
           this.hydrationState.set('ready');
         }),
         catchError(() => {
-          this.sessionState.set(null);
+          this.clearSession();
           this.hydrationState.set('ready');
           return of(null);
         }),
@@ -63,9 +80,48 @@ export class AuthSessionService {
   }
 
   /**
-   * Guarda el perfil tras un login exitoso.
+   * Completa cuando la hidratación terminó (útil en guards).
    *
-   * @param profile - Perfil devuelto por la API.
+   * @returns Observable que emite `true` si hay sesión.
+   */
+  ensureReady(): Observable<boolean> {
+    if (this.hydrationState() === 'idle') {
+      this.hydrateFromServer();
+    }
+
+    if (this.hydrationState() === 'ready') {
+      return of(this.isAuthenticated());
+    }
+
+    return toObservable(this.hydrationState).pipe(
+      filter((status) => status === 'ready'),
+      take(1),
+      map(() => this.isAuthenticated()),
+    );
+  }
+
+  /**
+   * Persiste el JWT y el perfil tras un login 200.
+   *
+   * @param response - Body de `POST /api/v1/auth/login`.
+   * @param persist - Si es `true`, usa `localStorage` (Recuérdame).
+   */
+  applyLogin(response: LoginResponseApiDto, persist = false): void {
+    const token = response.token.trim();
+    this.tokenState.set(token);
+    this.sessionState.set(toAuthUserProfile(response.user));
+    this.hydrationState.set('ready');
+    writeStoredAuth({
+      token,
+      expiresAt: response.expiresAt,
+      persist,
+    });
+  }
+
+  /**
+   * Aplica un perfil sin token (tests o banner de UI).
+   *
+   * @param profile - Perfil ya mapeado.
    */
   applyAuthenticatedProfile(profile: AuthUserProfile): void {
     this.sessionState.set(profile);
@@ -73,10 +129,21 @@ export class AuthSessionService {
   }
 
   /**
-   * Cierra la sesión en el cliente.
-   * No puede borrar la cookie HttpOnly: no hay endpoint de logout.
+   * Indica si el usuario tiene el rol indicado.
+   *
+   * @param role - Código de `role.code` (p. ej. `ADMIN`).
+   */
+  hasRole(role: string): boolean {
+    return this.roles().includes(role);
+  }
+
+  /**
+   * Cierra la sesión en el cliente (borra JWT de memoria y storage).
+   * No hay logout en la API: el token sigue válido hasta `exp`.
    */
   clearSession(): void {
+    this.tokenState.set(null);
     this.sessionState.set(null);
+    clearStoredAuth();
   }
 }

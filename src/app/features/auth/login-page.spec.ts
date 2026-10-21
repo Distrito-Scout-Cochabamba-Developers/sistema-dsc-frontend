@@ -5,6 +5,7 @@ import { provideRouter } from '@angular/router';
 
 import { authInterceptor } from '@core/interceptors/auth.interceptor';
 import { AuthSessionService } from '@core/services/auth-session.service';
+import { AUTH_TOKEN_STORAGE_KEY } from '@core/utils/auth-token.storage';
 
 import { LoginPage } from './login-page';
 
@@ -16,6 +17,8 @@ describe('LoginPage', () => {
   }
 
   beforeEach(async () => {
+    sessionStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
+    localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
     await TestBed.configureTestingModule({
       imports: [LoginPage],
       providers: [
@@ -29,6 +32,8 @@ describe('LoginPage', () => {
 
   afterEach(() => {
     http.verify();
+    sessionStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
+    localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
   });
 
   function createFixture() {
@@ -37,32 +42,34 @@ describe('LoginPage', () => {
     return fixture;
   }
 
-  it('muestra el título y los campos de correo y contraseña', () => {
+  it('muestra el título y los campos de identificador y contraseña', () => {
     const fixture = createFixture();
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
 
     expect(text).toContain('Bienvenido');
-    expect(fixture.nativeElement.querySelector('#email')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('#identifier')).toBeTruthy();
     expect(fixture.nativeElement.querySelector('#password')).toBeTruthy();
   });
 
-  it('exige un correo válido antes de llamar a la API', async () => {
+  it('exige identificador antes de llamar a la API', async () => {
     const fixture = createFixture();
     const form = fixture.nativeElement.querySelector('form') as HTMLFormElement;
     form.dispatchEvent(new Event('submit', { cancelable: true }));
     fixture.detectChanges();
     await fixture.whenStable();
 
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('El correo es obligatorio');
-    http.expectNone('/api/auth/login/email');
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain(
+      'El usuario o correo es obligatorio',
+    );
+    http.expectNone('/api/v1/auth/login');
   });
 
-  it('envía POST /api/auth/login/email con credenciales y guarda la sesión', async () => {
+  it('envía POST /api/v1/auth/login y guarda JWT + sesión', async () => {
     const fixture = createFixture();
-    const email = fixture.nativeElement.querySelector('#email') as HTMLInputElement;
+    const identifier = fixture.nativeElement.querySelector('#identifier') as HTMLInputElement;
     const password = fixture.nativeElement.querySelector('#password') as HTMLInputElement;
-    email.value = 'juan@dsc.org';
-    email.dispatchEvent(new Event('input'));
+    identifier.value = 'pablo.rocha';
+    identifier.dispatchEvent(new Event('input'));
     password.value = 'secret';
     password.dispatchEvent(new Event('input'));
     fixture.detectChanges();
@@ -72,30 +79,37 @@ describe('LoginPage', () => {
     fixture.detectChanges();
     await fixture.whenStable();
 
-    const req = http.expectOne('/api/auth/login/email');
+    const req = http.expectOne('/api/v1/auth/login');
     expect(req.request.method).toBe('POST');
-    expect(req.request.withCredentials).toBe(true);
-    expect(req.request.body).toEqual({ email: 'juan@dsc.org', password: 'secret' });
+    expect(req.request.body).toEqual({ identifier: 'pablo.rocha', password: 'secret' });
     req.flush({
-      id: 1,
-      username: 'juan',
-      email: 'juan@dsc.org',
-      roles: ['admin'],
+      token: 'jwt-token',
+      tokenType: 'Bearer',
+      expiresAt: '2099-01-01T00:00:00.000Z',
+      user: {
+        id: 2,
+        personId: 2,
+        username: 'pablo.rocha',
+        email: 'pablo.rocha@example.test',
+        roles: ['ADMIN', 'DISTRICT_DIRECTOR'],
+      },
     });
     await wait(50);
     fixture.detectChanges();
 
     const auth = TestBed.inject(AuthSessionService);
     expect(auth.isAuthenticated()).toBe(true);
-    expect(auth.session()?.email).toBe('juan@dsc.org');
+    expect(auth.accessToken()).toBe('jwt-token');
+    expect(auth.roles()).toEqual(['ADMIN', 'DISTRICT_DIRECTOR']);
+    expect(auth.currentUser()?.email).toBe('pablo.rocha@example.test');
   });
 
   it('muestra el detalle de credenciales inválidas', async () => {
     const fixture = createFixture();
-    const email = fixture.nativeElement.querySelector('#email') as HTMLInputElement;
+    const identifier = fixture.nativeElement.querySelector('#identifier') as HTMLInputElement;
     const password = fixture.nativeElement.querySelector('#password') as HTMLInputElement;
-    email.value = 'juan@dsc.org';
-    email.dispatchEvent(new Event('input'));
+    identifier.value = 'pablo.rocha';
+    identifier.dispatchEvent(new Event('input'));
     password.value = 'bad';
     password.dispatchEvent(new Event('input'));
     fixture.detectChanges();
@@ -105,9 +119,9 @@ describe('LoginPage', () => {
     fixture.detectChanges();
     await fixture.whenStable();
 
-    http.expectOne('/api/auth/login/email').flush(
+    http.expectOne('/api/v1/auth/login').flush(
       { detail: 'Las credenciales son inválidas.' },
-      { status: 400, statusText: 'Bad Request' },
+      { status: 401, statusText: 'Unauthorized' },
     );
     await wait(50);
     fixture.detectChanges();

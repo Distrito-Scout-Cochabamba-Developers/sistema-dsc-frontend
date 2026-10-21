@@ -1,52 +1,76 @@
 # Login y sesión (frontend)
 
-- **Estado:** Completado (correo + contraseña + cookie HttpOnly + `/me`)
+- **Estado:** Completado (identifier + JWT Bearer + Signals + guards listos)
 - **Ruta:** `/auth/login` (alias `/login`)
-- **Emblema:** `public/assets/branding/distrito-cochabamba-emblem.png` → URL `/assets/branding/distrito-cochabamba-emblem.png`
-- **Marca DSC (cuadrícula):** `public/assets/branding/dsc-grid-mark.svg` → `/assets/branding/dsc-grid-mark.svg`
+- **Contrato backend:** `sistema-dsc-backend/docs/auth-login.md`
+- **Emblema:** `public/assets/branding/distrito-cochabamba-emblem.png`
+- **Marca DSC:** `public/assets/branding/dsc-grid-mark.svg`
+- **Última actualización:** 2026-10-21
 
-## Cómo cargar el logo
-
-Angular copia todo lo que esté en `public/` a la raíz del sitio (`angular.json` → `assets`).
-
-1. Coloca el PNG oficial del emblema (fondo transparente o degradado claro) en:
-
-   `sistema-dsc-frontend/public/assets/branding/distrito-cochabamba-emblem.png`
-
-2. No cambies el nombre del archivo si no actualizas `DISTRITO_EMBLEM_SRC` en `src/app/features/auth/login-page.ts`.
-3. Recarga `ng serve`. La imagen se pide como `/assets/branding/distrito-cochabamba-emblem.png`.
-
-Hoy hay un recorte del mockup como placeholder. Sustitúyelo por el archivo de marca en alta resolución cuando lo tengas.
-
-## Contrato HTTP usado
+## Contrato HTTP
 
 | Método | Path | Body / notas |
 | ------ | ---- | ------------ |
-| `POST` | `/api/auth/login/email` | `{ email, password }` → `UserProfileDto`. Cookie HttpOnly `access_token`. |
-| `POST` | `/api/auth/login` | Mismo handler que email (no lo usa la UI). |
-| `POST` | `/api/auth/login/username` | `{ username, password }` (cliente listo, UI no lo usa). |
-| `GET` | `/api/auth/me` | Requiere cookie. Hidrata la sesión al arrancar. |
+| `POST` | `/api/v1/auth/login` | `{ identifier, password }` → `{ token, tokenType: "Bearer", expiresAt, user }` |
+| `GET` | `/api/v1/auth/me` | Header `Authorization: Bearer <token>` → `{ id, personId, username, email, roles }` |
 
-La API **no** devuelve el JWT en JSON. El frontend envía `withCredentials: true` y el proxy reescribe el dominio de la cookie a `localhost`.
+`identifier` es **username o email**. El JWT va en el **body**, no en cookie. El interceptor adjunta Bearer en `/api`.
+
+Rutas retiradas en backend (404): `/api/auth/login`, `/api/auth/login/email`, `/api/auth/login/username`.
+
+### Claims del JWT
+
+`sub`, `email`, `personId`, `username`, `roles`, `exp`, `iss`, `aud`. `RoleClaimType` = `roles`.
+
+### Roles (`role.code`)
+
+`ADMIN`, `DISTRICT_DIRECTOR`, `COMMUNICATIONS_OFFICER`, `DISTRICT_SECRETARY`, `FINANCE_COMMISSIONER`, `YOUTH_PROGRAM_COORDINATOR`, `ADULT_RESOURCES_COORDINATOR`, `QUARTERMASTER`, `OPERATIONS_OFFICER`, `BRANCH_COMMISSIONER`.
+
+Constantes TS: `src/app/core/models/auth-roles.ts`.
+
+## Implementación Angular 22
+
+| Spec | Dónde |
+| ---- | ----- |
+| Login Tailwind v4 + Signal Forms | `features/auth/login-page.ts` + `.html` (`form()` / `submit()`) |
+| `AuthSessionService` Signals | `currentUser`, `isAuthenticated`, `roles`, `accessToken` |
+| Interceptor Bearer | `core/interceptors/auth.interceptor.ts` |
+| Guards funcionales | `authGuard`, `roleGuard(...códigos)` en `core/guards/` |
+
+El JWT se guarda en `sessionStorage` o, si «Recuérdame», en `localStorage` (`dsc.auth.session`). Al arrancar, si hay token vigente se llama a `/me`.
+
+`authGuard` / `roleGuard` **están listos** para rutas lazy. No se aplican a `/`, `/modulos` ni `/asistencia`: el registro de asistencia sigue siendo anónimo en la API. Ejemplo futuro:
+
+```ts
+{
+  path: 'admin',
+  canActivate: [authGuard, roleGuard('ADMIN', 'DISTRICT_SECRETARY')],
+  loadChildren: () => import('...'),
+}
+```
+
+## Usuarios de desarrollo
+
+Contraseña local (Docker / Compose): **`1234`** (`DSC_SEED_PASSWORD`). El seeder corre en el servicio `auth-seed`; no hace falta `dotnet` en el host.
+
+| Username | Roles |
+| -------- | ----- |
+| `pablo.rocha` | `ADMIN`, `DISTRICT_DIRECTOR` |
+| `maricel.rocha` | `DISTRICT_SECRETARY`, `FINANCE_COMMISSIONER` |
+| `teresa.aillon` | `COMMUNICATIONS_OFFICER` |
+| `german.rocha` | `YOUTH_PROGRAM_COORDINATOR` |
+| `daniel.vargas` | `ADULT_RESOURCES_COORDINATOR` |
+| `jorge.revollo` | `QUARTERMASTER` |
+| `apu` | `OPERATIONS_OFFICER` |
+| `ana.laura` / `fabiola` / `erick` / `mariel` | `BRANCH_COMMISSIONER` |
 
 ## Comportamiento de producto
 
-- Login a **pantalla completa** (fuera de `MainLayout`).
-- Paleta DSC: `--color-dsc` `#009ee2`, `dsc-soft`, `dsc-dark`, `dsc-navy`.
+- Login a pantalla completa (fuera de `MainLayout`).
 - Tras login: `returnUrl` interno o `/`.
-- Navbar «Iniciar Sesión» navega a `/auth/login`. «Cerrar sesión» solo limpia el estado local (no hay logout en API).
-- Google, registro, «olvidé contraseña», centro de ayuda: visibles y **deshabilitados**.
-- «Recuérdame» es solo UI: la cookie dura 60 minutos fijos en backend.
+- Navbar: iniciar sesión / cerrar sesión (solo borra el JWT local; no hay logout API).
+- Google, registro, «olvidé contraseña»: visibles y deshabilitados.
 
-## Completado
+## Pendiente de API (no bloquea este login)
 
-El flujo de login **está entregado** en frontend y conectado a la API existente:
-
-- pantalla a diseño en `/auth/login`;
-- `POST /api/auth/login/email` + cookie `access_token`;
-- hidratación con `GET /api/auth/me`;
-- navbar real (ya no hay toggle demo).
-
-Pendiente de API (no bloquea el login): logout, Google, registro de cuenta, «Recuérdame», CI en `/me`. Ver [auth-backend-gaps.md](./auth-backend-gaps.md).
-
-El registro a módulos **según rol** (admin/secretaría vs. autoinscripción) no forma parte del login; está en [asistencia-registro-por-rol.md](./asistencia-registro-por-rol.md).
+Logout que invalide el token, Google, registro de cuenta, CI en `/me`, `[Authorize]` en asistencia. Ver [auth-backend-gaps.md](./auth-backend-gaps.md).

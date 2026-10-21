@@ -1,26 +1,28 @@
 /**
- * Contratos HTTP de autenticación (camelCase, DSC.Application.DTOs).
+ * Contratos HTTP de autenticación (`/api/v1/auth`, camelCase).
  */
 
-/** `POST /api/auth/login` y `POST /api/auth/login/email`. */
-export interface LoginEmailRequestApiDto {
-  readonly email: string;
-  readonly password: string;
-}
-
-/** `POST /api/auth/login/username`. */
-export interface LoginUsernameRequestApiDto {
-  readonly username: string;
+/** `POST /api/v1/auth/login`. `identifier` es email o username. */
+export interface LoginRequestApiDto {
+  readonly identifier: string;
   readonly password: string;
 }
 
 /**
- * Perfil que devuelve login y `GET /api/auth/me`.
- * El JWT no viaja en el JSON: la API lo deja en cookie HttpOnly `access_token`.
+ * Perfil en el body de login y en `GET /api/v1/auth/me`.
  */
 export interface UserProfileApiDto {
   readonly id: number;
+  readonly personId: number;
   readonly username: string;
   readonly email: string;
   readonly roles: readonly string[];
+}
+
+/** Respuesta 200 de `POST /api/v1/auth/login`. El JWT viaja en `token`, no en cookie. */
+export interface LoginResponseApiDto {
+  readonly token: string;
+  readonly tokenType: string;
+  readonly expiresAt: string;
+  readonly user: UserProfileApiDto;
 }

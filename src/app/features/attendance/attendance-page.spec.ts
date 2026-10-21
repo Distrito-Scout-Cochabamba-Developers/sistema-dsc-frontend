@@ -104,6 +104,7 @@ describe('AttendancePage', () => {
   it('muestra el perfil autenticado sin prellenar CI (la API no envía datos de dirigente)', async () => {
     TestBed.inject(AuthSessionService).applyAuthenticatedProfile({
       id: 1,
+      personId: 1,
       username: 'jperez',
       email: 'jperez@dsc.org',
       roles: [],

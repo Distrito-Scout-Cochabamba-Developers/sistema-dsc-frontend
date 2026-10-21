@@ -1,6 +1,6 @@
 /**
  * Pantalla de inicio de sesión (layout partido, sin shell DSC).
- * Conecta con `POST /api/auth/login/email`; Google, registro y recuperación
+ * Conecta con `POST /api/v1/auth/login`; Google, registro y recuperación
  * se muestran deshabilitados porque la API no los expone.
  */
 import { NgOptimizedImage } from '@angular/common';
@@ -14,17 +14,16 @@ import {
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { FormField, email, form, required, submit } from '@angular/forms/signals';
+import { FormField, form, required, submit } from '@angular/forms/signals';
 import { firstValueFrom } from 'rxjs';
 
-import { toAuthUserProfile } from '@core/models/auth.models';
 import { AuthApiService } from '@core/services/auth-api.service';
 import { AuthSessionService } from '@core/services/auth-session.service';
 import { isRetryableHttpError, problemDetailMessage } from '@core/utils/http-error.utils';
 import { safeInternalUrl } from '@core/utils/navigation.utils';
 
 interface LoginFormModel {
-  email: string;
+  identifier: string;
   password: string;
 }
 
@@ -52,22 +51,21 @@ export class LoginPage {
   protected readonly submitRetryable = signal(false);
   protected readonly showPassword = signal(false);
   protected readonly rememberMe = signal(false);
-  protected readonly touchedEmail = signal(false);
+  protected readonly touchedIdentifier = signal(false);
   protected readonly touchedPassword = signal(false);
 
   protected readonly loginModel = signal<LoginFormModel>({
-    email: '',
+    identifier: '',
     password: '',
   });
 
   protected readonly loginForm = form(this.loginModel, (p) => {
-    required(p.email, { message: 'El correo es obligatorio' });
-    email(p.email, { message: 'Ingresa un correo válido' });
+    required(p.identifier, { message: 'El usuario o correo es obligatorio' });
     required(p.password, { message: 'La contraseña es obligatoria' });
   });
 
-  protected readonly showEmailError = computed(
-    () => this.touchedEmail() && this.loginForm.email().invalid(),
+  protected readonly showIdentifierError = computed(
+    () => this.touchedIdentifier() && this.loginForm.identifier().invalid(),
   );
 
   protected readonly showPasswordError = computed(
@@ -87,25 +85,25 @@ export class LoginPage {
   }
 
   /**
-   * Envía las credenciales a la API y guarda el perfil en sesión.
+   * Envía identificador y contraseña; guarda JWT + perfil.
    *
    * @param event - Submit del formulario.
    */
   protected onSubmit(event: Event): void {
     event.preventDefault();
-    this.touchedEmail.set(true);
+    this.touchedIdentifier.set(true);
     this.touchedPassword.set(true);
     this.submitError.set('');
     this.submitRetryable.set(false);
 
     void submit(this.loginForm, async () => {
-      const { email, password } = this.loginModel();
+      const { identifier, password } = this.loginModel();
       this.submitting.set(true);
       try {
-        const dto = await firstValueFrom(
-          this.api.loginWithEmail({ email: email.trim(), password }),
+        const response = await firstValueFrom(
+          this.api.login({ identifier: identifier.trim(), password }),
         );
-        this.auth.applyAuthenticatedProfile(toAuthUserProfile(dto));
+        this.auth.applyLogin(response, this.rememberMe());
         await this.router.navigateByUrl(this.returnUrl());
       } catch (error) {
         this.submitError.set(
@@ -129,7 +127,7 @@ export class LoginPage {
   }
 
   /**
-   * Actualiza "Recuérdame" (solo UI: la API fija la cookie a 60 minutos).
+   * Recuérdame: persiste el JWT en `localStorage` en lugar de `sessionStorage`.
    *
    * @param event - Change del checkbox.
    */

@@ -1,7 +1,7 @@
 # Registro a módulos según rol (pendiente de backend)
 
-- **Estado:** Documentado; **no implementable de forma segura solo en frontend**
-- **Fecha:** 2026-10-16
+- **Estado:** Login ya trae roles; asistencia **sigue anónima** — no implementable de forma segura solo en frontend
+- **Fecha:** 2026-10-21
 - **Relacionado:** [asistencia-registro.md](./asistencia-registro.md) · [asistencia-backend-gaps.md](./asistencia-backend-gaps.md) · [auth-login.md](./auth-login.md)
 
 ## Regla de producto (acordada)
@@ -16,11 +16,10 @@ Hoy la pantalla de asistencia es la misma para todos y el POST es anónimo.
 ## Por qué no se hace solo en el frontend
 
 1. `POST /api/attendance/register` y `GET /api/attendance/lookup-ci/{ci}` **no piden autenticación ni rol**. Cualquier cliente puede inscribir cualquier CI. Una UI que “bloquee” el formulario no es una regla de negocio.
-2. `GET /api/auth/me` (`UserProfileDto`) solo trae `id`, `username`, `email`, `roles`. **No hay CI, nombre, extensión ni teléfono**, así que no se puede autocompletar “con mi credencial”.
-3. El modelo RBAC existe (`role`, `user_role`, claims en el JWT), pero:
-   - la tabla `role` no está sembrada (no hay códigos `ADMIN` / `SECRETARIA`);
+2. `GET /api/v1/auth/me` trae `id`, `personId`, `username`, `email`, `roles`. **No hay CI, nombre, extensión ni teléfono**, así que no se puede autocompletar “con mi credencial”.
+3. El login **sí** emite roles (`ADMIN`, `DISTRICT_SECRETARY`, `BRANCH_COMMISSIONER`, …), pero:
    - ningún endpoint de asistencia usa `[Authorize]` ni `[Authorize(Roles = …)]`;
-   - el usuario local de desarrollo queda con `roles: []`.
+   - un `RoleGuard` en Angular no impide `POST /api/attendance/register` anónimo.
 
 Simular la UX en Angular (ocultar campos si el JWT no trae admin) **no impide** registrar a terceros vía API.
 
@@ -28,13 +27,12 @@ Simular la UX en Angular (ocultar campos si el JWT no trae admin) **no impide** 
 
 Orden sugerido:
 
-1. **Catálogo de roles** y asignación. Códigos tentativos (confirmar con producto): `ADMIN`, `SECRETARIA`, y el rol de dirigente/usuario normal (p. ej. `DIRIGENTE` o el que definan).
-2. **Autorizar asistencia:** `[Authorize]` en lookup y register.
-3. **Regla en el handler de register:**
-   - si el usuario es `ADMIN` o `SECRETARIA` → se acepta el body (CI de terceros), como ahora;
+1. **Autorizar asistencia:** `[Authorize]` en lookup y register.
+2. **Regla en el handler de register:**
+   - si el usuario es `ADMIN` o `DISTRICT_SECRETARY` → se acepta el body (CI de terceros), como ahora;
    - si no → **ignorar CI/nombre del body** y registrar con la `Person` ligada a `CurrentUser` (relación `user.person_id`).
-4. **Datos de persona en sesión:** ampliar `UserProfileDto` / `/me` **o** `GET /api/auth/me/person` con CI, extensión, nombres y teléfono, para el prefill del formulario del usuario normal.
-5. Lookup por CI: reservarlo a admin/secretaría (el usuario normal no lo necesita).
+3. **Datos de persona en sesión:** ampliar `/me` **o** `GET /api/v1/auth/me/person` con CI, extensión, nombres y teléfono.
+4. Lookup por CI: reservarlo a admin/secretaría.
 
 Cuando eso exista, el frontend podrá:
 
@@ -46,4 +44,4 @@ Cuando eso exista, el frontend podrá:
 
 - Semilla de módulos / QR de convocatoria.
 - Logout, Google, registro de cuentas.
-- Códigos definitivos de rol (producto + backend).
+- Códigos de rol: ya definidos en backend (`ADMIN`, `DISTRICT_SECRETARY`, …).

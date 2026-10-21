@@ -5,8 +5,8 @@
 | Documento | Contenido |
 | --------- | --------- |
 | [seguimiento.md](./seguimiento.md) | **Seguimiento**: hecho, en curso y pendiente |
-| [features/auth-login.md](./features/auth-login.md) | Pantalla de login y dónde poner el emblema |
-| [features/auth-backend-gaps.md](./features/auth-backend-gaps.md) | Límites de auth en la API actual |
+| [features/auth-login.md](./features/auth-login.md) | Login JWT Bearer, Signals, guards |
+| [features/auth-backend-gaps.md](./features/auth-backend-gaps.md) | Límites que quedan (logout, asistencia anónima) |
 | [features/modulos-catalogo.md](./features/modulos-catalogo.md) | Listado `/modulos`; el formulario solo al elegir un módulo |
 | [features/asistencia-registro.md](./features/asistencia-registro.md) | Feature de registro de asistencia (frontend) |
 | [features/asistencia-registro-por-rol.md](./features/asistencia-registro-por-rol.md) | Futuro: admin/secretaría vs. autoinscripción |
