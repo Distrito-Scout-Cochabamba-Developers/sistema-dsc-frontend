@@ -20,29 +20,41 @@ describe('AuthApiService', () => {
     http.verify();
   });
 
-  it('POST /api/auth/login/email', () => {
-    let email = '';
-    service.loginWithEmail({ email: 'a@b.c', password: 'x' }).subscribe((dto) => {
-      email = dto.email;
+  it('POST /api/v1/auth/login', () => {
+    let token = '';
+    service.login({ identifier: 'pablo.rocha', password: 'x' }).subscribe((dto) => {
+      token = dto.token;
     });
 
-    const req = http.expectOne('/api/auth/login/email');
-    expect(req.request.body).toEqual({ email: 'a@b.c', password: 'x' });
-    req.flush({ id: 1, username: 'a', email: 'a@b.c', roles: [] });
-    expect(email).toBe('a@b.c');
+    const req = http.expectOne('/api/v1/auth/login');
+    expect(req.request.body).toEqual({ identifier: 'pablo.rocha', password: 'x' });
+    req.flush({
+      token: 'jwt',
+      tokenType: 'Bearer',
+      expiresAt: '2099-01-01T00:00:00.000Z',
+      user: {
+        id: 1,
+        personId: 1,
+        username: 'pablo.rocha',
+        email: 'pablo.rocha@example.test',
+        roles: ['ADMIN'],
+      },
+    });
+    expect(token).toBe('jwt');
   });
 
-  it('GET /api/auth/me', () => {
+  it('GET /api/v1/auth/me', () => {
     let username = '';
     service.getCurrentUser().subscribe((dto) => {
       username = dto.username;
     });
 
-    http.expectOne('/api/auth/me').flush({
+    http.expectOne('/api/v1/auth/me').flush({
       id: 2,
+      personId: 2,
       username: 'scout',
       email: 'scout@dsc.org',
-      roles: ['leader'],
+      roles: ['BRANCH_COMMISSIONER'],
     });
     expect(username).toBe('scout');
   });

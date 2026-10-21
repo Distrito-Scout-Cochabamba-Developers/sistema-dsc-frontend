@@ -1,6 +1,5 @@
 /**
- * Envía cookies de sesión en llamadas a `/api`.
- * Si existiera un JWT en memoria, también adjunta Bearer.
+ * Adjunta `Authorization: Bearer <token>` en llamadas a `/api` si hay JWT.
  */
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
@@ -12,12 +11,14 @@ function isApiRequest(url: string): boolean {
 }
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const apiReq = isApiRequest(req.url) ? req.clone({ withCredentials: true }) : req;
-  const token = inject(AuthSessionService).accessToken();
-
-  if (!token) {
-    return next(apiReq);
+  if (!isApiRequest(req.url)) {
+    return next(req);
   }
 
-  return next(apiReq.clone({ setHeaders: { Authorization: `Bearer ${token}` } }));
+  const token = inject(AuthSessionService).accessToken();
+  if (!token) {
+    return next(req);
+  }
+
+  return next(req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }));
 };

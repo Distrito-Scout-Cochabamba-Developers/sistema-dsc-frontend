@@ -1,27 +1,20 @@
 # Gaps del backend que limitan autenticación
 
-El frontend **no modifica** el backend. Lo que falta queda aquí.
+Login JWT + roles **ya está**. Lo que falta:
 
 | Gap | Impacto | Mitigación en frontend | Falta en API |
 | --- | --- | --- | --- |
-| Cookie HttpOnly `access_token`, sin token en JSON | No se puede usar Bearer desde JS | `withCredentials` + proxy en `ng serve` | Documentar cookie como contrato oficial |
-| No hay `POST /api/auth/logout` | No se puede borrar la cookie | «Cerrar sesión» solo limpia el perfil en memoria; un refresh rehidrata `/me` | Logout que expire `access_token` |
-| Cookie 60 minutos fijos | «Recuérdame» no alarga la sesión | Checkbox visual, no se envía | `rememberMe` o `Expires` configurable |
-| `SameSite=Strict` + sin CORS | Prod en otro origen no enviará la cookie | Proxy local; prod same-origin o CORS + `AllowCredentials` | CORS o reverse proxy |
-| No hay Google / OAuth | El botón del mockup no puede autenticar | Botón deshabilitado | IdP + callback |
-| No hay registro público | «Regístrate» no tiene destino | Botón deshabilitado | `POST /api/auth/register` (si producto lo pide) |
-| No hay recuperación de contraseña | «Olvidé mi contraseña» inerte | Botón deshabilitado | Flujo de reset |
-| `/me` no trae CI, nombre completo ni teléfono | Un usuario normal no puede autocompletar su ficha al inscribirse a un módulo | Banner de sesión; el dirigente escribe el CI | Ampliar `UserProfileDto` o `GET /me/person` (ver [asistencia-registro-por-rol.md](./asistencia-registro-por-rol.md)) |
-| Catálogo `role` vacío; JWT sin roles reales | No se distingue admin/secretaría vs. dirigente | `roles: []` en el usuario local | Sembrar roles y asignarlos |
-| Asistencia anónima | La UI no puede imponer “solo yo” | N/A (hace falta API) | `[Authorize]` + regla por rol en `register` |
-| Contraseña en claro en infra (hasher de desarrollo) | Riesgo de seguridad, no de UI | N/A | Hash real (fuera de este repo frontend) |
-| Centro de ayuda / legales | Links del mockup sin destino | Deshabilitados | CMS o URLs estáticas |
+| No hay `POST /api/v1/auth/logout` | El JWT sigue válido hasta `exp` | «Cerrar sesión» borra storage y memoria | Revocar o acortar token |
+| JWT en Web Storage | XSS puede leer el token | Mínimo de JS propio; no hay cookie HttpOnly | — (contrato actual) |
+| `/me` sin CI / teléfono | No se prellena asistencia | Banner de sesión | Ampliar perfil o `GET /me/person` |
+| Asistencia anónima | Un `RoleGuard` no impide inscribir por API | Guards listos; no se aplican a `/asistencia` | `[Authorize]` + regla por rol |
+| No hay Google / OAuth | Botón del mockup inerte | Deshabilitado | IdP + callback |
+| No hay registro público | «Regístrate» sin destino | Deshabilitado | `POST /api/auth/register` si producto lo pide |
+| No hay recuperación de contraseña | Enlace inerte | Deshabilitado | Flujo de reset |
 
-## Preguntas abiertas (consultar antes de implementar)
+## Preguntas abiertas
 
-1. ¿Logout en API o basta con expiración de cookie?
-2. ¿«Recuérdame» debe cambiar la duración de la cookie?
-3. ¿Google es requisito de producto o solo del mockup?
-4. ¿El registro de cuentas es público o solo administración?
-5. ¿`/me` debe incluir datos de dirigente (CI) para prefill de asistencia? **Sí, para el usuario normal** (regla en [asistencia-registro-por-rol.md](./asistencia-registro-por-rol.md)).
-6. Códigos de rol definitivos: ¿`ADMIN` / `SECRETARIA` / `DIRIGENTE`?
+1. ¿Logout que invalide el JWT?
+2. ¿Google es requisito de producto?
+3. ¿`/me` debe incluir ficha de dirigente (CI) para asistencia?
+4. ¿Asistencia debe exigir `ADMIN` / `DISTRICT_SECRETARY` para terceros? Ver [asistencia-registro-por-rol.md](./asistencia-registro-por-rol.md).

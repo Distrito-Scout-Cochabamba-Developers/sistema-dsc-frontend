@@ -26,7 +26,7 @@ Listado: [modulos-catalogo.md](./modulos-catalogo.md). Contrato: [contrato-api-a
 
 ## Pendiente fuera de este frontend
 
-- [x] Auth real (login + cookie + `/me`) — ver [auth-login.md](./auth-login.md)
+- [x] Auth real (login JWT Bearer + `/me`) — ver [auth-login.md](./auth-login.md)
 - [x] GET de catálogo / módulo por código (`GET /api/attendance/modules`)
 - [ ] QR generado por admin
 - [ ] CORS o reverse proxy en producción

@@ -5,11 +5,14 @@ import { provideRouter } from '@angular/router';
 
 import { authInterceptor } from '@core/interceptors/auth.interceptor';
 import { AuthSessionService } from '@core/services/auth-session.service';
+import { AUTH_TOKEN_STORAGE_KEY, writeStoredAuth } from '@core/utils/auth-token.storage';
 
 import { App } from './app';
 
 describe('App', () => {
   beforeEach(async () => {
+    sessionStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
+    localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
     await TestBed.configureTestingModule({
       imports: [App],
       providers: [
@@ -22,34 +25,41 @@ describe('App', () => {
 
   afterEach(() => {
     TestBed.inject(HttpTestingController).verify();
+    sessionStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
+    localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
   });
-
-  function flushHydrationUnauthorized(): void {
-    const http = TestBed.inject(HttpTestingController);
-    const req = http.expectOne('/api/auth/me');
-    expect(req.request.withCredentials).toBe(true);
-    req.flush({ detail: 'No autorizado' }, { status: 401, statusText: 'Unauthorized' });
-  }
 
   it('should create the app', () => {
     const fixture = TestBed.createComponent(App);
-    flushHydrationUnauthorized();
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('hidrata la sesión desde /api/auth/me', () => {
+  it('no llama /me si no hay JWT guardado', () => {
+    TestBed.createComponent(App);
+    TestBed.inject(HttpTestingController).expectNone('/api/v1/auth/me');
+  });
+
+  it('hidrata la sesión desde /api/v1/auth/me cuando hay token', () => {
+    writeStoredAuth({
+      token: 'stored-jwt',
+      expiresAt: '2099-01-01T00:00:00.000Z',
+      persist: false,
+    });
     TestBed.createComponent(App);
     const http = TestBed.inject(HttpTestingController);
-    const req = http.expectOne('/api/auth/me');
+    const req = http.expectOne('/api/v1/auth/me');
+    expect(req.request.headers.get('Authorization')).toBe('Bearer stored-jwt');
     req.flush({
       id: 7,
+      personId: 7,
       username: 'dirigent',
       email: 'dirigent@dsc.org',
-      roles: ['leader'],
+      roles: ['BRANCH_COMMISSIONER'],
     });
 
     const auth = TestBed.inject(AuthSessionService);
     expect(auth.isAuthenticated()).toBe(true);
-    expect(auth.session()?.displayName).toBe('dirigent');
+    expect(auth.currentUser()?.displayName).toBe('dirigent');
+    expect(auth.roles()).toEqual(['BRANCH_COMMISSIONER']);
   });
 });

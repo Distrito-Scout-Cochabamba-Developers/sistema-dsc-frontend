@@ -1,7 +1,7 @@
 # Seguimiento del proyecto
 
-- **Última actualización:** 2026-10-16
-- **Estado general:** Login **completado**. Catálogo de módulos en `/modulos` (GET API + semilla Docker). El formulario de asistencia se abre al hacer click. El registro **según rol** espera API. Logout, CORS prod y Google siguen pendientes.
+- **Última actualización:** 2026-10-21
+- **Estado general:** Login **JWT Bearer** (`/api/v1/auth/login` + roles). Catálogo en `/modulos`. Asistencia pública. Registro **según rol** espera `[Authorize]` en attendance. Logout API y Google pendientes.
 
 Este archivo es el tablero de seguimiento. Márcalo al avanzar (cambia `Pendiente` → `En curso` → `Hecho`).
 
@@ -52,13 +52,13 @@ Detalle: [features/asistencia-registro.md](./features/asistencia-registro.md) ·
 | A-08 | Registro parcial si no está en el sistema | Hecho | 404 lookup + `isPartialRegistration` |
 | A-09 | Conectar lookup CI a API real | Hecho | `AdultDirectoryService` |
 | A-10 | Conectar registro a API real | Hecho | `AttendanceRegistrationService` |
-| A-11 | Auth real (login / token / sesión) | Hecho | **Completado:** `/auth/login`, cookie `access_token`, `GET /me`. Logout API pendiente |
+| A-11 | Auth real (login / token / sesión) | Hecho | JWT Bearer `POST /api/v1/auth/login`, Signals, interceptor, guards. Logout API pendiente |
 | A-12 | Generación/consumo de QR de sesión | En curso | **Consumo hecho** (deep link + QR local). **Generación admin bloqueada**. |
 | A-13 | Tests unitarios de la página / validaciones | Hecho | Página + HTTP + utils |
 | A-14 | Estados de error de red / retry UX | Hecho | Problem Details, retry GET 5xx, botones Reintentar |
 | A-15 | Accesibilidad (ARIA labels, foco, contraste) | Hecho | Labels, `aria-invalid`, skip link, foco al primer error |
 | A-16 | Usuario normal: solo autoinscripción + prefill de su persona | Bloqueado | API anónima y `/me` sin ficha. Doc: [asistencia-registro-por-rol.md](./features/asistencia-registro-por-rol.md) |
-| A-17 | Admin/secretaría: registrar a terceros en un módulo | Bloqueado | Faltan roles sembrados y `[Authorize]` en attendance |
+| A-17 | Admin/secretaría: registrar a terceros en un módulo | Bloqueado | Roles en JWT ya existen; falta `[Authorize]` en attendance |
 
 ---
 
@@ -70,7 +70,7 @@ Detalle: [features/asistencia-registro.md](./features/asistencia-registro.md) ·
 | B-02 | `HttpClient` + interceptores (auth, errores) | Hecho | `withFetch`, `authInterceptor`, `httpRetryInterceptor` |
 | B-03 | Environments (`apiBaseUrl` dev/prod) | Hecho | `src/environments` + proxy local |
 | B-04 | Manejo de errores HTTP tipados | Hecho | RFC 7807 `detail` + `status === 0` |
-| B-05 | CORS / cookies / refresh token (según diseño) | En curso | Cookie HttpOnly en login. **CORS no está en `Program.cs`**. Sin logout ni refresh. |
+| B-05 | CORS / cookies / refresh token (según diseño) | En curso | Auth es Bearer (no cookie). **CORS no está en `Program.cs`**. Sin logout ni refresh. |
 
 ---
 
@@ -95,7 +95,7 @@ Detalle: [features/asistencia-registro.md](./features/asistencia-registro.md) ·
 | Q-02 | CI (build + test en PR) | Pendiente | — |
 | Q-03 | Coverage mínimo en features críticas | Pendiente | — |
 | Q-04 | Instalar `uv` (recomendado por BMAD) | Pendiente | Opcional para workflows Python |
-| Q-05 | Primer ADR formal (mocks vs API) | Hecho | ADR 0001–0006 |
+| Q-05 | Primer ADR formal (mocks vs API) | Hecho | ADR 0001–0007 |
 
 ---
 
@@ -116,7 +116,7 @@ pnpm start
 - CI conocido: el que exista en `person.id_card`
 - CI desconocido: 7–10 dígitos → registro parcial si existe el `TrainingModule.Code`
 - Duplicado → 409
-- Auth: **listo.** Correo/contraseña contra `POST /api/auth/login/email` (usuario existente en BD). Docker local: `prueba@gmail.com` / `1234`
+- Auth: `POST /api/v1/auth/login` con `{ identifier, password }`. JWT en el body. Usuarios de seeder (`pablo.rocha`, `maricel.rocha`, …). Contraseña local Docker: `1234`.
 
 Docker siembra `module_type` + 4 `training_module` (`docker/seed-dev-modules.sql`). Un código que no exista muestra «Sesión no válida» (sin formulario).
 
@@ -125,6 +125,6 @@ Docker siembra `module_type` + 4 `training_module` (`docker/seed-dev-modules.sql
 ## Próximo paso sugerido (backend / producto)
 
 1. Registro a módulos según rol (A-16/A-17): Authorize + `/me` con persona. Ver [asistencia-registro-por-rol.md](./features/asistencia-registro-por-rol.md).
-2. Logout que expire la cookie y CORS o reverse proxy same-origin (B-05).
+2. Logout que invalide el JWT y CORS o reverse proxy same-origin (B-05).
 3. Definir si el QR usa `Code` o `QrToken`.
 4. GET de convocatoria (fecha/horario) si el catálogo deja de ser el módulo curricular.

@@ -2,6 +2,7 @@
  * Rutas raíz de la aplicación.
  * Las features se cargan de forma diferida; no importar features de forma eager.
  * Auth vive fuera del shell para coincidir con el login a pantalla completa.
+ * Guards: `authGuard` / `roleGuard` en `core/guards/` (asistencia y catálogo siguen públicos).
  */
 import { Routes } from '@angular/router';
 
