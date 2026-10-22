@@ -8,6 +8,8 @@
 | [features/auth-login.md](./features/auth-login.md) | Login JWT Bearer, Signals, guards |
 | [features/auth-backend-gaps.md](./features/auth-backend-gaps.md) | Límites que quedan (logout, asistencia anónima) |
 | [features/modulos-catalogo.md](./features/modulos-catalogo.md) | Listado `/modulos`; el formulario solo al elegir un módulo |
+| [features/catalogo-admin-modulos.md](./features/catalogo-admin-modulos.md) | Admin `/admin/modulos` (ADMIN / secretaría) |
+| [features/catalogo-admin-backend-gaps.md](./features/catalogo-admin-backend-gaps.md) | POST/PUT y Authorize que faltan |
 | [features/asistencia-registro.md](./features/asistencia-registro.md) | Feature de registro de asistencia (frontend) |
 | [features/asistencia-registro-por-rol.md](./features/asistencia-registro-por-rol.md) | Futuro: admin/secretaría vs. autoinscripción |
 | [features/contrato-api-asistencia.md](./features/contrato-api-asistencia.md) | Contrato HTTP lookup + register |

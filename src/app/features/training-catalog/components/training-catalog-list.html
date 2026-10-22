@@ -1,0 +1,56 @@
+<div class="flex flex-wrap items-center justify-between gap-3">
+  <p class="m-0 text-sm text-muted">{{ modules().length }} módulo(s) en el catálogo</p>
+  <button
+    type="button"
+    class="rounded-lg bg-dsc px-4 py-2 text-sm font-semibold text-white transition hover:bg-dsc-dark"
+    (click)="create.emit()"
+  >
+    Nuevo módulo
+  </button>
+</div>
+
+<div class="mt-4 overflow-x-auto rounded-2xl border border-border bg-elevated shadow-sm">
+  <table class="w-full min-w-[40rem] border-collapse text-left text-sm">
+    <thead class="border-b border-border bg-dsc-soft/60 text-xs tracking-wide text-dsc-dark uppercase">
+      <tr>
+        <th class="px-4 py-3 font-semibold">Código</th>
+        <th class="px-4 py-3 font-semibold">Nombre</th>
+        <th class="px-4 py-3 font-semibold">Tipo</th>
+        <th class="px-4 py-3 font-semibold">Descripción</th>
+        <th class="px-4 py-3 font-semibold">
+          <span class="sr-only">Acciones</span>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (module of modules(); track module.code) {
+        <tr class="border-b border-border last:border-b-0">
+          <td class="px-4 py-3 font-mono text-xs text-ink">{{ module.code }}</td>
+          <td class="px-4 py-3 font-medium text-ink">{{ module.name }}</td>
+          <td class="px-4 py-3 text-muted">{{ module.moduleTypeName }}</td>
+          <td class="max-w-xs truncate px-4 py-3 text-muted">
+            {{ module.description || '—' }}
+          </td>
+          <td class="px-4 py-3 text-right">
+            <div class="flex justify-end gap-3">
+              <button
+                type="button"
+                class="font-semibold text-dsc hover:underline"
+                (click)="edit.emit(module)"
+              >
+                Editar
+              </button>
+              <button
+                type="button"
+                class="font-semibold text-danger hover:underline"
+                (click)="remove.emit(module)"
+              >
+                Eliminar
+              </button>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

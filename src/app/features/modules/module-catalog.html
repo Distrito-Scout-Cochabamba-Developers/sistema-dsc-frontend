@@ -2,13 +2,25 @@
   <p class="w-fit rounded-full bg-dsc-soft px-3 py-1 text-xs font-bold tracking-wide text-dsc-dark">
     FORMACIÓN
   </p>
-  <h1 class="mt-4 m-0 text-headline-lg font-bold tracking-tight text-ink md:text-headline-lg-desktop">
-    Módulos
-  </h1>
-  <p class="mt-2 max-w-2xl text-body text-muted">
-    Elige un módulo para registrar asistencia. El formulario se abre solo al
-    entrar a uno.
-  </p>
+  <div class="mt-4 flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <h1 class="m-0 text-headline-lg font-bold tracking-tight text-ink md:text-headline-lg-desktop">
+        Módulos
+      </h1>
+      <p class="mt-2 mb-0 max-w-2xl text-body text-muted">
+        Elige un módulo para registrar asistencia. El formulario se abre solo al
+        entrar a uno.
+      </p>
+    </div>
+    @if (canManageCatalog()) {
+      <a
+        class="rounded-lg bg-dsc px-4 py-2 text-sm font-semibold text-white no-underline transition hover:bg-dsc-dark"
+        routerLink="/admin/modulos"
+      >
+        Administrar módulos
+      </a>
+    }
+  </div>
 
   @if (loading()) {
     <p class="mt-8 text-sm text-muted" role="status">Cargando módulos…</p>

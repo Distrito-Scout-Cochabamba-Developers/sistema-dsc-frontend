@@ -141,6 +141,7 @@ Arranque: en Claude Code o Cursor, invocar **`bmad-help`**.
 | [`docs/seguimiento.md`](./docs/seguimiento.md) | Tablero hecho / pendiente |
 | [`docs/features/auth-login.md`](./docs/features/auth-login.md) | Login JWT Bearer y guards |
 | [`docs/features/modulos-catalogo.md`](./docs/features/modulos-catalogo.md) | Listado `/modulos` y enlace al formulario |
+| [`docs/features/catalogo-admin-modulos.md`](./docs/features/catalogo-admin-modulos.md) | Admin `/admin/modulos` |
 | [`docs/features/asistencia-registro.md`](./docs/features/asistencia-registro.md) | Feature registro de asistencia |
 | [`docs/`](./docs/README.md) | Índice de documentación técnica |
 | [`_bmad-output/project-context.md`](./_bmad-output/project-context.md) | Contexto BMAD / brownfield |
