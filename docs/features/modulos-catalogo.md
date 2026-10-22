@@ -12,6 +12,7 @@ Antes el CTA de inicio y «Módulos» apuntaban directo al formulario demo. Ahor
 2. El click navega a `/asistencia/{code}`.
 3. Esa página pide `GET /api/attendance/modules/{code}`. Si 404 o código vacío → «Sesión no válida», **sin** formulario.
 4. Landing y navbar apuntan a `/modulos`.
+5. Si la sesión es `ADMIN` o `DISTRICT_SECRETARY`, el botón **Administrar módulos** lleva a `/admin/modulos`.
 
 ## Archivos
 

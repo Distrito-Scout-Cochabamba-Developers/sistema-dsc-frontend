@@ -1,6 +1,6 @@
 # Seguimiento del proyecto
 
-- **Última actualización:** 2026-10-21
+- **Última actualización:** 2026-10-22
 - **Estado general:** Login **JWT Bearer** (`/api/v1/auth/login` + roles). Catálogo en `/modulos`. Asistencia pública. Registro **según rol** espera `[Authorize]` en attendance. Logout API y Google pendientes.
 
 Este archivo es el tablero de seguimiento. Márcalo al avanzar (cambia `Pendiente` → `En curso` → `Hecho`).
@@ -83,6 +83,7 @@ Detalle: [features/asistencia-registro.md](./features/asistencia-registro.md) ·
 | P-03 | Mapa / ubicaciones | Pendiente | Link deshabilitado en nav |
 | P-04 | Iniciar sesión (pantalla real) | Hecho | **Completado.** Google/registro de cuenta deshabilitados (gaps de API) |
 | P-05 | Área de facilitador (generar QR / lista de asistentes) | Pendiente | Fuera de alcance del participante |
+| P-07 | Admin catálogo de módulos (CRUD) | Hecho | GET/POST/PUT/DELETE admin + tipos. [catalogo-admin-modulos.md](./features/catalogo-admin-modulos.md) |
 | P-06 | i18n (es / otros) | Pendiente | Copy actual en español fijo |
 
 ---

@@ -17,3 +17,6 @@ export const AUTH_ROLE_CODES = [
 
 /** Código de rol emitido por la API. */
 export type AuthRoleCode = (typeof AUTH_ROLE_CODES)[number];
+
+/** Roles que administran el catálogo de módulos. */
+export const TRAINING_CATALOG_ROLES = ['ADMIN', 'DISTRICT_SECRETARY'] as const satisfies readonly AuthRoleCode[];

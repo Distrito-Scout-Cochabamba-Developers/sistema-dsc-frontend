@@ -2,11 +2,20 @@
  * Listado de módulos de formación. El formulario de asistencia solo se abre
  * al elegir un ítem (`/asistencia/:code`).
  */
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 
+import { TRAINING_CATALOG_ROLES } from '@core/models/auth-roles';
 import type { TrainingModuleApiDto } from '@core/models/attendance-api.models';
+import { AuthSessionService } from '@core/services/auth-session.service';
 import { TrainingModulesService } from '@core/services/training-modules.service';
 import { isRetryableHttpError, problemDetailMessage } from '@core/utils/http-error.utils';
 import { StateCard } from '@shared/components/state-card';
@@ -19,12 +28,18 @@ import { StateCard } from '@shared/components/state-card';
 })
 export class ModuleCatalog {
   private readonly catalog = inject(TrainingModulesService);
+  private readonly auth = inject(AuthSessionService);
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly modules = signal<readonly TrainingModuleApiDto[]>([]);
   protected readonly loading = signal(true);
   protected readonly error = signal('');
   protected readonly retryable = signal(false);
+
+  /** Admin o secretaría: ven el acceso a editar el catálogo. */
+  protected readonly canManageCatalog = computed(() =>
+    TRAINING_CATALOG_ROLES.some((role) => this.auth.hasRole(role)),
+  );
 
   constructor() {
     this.load();

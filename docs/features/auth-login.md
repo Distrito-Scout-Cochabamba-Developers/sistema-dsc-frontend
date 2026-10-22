@@ -39,15 +39,7 @@ Constantes TS: `src/app/core/models/auth-roles.ts`.
 
 El JWT se guarda en `sessionStorage` o, si «Recuérdame», en `localStorage` (`dsc.auth.session`). Al arrancar, si hay token vigente se llama a `/me`.
 
-`authGuard` / `roleGuard` **están listos** para rutas lazy. No se aplican a `/`, `/modulos` ni `/asistencia`: el registro de asistencia sigue siendo anónimo en la API. Ejemplo futuro:
-
-```ts
-{
-  path: 'admin',
-  canActivate: [authGuard, roleGuard('ADMIN', 'DISTRICT_SECRETARY')],
-  loadChildren: () => import('...'),
-}
-```
+`authGuard` / `roleGuard` se aplican en `/admin/modulos` (`ADMIN`, `DISTRICT_SECRETARY`). No se aplican a `/`, `/modulos` ni `/asistencia`: el registro de asistencia sigue siendo anónimo en la API.
 
 ## Usuarios de desarrollo
 

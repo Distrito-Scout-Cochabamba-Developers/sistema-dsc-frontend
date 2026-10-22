@@ -2,9 +2,14 @@
  * Rutas raíz de la aplicación.
  * Las features se cargan de forma diferida; no importar features de forma eager.
  * Auth vive fuera del shell para coincidir con el login a pantalla completa.
- * Guards: `authGuard` / `roleGuard` en `core/guards/` (asistencia y catálogo siguen públicos).
+ * `/admin/modulos` usa `authGuard` + `roleGuard` (ADMIN / DISTRICT_SECRETARY).
+ * `/modulos` y `/asistencia` siguen públicos: la API de asistencia es anónima.
  */
 import { Routes } from '@angular/router';
+
+import { authGuard } from '@core/guards/auth.guard';
+import { roleGuard } from '@core/guards/role.guard';
+import { TRAINING_CATALOG_ROLES } from '@core/models/auth-roles';
 
 export const routes: Routes = [
   {
@@ -30,6 +35,14 @@ export const routes: Routes = [
         path: 'modulos',
         loadChildren: () =>
           import('@features/modules/modules.routes').then((m) => m.MODULES_ROUTES),
+      },
+      {
+        path: 'admin/modulos',
+        canActivate: [authGuard, roleGuard(...TRAINING_CATALOG_ROLES)],
+        loadChildren: () =>
+          import('@features/training-catalog/training-catalog.routes').then(
+            (m) => m.TRAINING_CATALOG_ROUTES,
+          ),
       },
       {
         path: 'asistencia',
