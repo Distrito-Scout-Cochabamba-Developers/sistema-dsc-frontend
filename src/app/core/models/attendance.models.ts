@@ -17,7 +17,8 @@ export type DepartmentCode = 'LP' | 'CB' | 'SC' | 'OR' | 'PT' | 'TJ' | 'CH' | 'B
 export type AttendanceRegistrationStatus = 'completo' | 'parcial';
 
 /**
- * Perfil de dirigente autenticado (sesión de aplicación).
+ * Perfil de dirigente autenticado con datos de asistencia (CI/teléfono).
+ * La API de auth no lo entrega hoy; se conserva para cuando `/me` se amplíe.
  */
 export interface LeaderSession {
   readonly id: string;
@@ -54,14 +55,14 @@ export interface ModuleSession {
   readonly moduleTitle: string;
   readonly moduleName: string;
   readonly description: string;
-  readonly dateLabel: string;
-  readonly timeLabel: string;
+  readonly dateLabel?: string;
+  readonly timeLabel?: string;
   readonly imageAlt: string;
   readonly imageUrl: string;
 }
 
 /**
- * Payload de registro de asistencia (frontend; contrato futuro con API).
+ * Payload de registro de asistencia enviado desde el formulario.
  */
 export interface AttendanceRegistrationPayload {
   readonly sessionId: string;
@@ -69,7 +70,6 @@ export interface AttendanceRegistrationPayload {
   readonly fullName: string;
   readonly extension: DepartmentCode;
   readonly phone: string;
-  readonly estado: AttendanceRegistrationStatus;
 }
 
 /**

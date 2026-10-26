@@ -9,7 +9,6 @@ import {
   Component,
   DestroyRef,
   computed,
-  effect,
   inject,
   input,
   output,
@@ -17,9 +16,13 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { FormField, form, pattern, required, submit } from '@angular/forms/signals';
-import { debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, EMPTY, catchError, filter, firstValueFrom, switchMap, tap } from 'rxjs';
 
-import type { ModuleSession, AttendanceRegistrationResult } from '@core/models/attendance.models';
+import type {
+  DistrictAdult,
+  ModuleSession,
+  AttendanceRegistrationResult,
+} from '@core/models/attendance.models';
 import { AdultDirectoryService } from '@core/services/adult-directory.service';
 import { AuthSessionService } from '@core/services/auth-session.service';
 import {
@@ -29,6 +32,7 @@ import {
   isValidCiNumber,
   isValidDepartmentCode,
 } from '@core/utils/ci.utils';
+import { isRetryableHttpError, problemDetailMessage } from '@core/utils/http-error.utils';
 
 import { AttendanceRegistrationService } from '../services/attendance-registration.service';
 
@@ -39,7 +43,7 @@ interface AttendanceFormModel {
   phone: string;
 }
 
-type CiLookupStatus = 'idle' | 'loading' | 'found' | 'not-found' | 'invalid';
+type CiLookupStatus = 'idle' | 'loading' | 'found' | 'not-found' | 'invalid' | 'error';
 
 @Component({
   selector: 'app-attendance-form',
@@ -64,7 +68,9 @@ export class AttendanceForm {
 
   protected readonly submitting = signal(false);
   protected readonly submitError = signal('');
+  protected readonly submitRetryable = signal(false);
   protected readonly ciStatus = signal<CiLookupStatus>('idle');
+  protected readonly lookupError = signal('');
   /** `true` si el CI no estaba en el directorio (registro parcial). */
   private readonly partialFromDirectory = signal(false);
 
@@ -108,26 +114,7 @@ export class AttendanceForm {
   );
 
   constructor() {
-    this.watchAuthSession();
     this.watchCiLookup();
-  }
-
-  /** Prellena el formulario con el perfil del dirigente si hay sesión activa. */
-  private watchAuthSession(): void {
-    effect(() => {
-      const profile = this.auth.session();
-      if (!profile) {
-        return;
-      }
-      this.attendanceModel.set({
-        ci: profile.ci,
-        fullName: profile.fullName,
-        extension: profile.extension,
-        phone: profile.phone,
-      });
-      this.ciStatus.set('found');
-      this.partialFromDirectory.set(false);
-    });
   }
 
   /** Busca en el directorio distrital cada vez que el CI ingresado es válido. */
@@ -139,6 +126,7 @@ export class AttendanceForm {
         tap((ci) => {
           if (!ci.trim()) {
             this.ciStatus.set('idle');
+            this.lookupError.set('');
             return;
           }
           if (!isValidCiNumber(ci)) {
@@ -146,32 +134,27 @@ export class AttendanceForm {
           }
         }),
         filter((ci) => isValidCiNumber(ci)),
-        tap(() => this.ciStatus.set('loading')),
-        switchMap((ci) => this.directory.lookupByCi(ci)),
+        tap(() => {
+          this.ciStatus.set('loading');
+          this.lookupError.set('');
+        }),
+        switchMap((ci) =>
+          this.directory.lookupByCi(ci, this.attendanceModel().extension).pipe(
+            catchError((error: unknown) => {
+              this.onLookupFailure(error);
+              return EMPTY;
+            }),
+          ),
+        ),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe((adult) => {
-        if (!adult) {
-          this.ciStatus.set('not-found');
-          this.partialFromDirectory.set(true);
-          return;
-        }
-        this.ciStatus.set('found');
-        this.partialFromDirectory.set(false);
-        this.attendanceModel.update((current) => ({
-          ...current,
-          fullName: adult.fullName,
-          extension: adult.extension,
-          phone: current.phone || adult.phone,
-        }));
-      });
+      .subscribe((adult) => this.applyLookup(adult));
   }
 
   /**
-   * Cierra sesión demo y limpia el formulario para registro manual.
+   * Limpia el formulario para registrar a otra persona sin cerrar la sesión.
    */
   protected onChangeProfile(): void {
-    this.auth.clearSession();
     this.attendanceModel.set({
       ci: '',
       fullName: '',
@@ -180,6 +163,7 @@ export class AttendanceForm {
     });
     this.ciStatus.set('idle');
     this.partialFromDirectory.set(true);
+    this.lookupError.set('');
     this.touchedCi.set(false);
     this.touchedName.set(false);
     this.touchedExtension.set(false);
@@ -187,7 +171,33 @@ export class AttendanceForm {
   }
 
   /**
-   * Envía el registro mock tras validar el formulario.
+   * Repite el lookup de CI tras un error de red.
+   */
+  protected retryLookup(): void {
+    const ci = this.attendanceModel().ci.trim();
+    if (!isValidCiNumber(ci)) {
+      return;
+    }
+    this.ciStatus.set('loading');
+    this.lookupError.set('');
+    this.directory
+      .lookupByCi(ci, this.attendanceModel().extension)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (adult) => this.applyLookup(adult),
+        error: (error: unknown) => this.onLookupFailure(error),
+      });
+  }
+
+  /**
+   * Reenvía el formulario si el último POST falló de forma transitoria.
+   */
+  protected retrySubmit(): void {
+    this.onSubmit(new Event('submit', { cancelable: true, bubbles: true }));
+  }
+
+  /**
+   * Envía el registro de asistencia a la API tras validar el formulario.
    *
    * @param event - Evento submit del formulario.
    */
@@ -198,6 +208,11 @@ export class AttendanceForm {
     this.touchedExtension.set(true);
     this.touchedPhone.set(true);
     this.submitError.set('');
+    this.submitRetryable.set(false);
+
+    if (this.formIsInvalid()) {
+      this.focusFirstInvalid();
+    }
 
     void submit(this.attendanceForm, async () => {
       const model = this.attendanceModel();
@@ -211,24 +226,87 @@ export class AttendanceForm {
 
       this.submitting.set(true);
       try {
-        const result = await new Promise<AttendanceRegistrationResult>((resolve, reject) => {
-          this.registrationApi
-            .register({
-              sessionId: session.sessionId,
-              ci: model.ci.trim(),
-              fullName: model.fullName.trim(),
-              extension,
-              phone: model.phone.trim(),
-              estado: this.partialFromDirectory() ? 'parcial' : 'completo',
-            })
-            .subscribe({ next: resolve, error: reject });
-        });
+        const result = await firstValueFrom(
+          this.registrationApi.register({
+            sessionId: session.sessionId,
+            ci: model.ci.trim(),
+            fullName: model.fullName.trim(),
+            extension,
+            phone: model.phone.trim(),
+          }),
+        );
         this.registered.emit(result);
-      } catch {
-        this.submitError.set('No se pudo registrar la asistencia. Intenta de nuevo.');
+      } catch (error) {
+        this.submitError.set(
+          problemDetailMessage(error, 'No se pudo registrar la asistencia. Intenta de nuevo.'),
+        );
+        this.submitRetryable.set(isRetryableHttpError(error));
       } finally {
         this.submitting.set(false);
       }
     });
+  }
+
+  /**
+   * Aplica el resultado de lookup al formulario.
+   *
+   * @param adult - Perfil encontrado o `null`.
+   */
+  private applyLookup(adult: DistrictAdult | null): void {
+    if (!adult) {
+      this.ciStatus.set('not-found');
+      this.partialFromDirectory.set(true);
+      return;
+    }
+    this.ciStatus.set('found');
+    this.partialFromDirectory.set(false);
+    this.lookupError.set('');
+    this.attendanceModel.update((current) => ({
+      ...current,
+      fullName: adult.fullName,
+      extension: adult.extension,
+      phone: current.phone || adult.phone,
+    }));
+  }
+
+  /**
+   * Marca el lookup como error recuperable.
+   *
+   * @param error - Fallo HTTP o de red.
+   */
+  private onLookupFailure(error: unknown): void {
+    this.ciStatus.set('error');
+    this.lookupError.set(
+      problemDetailMessage(error, 'No se pudo consultar el CI. Intenta de nuevo.'),
+    );
+  }
+
+  /**
+   * Indica si algún campo del formulario es inválido.
+   */
+  private formIsInvalid(): boolean {
+    return (
+      this.attendanceForm.ci().invalid() ||
+      this.attendanceForm.fullName().invalid() ||
+      this.attendanceForm.extension().invalid() ||
+      this.attendanceForm.phone().invalid()
+    );
+  }
+
+  /**
+   * Mueve el foco al primer campo inválido.
+   */
+  private focusFirstInvalid(): void {
+    const fields: ReadonlyArray<{ id: string; invalid: boolean }> = [
+      { id: 'ci', invalid: this.attendanceForm.ci().invalid() },
+      { id: 'fullName', invalid: this.attendanceForm.fullName().invalid() },
+      { id: 'extension', invalid: this.attendanceForm.extension().invalid() },
+      { id: 'phone', invalid: this.attendanceForm.phone().invalid() },
+    ];
+    const first = fields.find((field) => field.invalid);
+    if (!first) {
+      return;
+    }
+    globalThis.document.getElementById(first.id)?.focus();
   }
 }

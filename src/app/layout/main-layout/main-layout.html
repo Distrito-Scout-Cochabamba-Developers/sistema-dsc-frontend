@@ -1,7 +1,63 @@
 <div class="grid min-h-dvh grid-rows-[auto_1fr_auto] bg-surface text-ink">
-  <app-dsc-navbar [isAuthenticated]="auth.isAuthenticated()" (authClicked)="onAuthClick()" />
+  <a
+    href="#contenido-principal"
+    class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-dsc focus:px-3 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
+  >
+    Saltar al contenido
+  </a>
+  <header class="sticky top-0 z-20 border-b border-border bg-elevated/95 backdrop-blur">
+    <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 md:px-6">
+      <a class="flex items-center gap-2 no-underline" routerLink="/">
+        <app-dsc-logo-badge size="md" />
+        <span class="text-lg font-bold text-dsc-navy">DSC</span>
+      </a>
 
-  <main class="min-w-0">
+      <nav class="hidden items-center gap-6 text-sm font-medium text-muted md:flex" aria-label="Principal">
+        <a
+          routerLink="/"
+          routerLinkActive="text-dsc border-b-2 border-dsc"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="border-b-2 border-transparent pb-0.5 text-ink no-underline hover:text-dsc"
+        >
+          Inicio
+        </a>
+        <span class="cursor-not-allowed border-b-2 border-transparent pb-0.5 text-ink/50" aria-disabled="true">
+          Calendario
+        </span>
+        <a
+          routerLink="/modulos"
+          routerLinkActive="text-dsc border-b-2 border-dsc"
+          class="border-b-2 border-transparent pb-0.5 text-ink no-underline hover:text-dsc"
+        >
+          Módulos
+        </a>
+        <span class="cursor-not-allowed border-b-2 border-transparent pb-0.5 text-ink/50" aria-disabled="true">
+          Mapa
+        </span>
+      </nav>
+
+      @if (auth.isAuthenticated()) {
+        <button
+          type="button"
+          class="rounded-lg bg-dsc-navy px-4 py-2 text-sm font-semibold text-white transition hover:bg-dsc-dark"
+          (click)="onLogout()"
+          aria-label="Cerrar sesión"
+        >
+          Cerrar sesión
+        </button>
+      } @else {
+        <a
+          class="rounded-lg bg-dsc-navy px-4 py-2 text-sm font-semibold text-white no-underline transition hover:bg-dsc-dark"
+          routerLink="/auth/login"
+          [queryParams]="{ returnUrl: router.url }"
+        >
+          Iniciar Sesión
+        </a>
+      }
+    </div>
+  </header>
+
+  <main id="contenido-principal" class="min-w-0" tabindex="-1">
     <router-outlet />
   </main>
 

@@ -1,11 +1,29 @@
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
+import type { ModuleAttendanceResultApiDto, ScoutLeaderApiDto } from '@core/models/attendance-api.models';
 import { AuthSessionService } from '@core/services/auth-session.service';
 
 import { AttendancePage } from './attendance-page';
 
 const SESSION_ID = 'mod-liderazgo-20241024';
+
+const MODULE_DTO = {
+  id: 1,
+  code: SESSION_ID,
+  name: 'Módulo de Liderazgo y Servicio',
+  description: 'Formación de liderazgo',
+  moduleTypeCode: 'AE',
+  moduleTypeName: 'Adultos en el Escultismo',
+};
+
+function flushModuleMeta(http: HttpTestingController): void {
+  http.expectOne((request) => request.url.includes(`/api/attendance/modules/${SESSION_ID}`)).flush(
+    MODULE_DTO,
+  );
+}
 
 function wait(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -33,54 +51,98 @@ function setInputValue(
 }
 
 describe('AttendancePage', () => {
+  let http: HttpTestingController;
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AttendancePage],
-      providers: [provideRouter([])],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
+    http = TestBed.inject(HttpTestingController);
+  });
+
+  afterEach(() => {
+    http.verify();
   });
 
   it('debe crearse', () => {
     const fixture = createComponent(SESSION_ID);
+    flushModuleMeta(http);
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('muestra "Sesión no válida" cuando el sessionId no existe en el mock', async () => {
-    const fixture = createComponent('sesion-inexistente');
-    await wait(200);
+  it('muestra "Sesión no válida" cuando el sessionId está vacío', async () => {
+    const fixture = createComponent('   ');
+    await wait(50);
     fixture.detectChanges();
 
     expect(textOf(fixture)).toContain('Sesión no válida');
   });
 
+  it('muestra "Sesión no válida" cuando el módulo no existe en la API', async () => {
+    const fixture = createComponent(SESSION_ID);
+    http
+      .expectOne((request) => request.url.includes(`/api/attendance/modules/${SESSION_ID}`))
+      .flush({ detail: 'no encontrado' }, { status: 404, statusText: 'Not Found' });
+    await wait(50);
+    fixture.detectChanges();
+
+    expect(textOf(fixture)).toContain('Sesión no válida');
+    expect(fixture.nativeElement.querySelector('#ci')).toBeNull();
+  });
+
   it('muestra el formulario con los datos de la sesión cuando el sessionId es válido', async () => {
     const fixture = createComponent(SESSION_ID);
-    await wait(200);
+    flushModuleMeta(http);
+    await wait(50);
     fixture.detectChanges();
 
     expect(textOf(fixture)).toContain('Módulo de Liderazgo y Servicio');
     expect(fixture.nativeElement.querySelector('#ci')).toBeTruthy();
   });
 
-  it('precompleta el formulario si el dirigente ya está autenticado', async () => {
+  it('muestra el perfil autenticado sin prellenar CI (la API no envía datos de dirigente)', async () => {
+    TestBed.inject(AuthSessionService).applyAuthenticatedProfile({
+      id: 1,
+      personId: 1,
+      username: 'jperez',
+      email: 'jperez@dsc.org',
+      roles: [],
+      displayName: 'jperez',
+    });
     const fixture = createComponent(SESSION_ID);
-    await wait(200);
+    flushModuleMeta(http);
+    await wait(50);
     fixture.detectChanges();
 
     const ciInput = fixture.nativeElement.querySelector('#ci') as HTMLInputElement;
-    expect(ciInput.value).toBe('12345678');
+    expect(ciInput.value).toBe('');
     expect(textOf(fixture)).toContain('Has iniciado sesión como');
+    expect(textOf(fixture)).toContain('jperez');
   });
 
   it('autocompleta nombre y extensión al ingresar un CI existente en el directorio (sin sesión activa)', async () => {
     TestBed.inject(AuthSessionService).clearSession();
     const fixture = createComponent(SESSION_ID);
-    await wait(200);
+    flushModuleMeta(http);
+    await wait(50);
     fixture.detectChanges();
 
     setInputValue(fixture, '#ci', '87654321');
     fixture.detectChanges();
-    await wait(900); // debounce (400ms) + delay del lookup mock (450ms)
+    await wait(500);
+
+    const req = http.expectOne((request) => request.url.includes('/api/attendance/lookup-ci/87654321'));
+    const body: ScoutLeaderApiDto = {
+      id: 2,
+      firstName: 'María',
+      lastName: 'López Quispe',
+      ciNumber: '87654321',
+      extension: 'CB',
+      phone: '71234567',
+      isProfileComplete: true,
+    };
+    req.flush(body);
     fixture.detectChanges();
 
     const nameInput = fixture.nativeElement.querySelector('#fullName') as HTMLInputElement;
@@ -91,12 +153,16 @@ describe('AttendancePage', () => {
   it('ofrece registro parcial cuando el CI no existe en el directorio', async () => {
     TestBed.inject(AuthSessionService).clearSession();
     const fixture = createComponent(SESSION_ID);
-    await wait(200);
+    flushModuleMeta(http);
+    await wait(50);
     fixture.detectChanges();
 
     setInputValue(fixture, '#ci', '99999999');
     fixture.detectChanges();
-    await wait(900);
+    await wait(500);
+
+    const req = http.expectOne((request) => request.url.includes('lookup-ci/99999999'));
+    req.flush({ detail: 'no encontrado' }, { status: 404, statusText: 'Not Found' });
     fixture.detectChanges();
 
     expect(textOf(fixture)).toContain('registro parcial');
@@ -105,7 +171,8 @@ describe('AttendancePage', () => {
   it('valida que el CI debe ser numérico', async () => {
     TestBed.inject(AuthSessionService).clearSession();
     const fixture = createComponent(SESSION_ID);
-    await wait(200);
+    flushModuleMeta(http);
+    await wait(50);
     fixture.detectChanges();
 
     const ciInput = fixture.nativeElement.querySelector('#ci') as HTMLInputElement;
@@ -121,7 +188,8 @@ describe('AttendancePage', () => {
   it('valida que el teléfono debe tener 8 dígitos', async () => {
     TestBed.inject(AuthSessionService).clearSession();
     const fixture = createComponent(SESSION_ID);
-    await wait(200);
+    flushModuleMeta(http);
+    await wait(50);
     fixture.detectChanges();
 
     const phoneInput = fixture.nativeElement.querySelector('#phone') as HTMLInputElement;
@@ -137,12 +205,17 @@ describe('AttendancePage', () => {
   it('completa el flujo de registro parcial y muestra la pantalla de éxito', async () => {
     TestBed.inject(AuthSessionService).clearSession();
     const fixture = createComponent(SESSION_ID);
-    await wait(200);
+    flushModuleMeta(http);
+    await wait(50);
     fixture.detectChanges();
 
     setInputValue(fixture, '#ci', '11112222');
     fixture.detectChanges();
-    await wait(900); // deja resolver el lookup (CI no encontrado)
+    await wait(500);
+
+    http
+      .expectOne((request) => request.url.includes('lookup-ci/11112222'))
+      .flush({ detail: 'no' }, { status: 404, statusText: 'Not Found' });
     fixture.detectChanges();
 
     setInputValue(fixture, '#fullName', 'Test Persona');
@@ -153,7 +226,22 @@ describe('AttendancePage', () => {
     const form = fixture.nativeElement.querySelector('form') as HTMLFormElement;
     form.dispatchEvent(new Event('submit', { cancelable: true }));
     fixture.detectChanges();
-    await wait(800); // delay del registro mock (600ms)
+    await wait(50);
+
+    const post = http.expectOne('/api/attendance/register');
+    const created: ModuleAttendanceResultApiDto = {
+      attendanceId: '11111111-1111-1111-1111-111111111111',
+      trainingModuleId: 1,
+      moduleTitle: 'Módulo de Liderazgo y Servicio',
+      scoutLeaderId: 9,
+      scoutLeaderFullName: 'Test Persona',
+      ciNumber: '11112222-LP',
+      registeredAt: '2026-08-18T18:00:00.000Z',
+      isPartialRegistration: true,
+    };
+    post.flush(created, { status: 201, statusText: 'Created' });
+    fixture.detectChanges();
+    await wait(50);
     fixture.detectChanges();
 
     const text = textOf(fixture);

@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { switchMap } from 'rxjs';
+import { catchError, of, switchMap } from 'rxjs';
 
 import type { ModuleSession, AttendanceRegistrationResult } from '@core/models/attendance.models';
-import { AdultDirectoryService } from '@core/services/adult-directory.service';
+import { TrainingModulesService } from '@core/services/training-modules.service';
+import { attendanceQrImageUrl } from '@core/utils/session-presentation.utils';
 import { StateCard } from '@shared/components/state-card';
 
 import { AttendanceForm } from './components/attendance-form';
@@ -23,16 +24,28 @@ export class AttendancePage {
   readonly sessionId = input.required<string>();
 
   private readonly destroyRef = inject(DestroyRef);
-  private readonly directory = inject(AdultDirectoryService);
+  private readonly modules = inject(TrainingModulesService);
 
   protected readonly session = signal<ModuleSession | null>(null);
   protected readonly loadError = signal(false);
   protected readonly success = signal<AttendanceRegistrationResult | null>(null);
 
+  /** QR del deep link actual (consumo local). */
+  protected readonly qrImageUrl = computed(() => {
+    const id = this.session()?.sessionId;
+    if (!id || typeof globalThis.location === 'undefined') {
+      return '';
+    }
+    const absolute = `${globalThis.location.origin}/asistencia/${encodeURIComponent(id)}`;
+    return attendanceQrImageUrl(absolute);
+  });
+
   constructor() {
     toObservable(this.sessionId)
       .pipe(
-        switchMap((id) => this.directory.getModuleSession(id)),
+        switchMap((id) =>
+          this.modules.getModuleSession(id).pipe(catchError(() => of(null))),
+        ),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((session) => {

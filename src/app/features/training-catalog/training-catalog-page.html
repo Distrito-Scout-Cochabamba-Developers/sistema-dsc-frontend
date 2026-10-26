@@ -1,0 +1,74 @@
+<section class="mx-auto max-w-6xl px-4 py-10 md:px-6">
+  <p class="w-fit rounded-full bg-dsc-soft px-3 py-1 text-xs font-bold tracking-wide text-dsc-dark">
+    ADMINISTRACIÓN
+  </p>
+  <a class="mt-4 inline-block text-sm font-semibold text-dsc no-underline hover:underline" routerLink="/modulos">
+    ← Volver a módulos
+  </a>
+  <h1 class="mt-3 m-0 text-headline-lg font-bold tracking-tight text-ink md:text-headline-lg-desktop">
+    Catálogo de módulos
+  </h1>
+  <p class="mt-2 max-w-2xl text-body text-muted">
+    Solo administradores y secretaría de distrito. Crear, editar y eliminar se guardan en la API.
+  </p>
+
+  @if (loading()) {
+    <p class="mt-8 text-sm text-muted" role="status">Cargando catálogo…</p>
+  } @else if (error()) {
+    <div class="mt-8">
+      <app-state-card title="No se pudo cargar el catálogo" ctaLabel="Volver al inicio" ctaLink="/">
+        {{ error() }}
+      </app-state-card>
+      @if (retryable()) {
+        <button
+          type="button"
+          class="mt-4 text-sm font-semibold text-dsc underline"
+          (click)="retry()"
+        >
+          Reintentar
+        </button>
+      }
+    </div>
+  } @else if (modules().length === 0) {
+    <div class="mt-8">
+      <p class="rounded-2xl border border-border bg-elevated p-6 text-sm text-muted">
+        Todavía no hay módulos en la base de datos.
+      </p>
+      <button
+        type="button"
+        class="mt-4 rounded-lg bg-dsc px-4 py-2 text-sm font-semibold text-white transition hover:bg-dsc-dark"
+        (click)="openCreate()"
+      >
+        Nuevo módulo
+      </button>
+    </div>
+  } @else {
+    <div class="mt-8">
+      <app-training-catalog-list
+        [modules]="modules()"
+        (create)="openCreate()"
+        (edit)="openEdit($event)"
+        (remove)="openDelete($event)"
+      />
+    </div>
+  }
+
+  <app-training-catalog-form-modal
+    [open]="modalOpen()"
+    [module]="editing()"
+    [moduleTypes]="moduleTypes()"
+    [saveError]="saveError()"
+    [submitting]="submitting()"
+    (closed)="closeModal()"
+    (saved)="save($event)"
+  />
+
+  <app-training-catalog-delete-dialog
+    [open]="deleting() !== null"
+    [module]="deleting()"
+    [deleteError]="deleteError()"
+    [submitting]="deleteSubmitting()"
+    (closed)="closeDelete()"
+    (confirmed)="confirmDelete()"
+  />
+</section>

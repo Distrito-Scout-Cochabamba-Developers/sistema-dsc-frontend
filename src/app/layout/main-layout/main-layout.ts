@@ -2,8 +2,8 @@
  * Shell DSC: navbar, contenido y footer alineados al diseño de asistencia.
  * Sin lógica de negocio; solo composición estructural.
  */
-import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 import { AuthSessionService } from '@core/services/auth-session.service';
 import { DscFooter } from '@shared/components/dsc-footer';
@@ -16,10 +16,17 @@ import { DscNavbar } from '@shared/components/dsc-navbar';
   templateUrl: './main-layout.html',
 })
 export class MainLayout {
-  /** Sesión mock para demostrar login / logout en el shell. */
+  /** Sesión real hidratada desde JWT (storage + `/me`) o login. */
   protected readonly auth = inject(AuthSessionService);
+  protected readonly router = inject(Router);
 
-  protected onAuthClick(): void {
-    this.auth.toggleDemoSession();
+  protected readonly currentYear = new Date().getFullYear();
+
+  /**
+   * Cierra la sesión en el cliente (borra el JWT local).
+   * El token sigue válido en el servidor hasta `exp`; no hay logout en la API.
+   */
+  protected onLogout(): void {
+    this.auth.clearSession();
   }
 }
