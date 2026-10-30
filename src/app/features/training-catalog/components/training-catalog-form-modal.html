@@ -1,0 +1,79 @@
+<dialog
+  #dialog
+  aria-modal="true"
+  class="fixed inset-0 z-50 m-auto h-fit max-h-[min(90dvh,40rem)] w-[min(calc(100%-2rem),32rem)] overflow-y-auto rounded-2xl border border-border bg-elevated p-0 shadow-xl backdrop:bg-ink/55"
+  (close)="onNativeClose()"
+>
+  <form class="p-6" (submit)="onSubmit($event)" novalidate>
+    <h2 class="m-0 text-xl font-bold text-ink">{{ title() }}</h2>
+
+    @if (saveError()) {
+      <p class="mt-2 rounded-md bg-danger-soft px-3 py-2 text-sm text-danger" role="alert">
+        {{ saveError() }}
+      </p>
+    }
+
+    <div class="mt-5 space-y-4">
+      <div>
+        <label class="mb-1.5 block text-sm font-medium text-ink" for="catalog-code">Código</label>
+        <input
+          id="catalog-code"
+          type="text"
+          class="w-full rounded-md border border-border bg-surface px-3 py-2.5 text-sm text-ink outline-none ring-dsc/30 focus:ring-2"
+          [readOnly]="isEdit()"
+          [formField]="catalogForm.code"
+        />
+      </div>
+      <div>
+        <label class="mb-1.5 block text-sm font-medium text-ink" for="catalog-name">Nombre</label>
+        <input
+          id="catalog-name"
+          type="text"
+          class="w-full rounded-md border border-border bg-surface px-3 py-2.5 text-sm text-ink outline-none ring-dsc/30 focus:ring-2"
+          [formField]="catalogForm.name"
+        />
+      </div>
+      <div>
+        <label class="mb-1.5 block text-sm font-medium text-ink" for="catalog-type">Tipo</label>
+        <select
+          id="catalog-type"
+          class="w-full rounded-md border border-border bg-surface px-3 py-2.5 text-sm text-ink outline-none ring-dsc/30 focus:ring-2"
+          [formField]="catalogForm.moduleTypeCode"
+        >
+          <option value="">Selecciona un tipo</option>
+          @for (type of moduleTypes(); track type.code) {
+            <option [value]="type.code">{{ type.name }} ({{ type.code }})</option>
+          }
+        </select>
+      </div>
+      <div>
+        <label class="mb-1.5 block text-sm font-medium text-ink" for="catalog-description">
+          Descripción
+        </label>
+        <textarea
+          id="catalog-description"
+          rows="3"
+          class="w-full rounded-md border border-border bg-surface px-3 py-2.5 text-sm text-ink outline-none ring-dsc/30 focus:ring-2"
+          [formField]="catalogForm.description"
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="mt-6 flex justify-end gap-3">
+      <button
+        type="button"
+        class="rounded-lg border border-border px-4 py-2 text-sm font-medium text-ink hover:bg-surface"
+        (click)="closed.emit()"
+      >
+        Cerrar
+      </button>
+      <button
+        type="submit"
+        class="rounded-lg bg-dsc px-4 py-2 text-sm font-semibold text-white transition hover:bg-dsc-dark disabled:cursor-not-allowed disabled:opacity-70"
+        [disabled]="submitting()"
+      >
+        {{ submitting() ? 'Guardando…' : 'Guardar' }}
+      </button>
+    </div>
+  </form>
+</dialog>

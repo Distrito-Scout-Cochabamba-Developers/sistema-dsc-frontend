@@ -1,0 +1,41 @@
+<dialog
+  #dialog
+  aria-modal="true"
+  class="fixed inset-0 z-50 m-auto h-fit max-h-[min(90dvh,40rem)] w-[min(calc(100%-2rem),32rem)] overflow-y-auto rounded-2xl border border-border bg-elevated p-0 shadow-xl backdrop:bg-ink/55"
+  (close)="onNativeClose()"
+>
+  <div class="p-6">
+    <h2 class="m-0 text-xl font-bold text-ink">Eliminar módulo</h2>
+    <p class="mt-3 m-0 text-sm text-muted">
+      ¿Eliminar
+      <span class="font-semibold text-ink">{{ module()?.name }}</span>
+      (<span class="font-mono text-xs">{{ module()?.code }}</span>)? Esta acción no se puede
+      deshacer.
+    </p>
+
+    @if (deleteError()) {
+      <p class="mt-3 rounded-md bg-danger-soft px-3 py-2 text-sm text-danger" role="alert">
+        {{ deleteError() }}
+      </p>
+    }
+
+    <div class="mt-6 flex justify-end gap-3">
+      <button
+        type="button"
+        class="rounded-lg border border-border px-4 py-2 text-sm font-medium text-ink hover:bg-surface"
+        (click)="closed.emit()"
+        [disabled]="submitting()"
+      >
+        Cancelar
+      </button>
+      <button
+        type="button"
+        class="rounded-lg bg-danger px-4 py-2 text-sm font-semibold text-white transition hover:bg-danger/90 disabled:cursor-not-allowed disabled:opacity-70"
+        (click)="confirmed.emit()"
+        [disabled]="submitting()"
+      >
+        {{ submitting() ? 'Eliminando…' : 'Eliminar' }}
+      </button>
+    </div>
+  </div>
+</dialog>

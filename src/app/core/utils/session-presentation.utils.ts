@@ -1,38 +1,28 @@
 /**
  * Token de sesión demo (deep link). Debe coincidir con `TrainingModule.Code`.
  */
+import type { TrainingModuleApiDto } from '@core/models/attendance-api.models';
+import type { ModuleSession } from '@core/models/attendance.models';
+
 export const DEMO_SESSION_TOKEN = 'mod-liderazgo-20241024';
 
 const FALLBACK_MODULE_IMAGE =
   'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80';
 
 /**
- * Vista de sesión desde el token de la URL.
- * El backend no expone GET de metadatos; el POST valida el código.
+ * Adapta el DTO de catálogo a la vista del formulario de asistencia.
  *
- * @param sessionId - `TrainingModule.Code` del deep link.
+ * @param dto - Módulo persistido en la API.
  */
-export function buildModuleSessionView(sessionId: string): {
-  sessionId: string;
-  moduleTitle: string;
-  moduleName: string;
-  description: string;
-  imageAlt: string;
-  imageUrl: string;
-} | null {
-  const id = sessionId.trim();
-  if (!id) {
-    return null;
-  }
-
+export function toModuleSession(dto: TrainingModuleApiDto): ModuleSession {
   return {
-    sessionId: id,
+    sessionId: dto.code,
     moduleTitle: 'Registro de Participantes',
-    moduleName:
-      id === DEMO_SESSION_TOKEN ? 'Módulo de Liderazgo y Servicio' : id,
+    moduleName: dto.name,
     description:
+      dto.description?.trim() ||
       'Completa el formulario para confirmar tu asistencia. Verifica que tus datos sean correctos para asegurar el registro de tus créditos de formación.',
-    imageAlt: 'Dirigentes scout en taller de liderazgo',
+    imageAlt: `Formación: ${dto.name}`,
     imageUrl: FALLBACK_MODULE_IMAGE,
   };
 }

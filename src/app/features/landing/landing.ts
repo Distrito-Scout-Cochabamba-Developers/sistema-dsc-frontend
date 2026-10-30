@@ -23,16 +23,10 @@ import { RouterLink } from '@angular/router';
       </p>
       <a
         class="inline-flex w-fit items-center justify-center rounded-xl bg-dsc px-5 py-3 text-sm font-bold text-white no-underline hover:bg-dsc-dark"
-        routerLink="/asistencia/mod-liderazgo-20241024"
+        routerLink="/modulos"
       >
-        Abrir registro de asistencia (demo QR)
+        Ver módulos e inscribirse
       </a>
-      <p class="text-xs text-muted">
-        Deep link de ejemplo:
-        <code class="rounded bg-elevated px-1.5 py-0.5 text-dsc-dark">
-          /asistencia/mod-liderazgo-20241024
-        </code>
-      </p>
     </section>
   `,
 })
@@ -42,6 +36,6 @@ export class Landing {
 
   /** Texto de apoyo de la vista inicial. */
   protected readonly subtitle = signal(
-        'Registro digital de asistencia a módulos. Requiere la API DSC en marcha para lookup y persistencia.',
+    'Elige un módulo de formación y registra tu asistencia. El formulario se abre al entrar a cada módulo.',
   );
 }

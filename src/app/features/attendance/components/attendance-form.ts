@@ -9,7 +9,6 @@ import {
   Component,
   DestroyRef,
   computed,
-  effect,
   inject,
   input,
   output,
@@ -115,26 +114,7 @@ export class AttendanceForm {
   );
 
   constructor() {
-    this.watchAuthSession();
     this.watchCiLookup();
-  }
-
-  /** Prellena el formulario con el perfil del dirigente si hay sesión activa. */
-  private watchAuthSession(): void {
-    effect(() => {
-      const profile = this.auth.session();
-      if (!profile) {
-        return;
-      }
-      this.attendanceModel.set({
-        ci: profile.ci,
-        fullName: profile.fullName,
-        extension: profile.extension,
-        phone: profile.phone,
-      });
-      this.ciStatus.set('found');
-      this.partialFromDirectory.set(false);
-    });
   }
 
   /** Busca en el directorio distrital cada vez que el CI ingresado es válido. */
@@ -154,15 +134,6 @@ export class AttendanceForm {
           }
         }),
         filter((ci) => isValidCiNumber(ci)),
-        filter((ci) => {
-          const profile = this.auth.session();
-          if (profile && profile.ci === ci.trim()) {
-            this.ciStatus.set('found');
-            this.partialFromDirectory.set(false);
-            return false;
-          }
-          return true;
-        }),
         tap(() => {
           this.ciStatus.set('loading');
           this.lookupError.set('');
@@ -181,10 +152,9 @@ export class AttendanceForm {
   }
 
   /**
-   * Cierra sesión demo y limpia el formulario para registro manual.
+   * Limpia el formulario para registrar a otra persona sin cerrar la sesión.
    */
   protected onChangeProfile(): void {
-    this.auth.clearSession();
     this.attendanceModel.set({
       ci: '',
       fullName: '',

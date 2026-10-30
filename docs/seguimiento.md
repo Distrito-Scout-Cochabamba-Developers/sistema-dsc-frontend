@@ -1,7 +1,7 @@
 # Seguimiento del proyecto
 
-- **Última actualización:** 2026-08-18
-- **Estado general:** Feature `attendance` conectada a lookup y POST de la API DSC. Auth, CORS y GET de sesión siguen pendientes en backend.
+- **Última actualización:** 2026-10-22
+- **Estado general:** Login **JWT Bearer** (`/api/v1/auth/login` + roles). Catálogo en `/modulos`. Asistencia pública. Registro **según rol** espera `[Authorize]` en attendance. Logout API y Google pendientes.
 
 Este archivo es el tablero de seguimiento. Márcalo al avanzar (cambia `Pendiente` → `En curso` → `Hecho`).
 
@@ -37,25 +37,28 @@ Este archivo es el tablero de seguimiento. Márcalo al avanzar (cambia `Pendient
 
 User story: *Como Dirigente Scout (Participante), quiero registrar mi asistencia a un módulo ingresando mis datos desde el dispositivo…*
 
-Detalle: [features/asistencia-registro.md](./features/asistencia-registro.md) · Contrato: [features/contrato-api-asistencia.md](./features/contrato-api-asistencia.md) · Gaps: [features/asistencia-backend-gaps.md](./features/asistencia-backend-gaps.md)
+Detalle: [features/asistencia-registro.md](./features/asistencia-registro.md) · Contrato: [features/contrato-api-asistencia.md](./features/contrato-api-asistencia.md) · Gaps: [features/asistencia-backend-gaps.md](./features/asistencia-backend-gaps.md) · Roles: [features/asistencia-registro-por-rol.md](./features/asistencia-registro-por-rol.md)
 
 | ID | Criterio / tarea | Estado | Notas |
 | -- | ---------------- | ------ | ----- |
 | A-01 | UI alineada al diseño (navbar, form, sidebar, footer) | Hecho | Ruta `/asistencia/:sessionId` |
-| A-02 | Acceso por link directo / QR (param `sessionId`) | Hecho | Demo: `mod-liderazgo-20241024` |
+| A-02 | Acceso por link directo / QR (param `sessionId`) | Hecho | Código = `TrainingModule.Code`. Catálogo: `/modulos` |
+| A-18 | Listar módulos desde BD; formulario solo al elegir uno | Hecho | `GET /api/attendance/modules` + feature `modules/` |
 | A-03 | Campos obligatorios: Nombre, CI, Extensión, Teléfono | Hecho | Signal Forms |
 | A-04 | Validación numérica de CI (7–10 dígitos) | Hecho | UI 7–10; API acepta 4–10 |
 | A-05 | Autocomplete de nombre si CI existe en directorio | Hecho | `GET api/attendance/lookup-ci/{ci}` |
 | A-06 | Mensaje de éxito con resumen del módulo | Hecho | `ModuleAttendanceResultDto` |
-| A-07 | Prefill si dirigente autenticado | Hecho | Solo perfil demo del navbar (sin JWT) |
+| A-07 | Prefill si dirigente autenticado | Bloqueado | `/me` no trae CI/teléfono; ver registro por rol (A-16) |
 | A-08 | Registro parcial si no está en el sistema | Hecho | 404 lookup + `isPartialRegistration` |
 | A-09 | Conectar lookup CI a API real | Hecho | `AdultDirectoryService` |
 | A-10 | Conectar registro a API real | Hecho | `AttendanceRegistrationService` |
-| A-11 | Auth real (login / token / sesión) | Bloqueado | La API no expone login/JWT. Interceptor Bearer listo. Toggle demo. |
+| A-11 | Auth real (login / token / sesión) | Hecho | JWT Bearer `POST /api/v1/auth/login`, Signals, interceptor, guards. Logout API pendiente |
 | A-12 | Generación/consumo de QR de sesión | En curso | **Consumo hecho** (deep link + QR local). **Generación admin bloqueada**. |
 | A-13 | Tests unitarios de la página / validaciones | Hecho | Página + HTTP + utils |
 | A-14 | Estados de error de red / retry UX | Hecho | Problem Details, retry GET 5xx, botones Reintentar |
 | A-15 | Accesibilidad (ARIA labels, foco, contraste) | Hecho | Labels, `aria-invalid`, skip link, foco al primer error |
+| A-16 | Usuario normal: solo autoinscripción + prefill de su persona | Bloqueado | API anónima y `/me` sin ficha. Doc: [asistencia-registro-por-rol.md](./features/asistencia-registro-por-rol.md) |
+| A-17 | Admin/secretaría: registrar a terceros en un módulo | Bloqueado | Roles en JWT ya existen; falta `[Authorize]` en attendance |
 
 ---
 
@@ -67,7 +70,7 @@ Detalle: [features/asistencia-registro.md](./features/asistencia-registro.md) ·
 | B-02 | `HttpClient` + interceptores (auth, errores) | Hecho | `withFetch`, `authInterceptor`, `httpRetryInterceptor` |
 | B-03 | Environments (`apiBaseUrl` dev/prod) | Hecho | `src/environments` + proxy local |
 | B-04 | Manejo de errores HTTP tipados | Hecho | RFC 7807 `detail` + `status === 0` |
-| B-05 | CORS / cookies / refresh token (según diseño) | Bloqueado | **CORS no está en `Program.cs`**. Dev: proxy. No hay cookies ni refresh. |
+| B-05 | CORS / cookies / refresh token (según diseño) | En curso | Auth es Bearer (no cookie). **CORS no está en `Program.cs`**. Sin logout ni refresh. |
 
 ---
 
@@ -75,11 +78,12 @@ Detalle: [features/asistencia-registro.md](./features/asistencia-registro.md) ·
 
 | ID | Ítem | Estado | Notas |
 | -- | ---- | ------ | ----- |
-| P-01 | Landing pública real (contenido DSC) | Pendiente | Hoy es placeholder con CTA al demo |
+| P-01 | Landing pública real (contenido DSC) | Pendiente | Placeholder con CTA a `/modulos` |
 | P-02 | Calendario de módulos | Pendiente | Link deshabilitado en nav |
 | P-03 | Mapa / ubicaciones | Pendiente | Link deshabilitado en nav |
-| P-04 | Iniciar sesión (pantalla real) | Pendiente | Hoy mock en shell |
+| P-04 | Iniciar sesión (pantalla real) | Hecho | **Completado.** Google/registro de cuenta deshabilitados (gaps de API) |
 | P-05 | Área de facilitador (generar QR / lista de asistentes) | Pendiente | Fuera de alcance del participante |
+| P-07 | Admin catálogo de módulos (CRUD) | Hecho | GET/POST/PUT/DELETE admin + tipos. [catalogo-admin-modulos.md](./features/catalogo-admin-modulos.md) |
 | P-06 | i18n (es / otros) | Pendiente | Copy actual en español fijo |
 
 ---
@@ -92,7 +96,7 @@ Detalle: [features/asistencia-registro.md](./features/asistencia-registro.md) ·
 | Q-02 | CI (build + test en PR) | Pendiente | — |
 | Q-03 | Coverage mínimo en features críticas | Pendiente | — |
 | Q-04 | Instalar `uv` (recomendado por BMAD) | Pendiente | Opcional para workflows Python |
-| Q-05 | Primer ADR formal (mocks vs API) | Hecho | ADR 0001–0004 |
+| Q-05 | Primer ADR formal (mocks vs API) | Hecho | ADR 0001–0007 |
 
 ---
 
@@ -106,20 +110,22 @@ pnpm start
 ```
 
 - Inicio: http://localhost:4200/
-- Registro: http://localhost:4200/asistencia/mod-liderazgo-20241024
-- Proxy `/api` → `:5090` (la API no tiene CORS)
+- Módulos: http://localhost:4200/modulos
+- Login: http://localhost:4200/auth/login
+- Registro (tras elegir un módulo): http://localhost:4200/asistencia/mod-liderazgo-20241024
+- Proxy `/api` → `:5090` (la API no tiene CORS; reescribe cookie a `localhost`)
 - CI conocido: el que exista en `person.id_card`
 - CI desconocido: 7–10 dígitos → registro parcial si existe el `TrainingModule.Code`
 - Duplicado → 409
-- Auth demo: navbar (no llama a la API)
+- Auth: `POST /api/v1/auth/login` con `{ identifier, password }`. JWT en el body. Usuarios de seeder (`pablo.rocha`, `maricel.rocha`, …). Contraseña local Docker: `1234`.
 
-Si el POST da 404, falta `training_module.code = mod-liderazgo-20241024`.
+Docker siembra `module_type` + 4 `training_module` (`docker/seed-dev-modules.sql`). Un código que no exista muestra «Sesión no válida» (sin formulario).
 
 ---
 
 ## Próximo paso sugerido (backend / producto)
 
-1. CORS o reverse proxy same-origin (B-05).
-2. GET de sesión/convocatoria y semilla del módulo demo.
+1. Registro a módulos según rol (A-16/A-17): Authorize + `/me` con persona. Ver [asistencia-registro-por-rol.md](./features/asistencia-registro-por-rol.md).
+2. Logout que invalide el JWT y CORS o reverse proxy same-origin (B-05).
 3. Definir si el QR usa `Code` o `QrToken`.
-4. Login real (A-11 / P-04).
+4. GET de convocatoria (fecha/horario) si el catálogo deja de ser el módulo curricular.

@@ -6,6 +6,16 @@ Base local: `/api` (proxy `ng serve` → `http://localhost:5090`). JSON camelCas
 
 ## Endpoints usados
 
+### `GET /api/attendance/modules`
+
+Catálogo para `/modulos`. `200` → `TrainingModuleApiDto[]` (puede ser vacío).
+
+### `GET /api/attendance/modules/{code}`
+
+Metadatos del módulo (`code` = `sessionToken` del POST). `200` → `TrainingModuleApiDto`. `404` → el formulario no se abre.
+
+`TrainingModuleApiDto`: `id`, `code`, `name`, `description`, `moduleTypeCode`, `moduleTypeName`.
+
 ### `GET /api/attendance/lookup-ci/{ci}?extension=`
 
 | | |

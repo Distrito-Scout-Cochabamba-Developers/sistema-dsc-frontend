@@ -31,7 +31,6 @@ test('flujo de registro digital de asistencia', async ({ page }) => {
   await page.goto(SESSION_PATH);
 
   await test.step('exige Nombre, CI, Extensión y Teléfono', async () => {
-    await page.getByRole('button', { name: 'Cambiar Perfil' }).click(); // limpia el prellenado
     await expect(page.locator('#ci')).toHaveValue('');
 
     await page.getByRole('button', { name: 'Registrar Asistencia' }).click();
@@ -75,11 +74,10 @@ test('flujo de registro digital de asistencia', async ({ page }) => {
   });
 });
 
-// Bug: getModuleSession fabrica la sesión en el cliente sin validar contra el
-// backend. Cualquier código abre el formulario igual (viola criterio 1).
-test.fixme('muestra "Sesión no válida" con un código inexistente', async ({ page }) => {
+test('muestra "Sesión no válida" con un código inexistente', async ({ page }) => {
   await page.goto('/asistencia/CODIGO-QUE-NO-EXISTE');
   await expect(page.getByText('Sesión no válida')).toBeVisible();
+  await expect(page.locator('#ci')).toHaveCount(0);
 });
 
 // Bug: el backend espera la tabla "ModuleAttendances", que no existe en el

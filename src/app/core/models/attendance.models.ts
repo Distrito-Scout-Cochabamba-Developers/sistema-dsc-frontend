@@ -17,7 +17,8 @@ export type DepartmentCode = 'LP' | 'CB' | 'SC' | 'OR' | 'PT' | 'TJ' | 'CH' | 'B
 export type AttendanceRegistrationStatus = 'completo' | 'parcial';
 
 /**
- * Perfil de dirigente autenticado (sesión de aplicación).
+ * Perfil de dirigente autenticado con datos de asistencia (CI/teléfono).
+ * La API de auth no lo entrega hoy; se conserva para cuando `/me` se amplíe.
  */
 export interface LeaderSession {
   readonly id: string;
