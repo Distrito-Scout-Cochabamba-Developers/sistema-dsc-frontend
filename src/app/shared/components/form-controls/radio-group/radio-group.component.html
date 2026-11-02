@@ -1,0 +1,64 @@
+
+<div class="space-y-4">
+
+  @for (option of options(); track option.value) {
+    <label
+      class="group flex cursor-pointer items-start gap-3"
+      [class.cursor-not-allowed]="disabled()"
+      [class.opacity-50]="disabled()"
+    >
+
+      <input
+        type="radio"
+        class="peer sr-only"
+        [name]="name()"
+        [value]="option.value"
+        [checked]="value() === option.value"
+        [disabled]="disabled()"
+        (change)="selectOption(option.value)"
+      />
+
+      <!-- Indicador circular -->
+      <span
+        class="mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center
+               justify-center rounded-full border-2 border-slate-300
+               bg-white transition-all duration-200
+               peer-checked:border-dsc-primary
+               peer-focus-visible:ring-2
+               peer-focus-visible:ring-dsc-primary/30
+               group-hover:border-dsc-primary"
+      >
+        @if (value() === option.value) {
+          <span class="h-2 w-2 rounded-full bg-dsc-primary"></span>
+        }
+      </span>
+
+      <!-- Información de la opción -->
+      <span class="min-w-0 flex-1">
+
+        <span class="flex flex-wrap items-center gap-2">
+          <span class="text-sm font-medium text-dsc-text">
+            {{ option.label }}
+          </span>
+
+          @if (option.badge) {
+            <span
+              class="rounded bg-sky-100 px-2 py-0.5
+                     text-[10px] font-medium text-sky-800"
+            >
+              {{ option.badge }}
+            </span>
+          }
+        </span>
+
+        @if (option.description) {
+          <span class="mt-1 block text-xs leading-relaxed text-slate-500">
+            {{ option.description }}
+          </span>
+        }
+
+      </span>
+    </label>
+  }
+
+</div>
