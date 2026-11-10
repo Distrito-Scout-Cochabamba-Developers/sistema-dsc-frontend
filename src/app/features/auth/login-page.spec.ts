@@ -47,8 +47,8 @@ describe('LoginPage', () => {
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
 
     expect(text).toContain('Bienvenido');
-    expect(fixture.nativeElement.querySelector('#identifier')).toBeTruthy();
-    expect(fixture.nativeElement.querySelector('#password')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('input#identifier')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('input#password')).toBeTruthy();
   });
 
   it('exige identificador antes de llamar a la API', async () => {
@@ -66,12 +66,12 @@ describe('LoginPage', () => {
 
   it('envía POST /api/v1/auth/login y guarda JWT + sesión', async () => {
     const fixture = createFixture();
-    const identifier = fixture.nativeElement.querySelector('#identifier') as HTMLInputElement;
-    const password = fixture.nativeElement.querySelector('#password') as HTMLInputElement;
+    const identifier = fixture.nativeElement.querySelector('input#identifier') as HTMLInputElement;
+    const password = fixture.nativeElement.querySelector('input#password') as HTMLInputElement;
     identifier.value = 'pablo.rocha';
-    identifier.dispatchEvent(new Event('input'));
+    identifier.dispatchEvent(new Event('input', { bubbles: true }));
     password.value = 'secret';
-    password.dispatchEvent(new Event('input'));
+    password.dispatchEvent(new Event('input', { bubbles: true }));
     fixture.detectChanges();
 
     const form = fixture.nativeElement.querySelector('form') as HTMLFormElement;
@@ -106,12 +106,12 @@ describe('LoginPage', () => {
 
   it('muestra el detalle de credenciales inválidas', async () => {
     const fixture = createFixture();
-    const identifier = fixture.nativeElement.querySelector('#identifier') as HTMLInputElement;
-    const password = fixture.nativeElement.querySelector('#password') as HTMLInputElement;
+    const identifier = fixture.nativeElement.querySelector('input#identifier') as HTMLInputElement;
+    const password = fixture.nativeElement.querySelector('input#password') as HTMLInputElement;
     identifier.value = 'pablo.rocha';
-    identifier.dispatchEvent(new Event('input'));
+    identifier.dispatchEvent(new Event('input', { bubbles: true }));
     password.value = 'bad';
-    password.dispatchEvent(new Event('input'));
+    password.dispatchEvent(new Event('input', { bubbles: true }));
     fixture.detectChanges();
 
     const form = fixture.nativeElement.querySelector('form') as HTMLFormElement;

@@ -1,7 +1,7 @@
 
 <div class="w-full">
 
-  <label class="mb-2 block text-sm font-medium text-dsc-text">
+  <label class="mb-2 block text-sm font-medium text-dsc-text" [attr.for]="id() || null">
     {{ label() }}
   </label>
 
@@ -16,6 +16,7 @@
              disabled:cursor-not-allowed
              disabled:bg-slate-100
              disabled:text-slate-400"
+      [attr.id]="id() || null"
       [value]="value()"
       [disabled]="disabled()"
       (change)="onChange($event)"

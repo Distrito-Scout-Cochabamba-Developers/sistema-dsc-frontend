@@ -45,7 +45,11 @@ export type TextFieldIcon =
   selector: 'app-text-field',
   standalone: true,
   templateUrl: './text-field.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    // `id` es el input del <input> interno; no duplicarlo en el host.
+    '[attr.id]': 'null',
+  },
 })
 export class TextFieldComponent {
 
@@ -75,7 +79,7 @@ export class TextFieldComponent {
 
   /** Tipo de entrada HTML. */
   readonly type = input<
-    'text' | 'email' | 'password' | 'search'
+    'text' | 'email' | 'password' | 'search' | 'tel'
   >('text');
 
   /** Indica si el campo es obligatorio. */

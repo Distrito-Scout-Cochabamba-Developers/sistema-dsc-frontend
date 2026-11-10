@@ -23,9 +23,16 @@ export interface SelectOption {
   selector: 'app-select',
   standalone: true,
   templateUrl: './select.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    // `id` es el input del <select> interno; no duplicarlo en el host.
+    '[attr.id]': 'null',
+  },
 })
 export class SelectComponent {
+
+  /** Identificador HTML opcional del `<select>`. */
+  readonly id = input<string>('');
 
   /** Etiqueta del selector. */
   readonly label = input.required<string>();

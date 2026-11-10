@@ -61,6 +61,15 @@ core      →  (Angular / libs; sin UI; sin imports de features)
 - **`features`**: cada feature es un bounded context con sus rutas, containers y servicios de dominio.
 - **`layout`**: composición estructural; no reglas de negocio.
 
+### Uso de `shared` (obligatorio cuando exista un componente)
+
+Antes de pintar UI nativa (`<input>`, `<select>`, `<textarea>`, checkbox, logo, listas de resumen, tarjetas de error, etc.) el agente **debe** revisar `src/app/shared/components/` (incluidos `form-controls/`) y **usar el componente shared existente**.
+
+1. Inventariar lo que ya hay y reutilizarlo. No duplicar markup, clases Tailwind ni controles en `features/` o `layout/` si `shared` cubre el caso.
+2. Si el componente shared es *dumb* (`value`/`valueChange`, `checked`/`checkedChange`) y no implementa `FormValueControl`, no forzar `[formField]` sobre el host. Mantener Signal Forms (`form()` + `submit()`) en el padre y cablear el DS con `[value]` + `(valueChange)` (o el contrato equivalente del control).
+3. No encajar a la fuerza un shared cuyo contrato visual o semántico no coincide (p. ej. `StateCard` es de error/peligro, no empty state).
+4. Si hace falta un control reutilizable nuevo, crearlo en `shared/` (sigue dumb, agnóstico al dominio) en lugar de un one-off en el feature. No acoplar `shared` a `features/` ni a HTTP de negocio.
+
 ### Lazy loading (obligatorio para features)
 
 ```typescript
@@ -195,6 +204,7 @@ Primera acción recomendada: invocar `bmad-help`.
 3. No dejar `any` sin justificación documentada.
 4. Tests colocados junto al artefacto o en convención del scaffold; no omitir cobertura en lógica de `core` y dominio de features.
 5. Commits atómicos; no mezclar refactors de arquitectura con features sin ADR.
+6. UI: preferir siempre los componentes de `src/app/shared/components/` cuando existan (ver §3). Inputs nativos solo si ningún shared cubre el caso.
 
 ---
 
@@ -203,6 +213,7 @@ Primera acción recomendada: invocar `bmad-help`.
 - [ ] Sin NgModules nuevos ni archivos `.js` de aplicación
 - [ ] Template inline si ≤50 líneas; `templateUrl` a `.html` propio si supera 50. Sin `.css` de componente salvo necesidad real
 - [ ] Archivo en la capa correcta (`core` / `shared` / `features` / `layout`)
+- [ ] La UI reutiliza componentes de `shared/` cuando existen; no se copió markup nativo que el DS ya cubre
 - [ ] Feature nueva con lazy loading
 - [ ] Estado local con Signals; asincronía con RxJS
 - [ ] JSDoc en toda entidad nueva pública o compleja
@@ -216,4 +227,4 @@ Primera acción recomendada: invocar `bmad-help`.
 
 Cualquier generación que incumpla este contrato (especialmente ausencia de JSDoc, uso de NgModules, o contaminación de capas) debe **rechazarse y rehacerse** antes de integrarse.
 
-*Última actualización del contrato: 2026-07-17.*
+*Última actualización del contrato: 2026-11-10.*

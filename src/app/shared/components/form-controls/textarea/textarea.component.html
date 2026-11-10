@@ -4,7 +4,7 @@
   <!-- Etiqueta y contador -->
   <div class="mb-2 flex items-center justify-between gap-3">
 
-    <label class="text-sm font-medium text-dsc-text">
+    <label class="text-sm font-medium text-dsc-text" [attr.for]="id() || null">
       {{ label() }}
     </label>
 
@@ -30,6 +30,7 @@
            disabled:cursor-not-allowed
            disabled:bg-slate-100
            disabled:text-slate-400"
+    [attr.id]="id() || null"
     [value]="value()"
     [rows]="rows()"
     [maxLength]="maxLength()"

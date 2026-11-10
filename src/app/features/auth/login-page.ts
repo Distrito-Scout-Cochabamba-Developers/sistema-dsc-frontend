@@ -14,13 +14,16 @@ import {
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { FormField, form, required, submit } from '@angular/forms/signals';
+import { form, required, submit } from '@angular/forms/signals';
 import { firstValueFrom } from 'rxjs';
 
 import { AuthApiService } from '@core/services/auth-api.service';
 import { AuthSessionService } from '@core/services/auth-session.service';
 import { isRetryableHttpError, problemDetailMessage } from '@core/utils/http-error.utils';
 import { safeInternalUrl } from '@core/utils/navigation.utils';
+import { DscLogoBadge } from '@shared/components/dsc-logo-badge';
+import { CheckboxComponent } from '@shared/components/form-controls/checkbox/checkbox.component';
+import { TextFieldComponent } from '@shared/components/form-controls/text-field/text-field.component';
 
 interface LoginFormModel {
   identifier: string;
@@ -33,7 +36,7 @@ export const DISTRITO_EMBLEM_SRC = '/assets/branding/distrito-cochabamba-emblem.
 @Component({
   selector: 'app-login-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormField, NgOptimizedImage, RouterLink],
+  imports: [CheckboxComponent, DscLogoBadge, NgOptimizedImage, RouterLink, TextFieldComponent],
   templateUrl: './login-page.html',
 })
 export class LoginPage {
@@ -49,7 +52,6 @@ export class LoginPage {
   protected readonly submitting = signal(false);
   protected readonly submitError = signal('');
   protected readonly submitRetryable = signal(false);
-  protected readonly showPassword = signal(false);
   protected readonly rememberMe = signal(false);
   protected readonly touchedIdentifier = signal(false);
   protected readonly touchedPassword = signal(false);
@@ -70,6 +72,16 @@ export class LoginPage {
 
   protected readonly showPasswordError = computed(
     () => this.touchedPassword() && this.loginForm.password().invalid(),
+  );
+
+  protected readonly identifierHint = computed(() =>
+    this.showIdentifierError()
+      ? (this.loginForm.identifier().errors()[0]?.message ?? '')
+      : '',
+  );
+
+  protected readonly passwordHint = computed(() =>
+    this.showPasswordError() ? (this.loginForm.password().errors()[0]?.message ?? '') : '',
   );
 
   protected readonly unavailableHint =
@@ -121,19 +133,24 @@ export class LoginPage {
     this.onSubmit(new Event('submit', { cancelable: true, bubbles: true }));
   }
 
-  /** Alterna visibilidad de la contraseña. */
-  protected togglePasswordVisibility(): void {
-    this.showPassword.update((visible) => !visible);
+  /**
+   * Actualiza el identificador desde `app-text-field`.
+   *
+   * @param value - Texto ingresado.
+   */
+  protected onIdentifierInput(value: string): void {
+    this.loginModel.update((model) => ({ ...model, identifier: value }));
+    this.touchedIdentifier.set(true);
   }
 
   /**
-   * Recuérdame: persiste el JWT en `localStorage` en lugar de `sessionStorage`.
+   * Actualiza la contraseña desde `app-text-field`.
    *
-   * @param event - Change del checkbox.
+   * @param value - Texto ingresado.
    */
-  protected onRememberMeChange(event: Event): void {
-    const target = event.target;
-    this.rememberMe.set(target instanceof HTMLInputElement && target.checked);
+  protected onPasswordInput(value: string): void {
+    this.loginModel.update((model) => ({ ...model, password: value }));
+    this.touchedPassword.set(true);
   }
 
   /**

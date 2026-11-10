@@ -88,7 +88,7 @@ describe('TrainingCatalogPage', () => {
     expect(dialog?.className).toContain('inset-0');
     expect(dialog?.className).toContain('m-auto');
     expect(dialog?.getAttribute('aria-modal')).toBe('true');
-    const name = dialog?.querySelector('#catalog-name') as HTMLInputElement | null;
+    const name = dialog?.querySelector('input#catalog-name') as HTMLInputElement | null;
     expect(name?.value).toBe('Módulo de Liderazgo y Servicio');
   });
 

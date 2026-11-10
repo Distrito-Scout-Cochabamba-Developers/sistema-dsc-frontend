@@ -16,9 +16,16 @@ import {
   selector: 'app-textarea',
   standalone: true,
   templateUrl: './textarea.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    // `id` es el input del <textarea> interno; no duplicarlo en el host.
+    '[attr.id]': 'null',
+  },
 })
 export class TextareaComponent {
+
+  /** Identificador HTML opcional del `<textarea>`. */
+  readonly id = input<string>('');
 
   /** Etiqueta del campo. */
   readonly label = input.required<string>();

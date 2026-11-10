@@ -14,16 +14,22 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { FormField, form, required, submit } from '@angular/forms/signals';
+import { form, required, submit } from '@angular/forms/signals';
 
 import type { TrainingModuleApiDto } from '@core/models/attendance-api.models';
+import {
+  SelectComponent,
+  type SelectOption,
+} from '@shared/components/form-controls/select/select.component';
+import { TextareaComponent } from '@shared/components/form-controls/textarea/textarea.component';
+import { TextFieldComponent } from '@shared/components/form-controls/text-field/text-field.component';
 
 import type { ModuleTypeApiDto, WriteTrainingModuleDto } from '../training-catalog.models';
 
 @Component({
   selector: 'app-training-catalog-form-modal',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormField],
+  imports: [SelectComponent, TextareaComponent, TextFieldComponent],
   templateUrl: './training-catalog-form-modal.html',
   styles: `
     :host {
@@ -75,6 +81,36 @@ export class TrainingCatalogFormModal {
     this.isEdit() ? 'Editar módulo' : 'Nuevo módulo',
   );
 
+  protected readonly attemptedSave = signal(false);
+
+  protected readonly typeOptions = computed<SelectOption[]>(() =>
+    this.moduleTypes().map((type) => ({
+      value: type.code,
+      label: `${type.name} (${type.code})`,
+    })),
+  );
+
+  protected readonly codeHint = computed(() => {
+    if (!this.attemptedSave() || !this.catalogForm.code().invalid()) {
+      return '';
+    }
+    return this.catalogForm.code().errors()[0]?.message ?? '';
+  });
+
+  protected readonly nameHint = computed(() => {
+    if (!this.attemptedSave() || !this.catalogForm.name().invalid()) {
+      return '';
+    }
+    return this.catalogForm.name().errors()[0]?.message ?? '';
+  });
+
+  protected readonly typeHint = computed(() => {
+    if (!this.attemptedSave() || !this.catalogForm.moduleTypeCode().invalid()) {
+      return '';
+    }
+    return this.catalogForm.moduleTypeCode().errors()[0]?.message ?? '';
+  });
+
   constructor() {
     this.destroyRef.onDestroy(() => {
       document.body.style.removeProperty('overflow');
@@ -82,6 +118,7 @@ export class TrainingCatalogFormModal {
 
     effect(() => {
       const current = this.module();
+      this.attemptedSave.set(false);
       this.formModel.set({
         code: current?.code ?? '',
         name: current?.name ?? '',
@@ -117,12 +154,22 @@ export class TrainingCatalogFormModal {
   }
 
   /**
+   * Actualiza un campo del draft desde los controles shared.
+   *
+   * @param partial - Campos a fusionar.
+   */
+  protected patchForm(partial: Partial<WriteTrainingModuleDto>): void {
+    this.formModel.update((model) => ({ ...model, ...partial }));
+  }
+
+  /**
    * Valida el formulario y emite el draft.
    *
    * @param event - Submit del formulario.
    */
   protected onSubmit(event: Event): void {
     event.preventDefault();
+    this.attemptedSave.set(true);
     void submit(this.catalogForm, async () => {
       const draft = this.formModel();
       this.saved.emit({

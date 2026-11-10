@@ -15,7 +15,7 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { FormField, form, pattern, required, submit } from '@angular/forms/signals';
+import { form, pattern, required, submit } from '@angular/forms/signals';
 import { debounceTime, distinctUntilChanged, EMPTY, catchError, filter, firstValueFrom, switchMap, tap } from 'rxjs';
 
 import type {
@@ -34,6 +34,15 @@ import {
 } from '@core/utils/ci.utils';
 import { isRetryableHttpError, problemDetailMessage } from '@core/utils/http-error.utils';
 
+import {
+  SelectComponent,
+  type SelectOption,
+} from '@shared/components/form-controls/select/select.component';
+import {
+  TextFieldComponent,
+  type TextFieldStatus,
+} from '@shared/components/form-controls/text-field/text-field.component';
+
 import { AttendanceRegistrationService } from '../services/attendance-registration.service';
 
 interface AttendanceFormModel {
@@ -48,7 +57,7 @@ type CiLookupStatus = 'idle' | 'loading' | 'found' | 'not-found' | 'invalid' | '
 @Component({
   selector: 'app-attendance-form',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormField],
+  imports: [SelectComponent, TextFieldComponent],
   templateUrl: './attendance-form.html',
 })
 export class AttendanceForm {
@@ -63,8 +72,10 @@ export class AttendanceForm {
   private readonly registrationApi = inject(AttendanceRegistrationService);
   protected readonly auth = inject(AuthSessionService);
 
-  /** Extensiones de CI disponibles. */
-  protected readonly extensions = CI_EXTENSIONS;
+  protected readonly extensionOptions: SelectOption[] = CI_EXTENSIONS.map((extension) => ({
+    value: extension.code,
+    label: extension.label,
+  }));
 
   protected readonly submitting = signal(false);
   protected readonly submitError = signal('');
@@ -113,8 +124,97 @@ export class AttendanceForm {
     () => this.touchedPhone() && this.attendanceForm.phone().invalid(),
   );
 
+  protected readonly ciFieldStatus = computed<TextFieldStatus>(() => {
+    if (this.showCiError() || this.ciStatus() === 'error') {
+      return 'error';
+    }
+    if (this.ciStatus() === 'found') {
+      return 'success';
+    }
+    return 'default';
+  });
+
+  protected readonly ciHint = computed(() => {
+    if (this.showCiError()) {
+      return 'Ingresa un CI numérico válido (7 a 10 dígitos).';
+    }
+    switch (this.ciStatus()) {
+      case 'loading':
+        return 'Buscando perfil…';
+      case 'found':
+        return 'Perfil encontrado. Datos autocompletados.';
+      case 'not-found':
+        return 'CI no encontrado en el distrito. Completa tus datos para un registro parcial.';
+      case 'error':
+        return this.lookupError();
+      default:
+        return '';
+    }
+  });
+
+  protected readonly nameHint = computed(() =>
+    this.showNameError() ? 'Este campo es obligatorio' : '',
+  );
+
+  protected readonly extensionHint = computed(() =>
+    this.showExtensionError() ? 'Este campo es obligatorio' : '',
+  );
+
+  protected readonly phoneHint = computed(() =>
+    this.showPhoneError() ? 'Ingresa un móvil de 8 dígitos.' : '',
+  );
+
   constructor() {
     this.watchCiLookup();
+  }
+
+  /**
+   * Actualiza un campo del modelo desde los controles shared.
+   *
+   * @param partial - Campos a fusionar.
+   */
+  protected patchForm(partial: Partial<AttendanceFormModel>): void {
+    this.attendanceModel.update((model) => ({ ...model, ...partial }));
+  }
+
+  /**
+   * Marca el CI como tocado y actualiza el valor.
+   *
+   * @param value - CI ingresado.
+   */
+  protected onCiInput(value: string): void {
+    this.patchForm({ ci: value });
+    this.touchedCi.set(true);
+  }
+
+  /**
+   * Marca el nombre como tocado y actualiza el valor.
+   *
+   * @param value - Nombre ingresado.
+   */
+  protected onNameInput(value: string): void {
+    this.patchForm({ fullName: value });
+    this.touchedName.set(true);
+  }
+
+  /**
+   * Marca la extensión como tocada y actualiza el valor.
+   *
+   * @param value - Código de departamento.
+   */
+  protected onExtensionInput(value: string): void {
+    this.patchForm({ extension: value });
+    this.touchedExtension.set(true);
+  }
+
+  /**
+   * Marca el teléfono como tocado y actualiza el valor.
+   *
+   * @param value - Móvil ingresado.
+   */
+  protected onPhoneInput(value: string): void {
+    this.patchForm({ phone: value });
+    this.touchedPhone.set(true);
   }
 
   /** Busca en el directorio distrital cada vez que el CI ingresado es válido. */

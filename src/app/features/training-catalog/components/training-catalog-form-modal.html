@@ -14,49 +14,45 @@
     }
 
     <div class="mt-5 space-y-4">
-      <div>
-        <label class="mb-1.5 block text-sm font-medium text-ink" for="catalog-code">Código</label>
-        <input
-          id="catalog-code"
-          type="text"
-          class="w-full rounded-md border border-border bg-surface px-3 py-2.5 text-sm text-ink outline-none ring-dsc/30 focus:ring-2"
-          [readOnly]="isEdit()"
-          [formField]="catalogForm.code"
-        />
-      </div>
-      <div>
-        <label class="mb-1.5 block text-sm font-medium text-ink" for="catalog-name">Nombre</label>
-        <input
-          id="catalog-name"
-          type="text"
-          class="w-full rounded-md border border-border bg-surface px-3 py-2.5 text-sm text-ink outline-none ring-dsc/30 focus:ring-2"
-          [formField]="catalogForm.name"
-        />
-      </div>
-      <div>
-        <label class="mb-1.5 block text-sm font-medium text-ink" for="catalog-type">Tipo</label>
-        <select
-          id="catalog-type"
-          class="w-full rounded-md border border-border bg-surface px-3 py-2.5 text-sm text-ink outline-none ring-dsc/30 focus:ring-2"
-          [formField]="catalogForm.moduleTypeCode"
-        >
-          <option value="">Selecciona un tipo</option>
-          @for (type of moduleTypes(); track type.code) {
-            <option [value]="type.code">{{ type.name }} ({{ type.code }})</option>
-          }
-        </select>
-      </div>
-      <div>
-        <label class="mb-1.5 block text-sm font-medium text-ink" for="catalog-description">
-          Descripción
-        </label>
-        <textarea
-          id="catalog-description"
-          rows="3"
-          class="w-full rounded-md border border-border bg-surface px-3 py-2.5 text-sm text-ink outline-none ring-dsc/30 focus:ring-2"
-          [formField]="catalogForm.description"
-        ></textarea>
-      </div>
+      <app-text-field
+        id="catalog-code"
+        label="Código"
+        [value]="formModel().code"
+        [required]="true"
+        [readonlyMode]="isEdit()"
+        [maxLength]="30"
+        [status]="codeHint() ? 'error' : 'default'"
+        [hint]="codeHint()"
+        (valueChange)="patchForm({ code: $event })"
+      />
+      <app-text-field
+        id="catalog-name"
+        label="Nombre"
+        [value]="formModel().name"
+        [required]="true"
+        [maxLength]="150"
+        [status]="nameHint() ? 'error' : 'default'"
+        [hint]="nameHint()"
+        (valueChange)="patchForm({ name: $event })"
+      />
+      <app-select
+        id="catalog-type"
+        label="Tipo"
+        placeholder="Selecciona un tipo"
+        [options]="typeOptions()"
+        [value]="formModel().moduleTypeCode"
+        [hint]="typeHint()"
+        (valueChange)="patchForm({ moduleTypeCode: $event })"
+      />
+      <app-textarea
+        id="catalog-description"
+        label="Descripción"
+        placeholder="Opcional"
+        [value]="formModel().description"
+        [rows]="3"
+        [maxLength]="500"
+        (valueChange)="patchForm({ description: $event })"
+      />
     </div>
 
     <div class="mt-6 flex justify-end gap-3">

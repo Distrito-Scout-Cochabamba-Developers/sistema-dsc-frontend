@@ -47,7 +47,8 @@ function setInputValue(
 ): void {
   const el = fixture.nativeElement.querySelector(selector) as HTMLInputElement | HTMLSelectElement;
   el.value = value;
-  el.dispatchEvent(new Event('input'));
+  el.dispatchEvent(new Event('input', { bubbles: true }));
+  el.dispatchEvent(new Event('change', { bubbles: true }));
 }
 
 describe('AttendancePage', () => {
@@ -88,7 +89,7 @@ describe('AttendancePage', () => {
     fixture.detectChanges();
 
     expect(textOf(fixture)).toContain('Sesión no válida');
-    expect(fixture.nativeElement.querySelector('#ci')).toBeNull();
+    expect(fixture.nativeElement.querySelector('input#ci')).toBeNull();
   });
 
   it('muestra el formulario con los datos de la sesión cuando el sessionId es válido', async () => {
@@ -98,7 +99,7 @@ describe('AttendancePage', () => {
     fixture.detectChanges();
 
     expect(textOf(fixture)).toContain('Módulo de Liderazgo y Servicio');
-    expect(fixture.nativeElement.querySelector('#ci')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('input#ci')).toBeTruthy();
   });
 
   it('muestra el perfil autenticado sin prellenar CI (la API no envía datos de dirigente)', async () => {
@@ -115,7 +116,7 @@ describe('AttendancePage', () => {
     await wait(50);
     fixture.detectChanges();
 
-    const ciInput = fixture.nativeElement.querySelector('#ci') as HTMLInputElement;
+    const ciInput = fixture.nativeElement.querySelector('input#ci') as HTMLInputElement;
     expect(ciInput.value).toBe('');
     expect(textOf(fixture)).toContain('Has iniciado sesión como');
     expect(textOf(fixture)).toContain('jperez');
@@ -128,7 +129,7 @@ describe('AttendancePage', () => {
     await wait(50);
     fixture.detectChanges();
 
-    setInputValue(fixture, '#ci', '87654321');
+    setInputValue(fixture, 'input#ci', '87654321');
     fixture.detectChanges();
     await wait(500);
 
@@ -145,7 +146,7 @@ describe('AttendancePage', () => {
     req.flush(body);
     fixture.detectChanges();
 
-    const nameInput = fixture.nativeElement.querySelector('#fullName') as HTMLInputElement;
+    const nameInput = fixture.nativeElement.querySelector('input#fullName') as HTMLInputElement;
     expect(nameInput.value).toBe('María López Quispe');
     expect(textOf(fixture)).toContain('Perfil encontrado');
   });
@@ -157,7 +158,7 @@ describe('AttendancePage', () => {
     await wait(50);
     fixture.detectChanges();
 
-    setInputValue(fixture, '#ci', '99999999');
+    setInputValue(fixture, 'input#ci', '99999999');
     fixture.detectChanges();
     await wait(500);
 
@@ -175,8 +176,8 @@ describe('AttendancePage', () => {
     await wait(50);
     fixture.detectChanges();
 
-    const ciInput = fixture.nativeElement.querySelector('#ci') as HTMLInputElement;
-    setInputValue(fixture, '#ci', 'abc123');
+    const ciInput = fixture.nativeElement.querySelector('input#ci') as HTMLInputElement;
+    setInputValue(fixture, 'input#ci', 'abc123');
     ciInput.dispatchEvent(new Event('blur'));
     fixture.detectChanges();
     await wait(50);
@@ -192,8 +193,8 @@ describe('AttendancePage', () => {
     await wait(50);
     fixture.detectChanges();
 
-    const phoneInput = fixture.nativeElement.querySelector('#phone') as HTMLInputElement;
-    setInputValue(fixture, '#phone', '123');
+    const phoneInput = fixture.nativeElement.querySelector('input#phone') as HTMLInputElement;
+    setInputValue(fixture, 'input#phone', '123');
     phoneInput.dispatchEvent(new Event('blur'));
     fixture.detectChanges();
     await wait(50);
@@ -209,7 +210,7 @@ describe('AttendancePage', () => {
     await wait(50);
     fixture.detectChanges();
 
-    setInputValue(fixture, '#ci', '11112222');
+    setInputValue(fixture, 'input#ci', '11112222');
     fixture.detectChanges();
     await wait(500);
 
@@ -218,9 +219,9 @@ describe('AttendancePage', () => {
       .flush({ detail: 'no' }, { status: 404, statusText: 'Not Found' });
     fixture.detectChanges();
 
-    setInputValue(fixture, '#fullName', 'Test Persona');
-    setInputValue(fixture, '#extension', 'LP');
-    setInputValue(fixture, '#phone', '70011122');
+    setInputValue(fixture, 'input#fullName', 'Test Persona');
+    setInputValue(fixture, 'select#extension', 'LP');
+    setInputValue(fixture, 'input#phone', '70011122');
     fixture.detectChanges();
 
     const form = fixture.nativeElement.querySelector('form') as HTMLFormElement;
