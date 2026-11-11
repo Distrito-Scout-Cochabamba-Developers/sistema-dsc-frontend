@@ -5,7 +5,6 @@
  * `/admin/modulos` usa `authGuard` + `roleGuard` (ADMIN / DISTRICT_SECRETARY).
  * `/modulos` y `/asistencia` siguen públicos: la API de asistencia es anónima.
  */
-import { isDevMode } from '@angular/core';
 import { Routes } from '@angular/router';
 
 import { authGuard } from '@core/guards/auth.guard';
@@ -52,20 +51,6 @@ export const routes: Routes = [
       },
     ],
   },
-
-  // Rutas exclusivas del entorno de desarrollo
-  ...(isDevMode()
-    ? [
-        {
-          path: 'design-system',
-          loadChildren: () =>
-            import('@features/design-system/design-system.routes').then(
-              (m) => m.DESIGN_SYSTEM_ROUTES,
-            ),
-        },
-      ]
-    : []),
-
   {
     path: '**',
     redirectTo: '',

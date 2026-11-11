@@ -36,33 +36,6 @@
 
   --text-caption: 0.625rem; /* 10px — badges/insignias pequeñas */
   --text-caption--line-height: 1;
-
-
-  /* Identidad institucional */
-  --color-dsc-primary: #009ee2;
-  --color-dsc-primary-bright: #009fe3;
-  --color-dsc-primary-hover: #006a9b;
-  --color-dsc-navy: #0c3856;
-
-  /* Textos */
-  --color-dsc-text: #14243a;
-  --color-dsc-muted: #64748b;
-
-  /* Superficies */
-  --color-dsc-background: #ffffff;
-  --color-dsc-surface: #f8fafc;
-  --color-dsc-border: #dce5ed;
-
-  /* Estados */
-  --color-dsc-success: #16834a;
-  --color-dsc-warning: #b86a08;
-  --color-dsc-danger: #dc3545;
-
-  /* Bordes */
-  --radius-dsc-sm: 0.375rem;
-  --radius-dsc-md: 0.5rem;
-  --radius-dsc-lg: 0.75rem;
-
 }
 
 html,
