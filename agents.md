@@ -217,3 +217,9 @@ Primera acción recomendada: invocar `bmad-help`.
 Cualquier generación que incumpla este contrato (especialmente ausencia de JSDoc, uso de NgModules, o contaminación de capas) debe **rechazarse y rehacerse** antes de integrarse.
 
 *Última actualización del contrato: 2026-07-17.*
+
+## Agent skills
+
+### Domain docs
+
+Use the single-context domain-docs layout. Read relevant glossary terms and ADRs before domain or architecture work; missing docs are fine. See `docs/agents/domain.md`.
