@@ -21,3 +21,8 @@ _bmad-output
 *.md
 .env
 **/.env
+.env.*
+**/.env.*
+**/*.publishsettings
+**/*.pfx
+**/*.pem

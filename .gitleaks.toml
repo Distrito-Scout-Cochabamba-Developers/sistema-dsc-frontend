@@ -1,0 +1,10 @@
+title = "DSC secret scanning"
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "BMAD asset integrity digest, not an authentication credential"
+condition = "AND"
+paths = ['''(^|/)_bmad/_config/files-manifest\.csv$''']
+regexTarget = "secret"
+regexes = ['''^[a-f0-9]{64}$''']

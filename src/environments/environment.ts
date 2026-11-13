@@ -1,6 +1,6 @@
 /**
- * Configuración de producción. `apiBaseUrl` vacío asume same-origin o reverse proxy.
+ * Configuración pública del despliegue de pruebas; nunca debe contener secretos JWT.
  */
 export const environment = {
-  apiBaseUrl: '',
+  apiBaseUrl: 'https://dsc-api-pruebas.runasp.net',
 };

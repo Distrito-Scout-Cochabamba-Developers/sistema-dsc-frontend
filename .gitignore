@@ -19,9 +19,15 @@ home/
 /_bmad-output/implementation-artifacts/spec-install-codebase-memory-index-project.md
 /_bmad-output/implementation-artifacts/spec-kardex-detail-dotnet-contract.md
 /docs/features/kardex-dirigentes.md
+/docs/analisis-front-back-indexacion-2026-10-26.local.md
+/docs/guia-despliegue-pruebas-2026-10-26.local.md
 
 # Node
 /node_modules
+.env
+.env.*
+!.env.example
+*.publishsettings
 npm-debug.log
 yarn-error.log
 pnpm-debug.log

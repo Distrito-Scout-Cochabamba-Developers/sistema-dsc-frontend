@@ -7,12 +7,12 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
 
 import { AuthSessionService } from '@core/services/auth-session.service';
 import { DscFooter } from '@shared/components/dsc-footer';
-import { DscNavbar } from '@shared/components/dsc-navbar';
+import { DscLogoBadge } from '@shared/components/dsc-logo-badge';
 
 @Component({
   selector: 'app-main-layout',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterOutlet, DscNavbar, DscFooter],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, DscLogoBadge, DscFooter],
   templateUrl: './main-layout.html',
 })
 export class MainLayout {
