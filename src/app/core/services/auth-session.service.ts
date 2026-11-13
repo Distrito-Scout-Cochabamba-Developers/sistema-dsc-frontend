@@ -138,6 +138,16 @@ export class AuthSessionService {
   }
 
   /**
+   * Indica si el usuario tiene al menos uno de los roles indicados.
+   *
+   * @param roles - Lista de códigos de rol permitidos.
+   */
+  hasAnyRole(...roles: readonly string[]): boolean {
+    const currentRoles = this.roles();
+    return roles.some((role) => currentRoles.includes(role));
+  }
+
+  /**
    * Cierra la sesión en el cliente (borra JWT de memoria y storage).
    * No hay logout en la API: el token sigue válido hasta `exp`.
    */

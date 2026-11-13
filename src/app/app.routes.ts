@@ -9,7 +9,7 @@ import { Routes } from '@angular/router';
 
 import { authGuard } from '@core/guards/auth.guard';
 import { roleGuard } from '@core/guards/role.guard';
-import { TRAINING_CATALOG_ROLES } from '@core/models/auth-roles';
+import { CURRICULUM_CONFIG_ROLES, TRAINING_CATALOG_ROLES } from '@core/models/auth-roles';
 
 export const routes: Routes = [
   {
@@ -42,6 +42,14 @@ export const routes: Routes = [
         loadChildren: () =>
           import('@features/training-catalog/training-catalog.routes').then(
             (m) => m.TRAINING_CATALOG_ROUTES,
+          ),
+      },
+      {
+        path: 'admin/requisitos-formacion',
+        canActivate: [authGuard, roleGuard(...CURRICULUM_CONFIG_ROLES)],
+        loadChildren: () =>
+          import('@features/curriculum-config/curriculum-config.routes').then(
+            (m) => m.CURRICULUM_CONFIG_ROUTES,
           ),
       },
       {

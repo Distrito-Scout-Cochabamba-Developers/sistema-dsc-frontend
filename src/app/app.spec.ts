@@ -6,8 +6,10 @@ import { provideRouter } from '@angular/router';
 import { authInterceptor } from '@core/interceptors/auth.interceptor';
 import { AuthSessionService } from '@core/services/auth-session.service';
 import { AUTH_TOKEN_STORAGE_KEY, writeStoredAuth } from '@core/utils/auth-token.storage';
+import { MainLayout } from '@layout/main-layout/main-layout';
 
 import { App } from './app';
+import { routes } from './app.routes';
 
 describe('App', () => {
   beforeEach(async () => {
@@ -37,6 +39,35 @@ describe('App', () => {
   it('no llama /me si no hay JWT guardado', () => {
     TestBed.createComponent(App);
     TestBed.inject(HttpTestingController).expectNone('/api/v1/auth/me');
+  });
+
+  it('expone requisitos de formación con carga diferida y guards', async () => {
+    const children = routes.find((route) => route.path === '')?.children ?? [];
+    const route = children.find((route) => route.path === 'admin/requisitos-formacion');
+    expect(route?.canActivate).toHaveLength(2);
+    expect(route?.loadChildren).toBeTypeOf('function');
+    const { CURRICULUM_CONFIG_ROUTES } =
+      await import('./features/curriculum-config/curriculum-config.routes');
+    expect(CURRICULUM_CONFIG_ROUTES[0]?.title).toBe('Requisitos de formación | DSC');
+  });
+
+  it('muestra la nueva ruta en el menú solo para los roles autorizados', () => {
+    const fixture = TestBed.createComponent(MainLayout);
+    fixture.detectChanges();
+    const root: HTMLElement = fixture.nativeElement;
+    expect(root.querySelector('a[href="/admin/requisitos-formacion"]')).toBeNull();
+    TestBed.inject(AuthSessionService).applyAuthenticatedProfile({
+      id: 1,
+      personId: 1,
+      username: 'secretaria',
+      displayName: 'Secretaría',
+      email: 'secretaria@example.com',
+      roles: ['DISTRICT_SECRETARY'],
+    });
+    fixture.detectChanges();
+    expect(root.querySelector('a[href="/admin/requisitos-formacion"]')?.textContent?.trim()).toBe(
+      'Requisitos de formación',
+    );
   });
 
   it('hidrata la sesión desde /api/v1/auth/me cuando hay token', () => {
