@@ -1,0 +1,676 @@
+
+<div class="min-h-screen bg-dsc-surface p-5 sm:p-8">
+
+  <!-- ====================================== -->
+  <!-- ENCABEZADO -->
+  <!-- ====================================== -->
+
+  <header class="mb-8">
+    <h1 class="text-3xl font-semibold text-dsc-navy">
+      Formularios & Entradas
+    </h1>
+
+    <p class="mt-1 text-sm text-slate-500">
+      Componentes de selección, configuración y entrada de información.
+    </p>
+  </header>
+
+
+  <!-- ====================================== -->
+  <!-- GRID DE COMPONENTES -->
+  <!-- ====================================== -->
+
+
+
+  <!-- ====================================== -->
+  <!-- CAMPOS DE TEXTO BÁSICOS -->
+  <!-- ====================================== -->
+
+    <section class="mt-12">
+
+      <div class="mb-6 flex flex-wrap items-center justify-between gap-2">
+        <h2 class="text-lg font-semibold text-dsc-text">
+          Campos de Texto Básicos
+        </h2>
+
+        <span class="text-xs text-slate-500">
+          32px / 40px de altura estándar
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+
+        <!-- DEFAULT -->
+        <article class="flex min-h-[205px] flex-col rounded-2xl
+                        border border-slate-100 bg-white p-6 shadow-sm">
+
+          <div class="mb-3 flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wide text-dsc-navy">
+              Estado Default
+            </span>
+
+            <span class="text-[11px] text-slate-500">
+              Activo
+            </span>
+          </div>
+
+          <app-text-field
+            id="basic-full-name"
+            label="Nombre Completo"
+            placeholder="Ej. Constanza Miranda"
+            [value]="fullName()"
+            [required]="true"
+            hint="Nombre oficial para credenciales y facturación."
+            (valueChange)="fullName.set($event)"
+          />
+
+          <div class="mt-auto flex items-center justify-between pt-5">
+            <span class="text-[11px] text-slate-500">
+              Hover/Blur estándar
+            </span>
+
+            <span class="text-slate-500" aria-hidden="true">
+              <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none">
+                <circle cx="12" cy="12" r="9"
+                        stroke="currentColor" stroke-width="1.8"/>
+                <path d="M12 11V16M12 8V8.1"
+                      stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round"/>
+              </svg>
+            </span>
+          </div>
+
+        </article>
+
+
+        <!-- FOCUS -->
+        <article class="flex min-h-[205px] flex-col rounded-2xl
+                        border border-slate-100 bg-white p-6 shadow-sm">
+
+          <div class="mb-3 flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wide text-sky-700">
+              Estado Enfocado (Focus)
+            </span>
+
+            <span class="rounded-full bg-blue-100 px-2 py-1 text-[10px] text-blue-800">
+              Halo 3px
+            </span>
+          </div>
+
+          <app-text-field
+            id="basic-email"
+            label="Correo Electrónico"
+            type="email"
+            [value]="emailAddress()"
+            [focusedDemo]="true"
+            hint="Indicador de foco activo #009FE3 para soporte motriz."
+            (valueChange)="emailAddress.set($event)"
+          />
+
+          <div class="mt-auto flex items-center justify-between pt-5">
+            <span class="text-[11px] text-slate-500">
+              Soporte NVDA / VoiceOver
+            </span>
+
+            <span class="text-dsc-primary" aria-hidden="true">
+              <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none">
+                <path d="M2 12S5.5 5 12 5S22 12 22 12
+                        S18.5 19 12 19S2 12 2 12Z"
+                      stroke="currentColor" stroke-width="2"/>
+                <circle cx="12" cy="12" r="3"
+                        stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </span>
+          </div>
+
+        </article>
+
+
+        <!-- READ ONLY -->
+        <article class="flex min-h-[205px] flex-col rounded-2xl
+                        border border-slate-100 bg-white p-6 shadow-sm">
+
+          <div class="mb-3 flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wide text-dsc-navy">
+              Solo lectura
+            </span>
+
+            <span class="text-[11px] text-slate-500">
+              Bloqueado
+            </span>
+          </div>
+
+          <app-text-field
+            id="basic-tenant"
+            label="Identificador de Tenant"
+            [value]="tenantId()"
+            [readonlyMode]="true"
+            trailingIcon="lock"
+            hint="Generado automáticamente por el provisionador cloud."
+          />
+
+          <div class="mt-auto flex items-center justify-between pt-5">
+            <span class="text-[11px] text-slate-500">
+              No interactivo (solo lectura)
+            </span>
+
+            <span class="text-slate-500" aria-hidden="true">
+              <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none">
+                <circle cx="12" cy="12" r="9"
+                        stroke="currentColor" stroke-width="1.8"/>
+                <path d="M6 6L18 18"
+                      stroke="currentColor" stroke-width="1.8"/>
+              </svg>
+            </span>
+          </div>
+
+        </article>
+
+      </div>
+    </section>
+
+
+  <!-- ====================================== -->
+  <!-- CAMPOS CON ICONOGRAFÍA ASISTIDA -->
+  <!-- ====================================== -->
+
+  <section class="mt-12">
+
+    <div class="mb-6">
+      <h2 class="text-lg font-semibold text-dsc-text">
+        Campos con Iconografía Asistida
+      </h2>
+
+      <p class="mt-1 text-xs text-slate-500">
+        Entradas especializadas con elementos visuales complementarios.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+
+      <!-- SEARCH -->
+      <article class="flex min-h-[155px] flex-col rounded-2xl
+                      border border-slate-100 bg-white p-6 shadow-sm">
+
+        <app-text-field
+          id="assisted-search"
+          label="Búsqueda Global"
+          type="search"
+          leadingIcon="search"
+          placeholder="Filtrar registros..."
+          [value]="globalSearch()"
+          hint="Atajo rápido ⌘K integrado."
+          (valueChange)="globalSearch.set($event)"
+        />
+
+      </article>
+
+
+      <!-- CURRENCY -->
+      <article class="flex min-h-[155px] flex-col rounded-2xl
+                      border border-slate-100 bg-white p-6 shadow-sm">
+
+        <app-text-field
+          id="assisted-budget"
+          label="Límite de Presupuesto"
+          type="text"
+          prefix="USD $"
+          suffix=".00"
+          [value]="budgetLimit()"
+          hint="Ajustado al ciclo mensual."
+          (valueChange)="budgetLimit.set($event)"
+        />
+
+      </article>
+
+
+      <!-- EMAIL -->
+      <article class="flex min-h-[155px] flex-col rounded-2xl
+                      border border-slate-100 bg-white p-6 shadow-sm">
+
+        <app-text-field
+          id="assisted-contact"
+          label="Email de Contacto"
+          type="email"
+          leadingIcon="at"
+          trailingIcon="building"
+          [value]="contactEmail()"
+          hint="Verificación MX confirmada."
+          (valueChange)="contactEmail.set($event)"
+        />
+
+      </article>
+
+
+      <!-- PASSWORD -->
+      <article class="flex min-h-[155px] flex-col rounded-2xl
+                      border border-slate-100 bg-white p-6 shadow-sm">
+
+        <app-text-field
+          id="assisted-password"
+          label="Contraseña Maestra"
+          type="password"
+          leadingIcon="key"
+          [value]="masterPassword()"
+          hint="Mínimo 12 caracteres mixtos."
+          (valueChange)="masterPassword.set($event)"
+        />
+
+      </article>
+
+    </div>
+  </section>
+
+
+  <!-- ====================================== -->
+  <!-- ESTADOS DE VALIDACIÓN Y FEEDBACK -->
+  <!-- ====================================== -->
+
+  <section class="mt-12">
+
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-2">
+
+      <h2 class="text-lg font-semibold text-dsc-text">
+        Estados de Validación & Feedback
+      </h2>
+
+      <span class="text-xs text-slate-500">
+        Roles ARIA: alert & status
+      </span>
+
+    </div>
+
+    <div class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+
+      <!-- SUCCESS -->
+      <article class="flex min-h-[185px] flex-col rounded-2xl
+                      border border-slate-100 bg-white p-6 shadow-sm">
+
+        <app-text-field
+          id="validation-subdomain"
+          label="Subdominio de Instancia"
+          [value]="subdomain()"
+          [status]="'success'"
+          statusLabel="Disponible"
+          hint="Subdominio verificado en la red CDN."
+          (valueChange)="subdomain.set($event)"
+        />
+
+        <div class="mt-auto pt-5">
+          <span class="inline-block rounded bg-indigo-50 px-2 py-1
+                      text-[10px] text-dsc-navy">
+            Token de borde:
+            <code>primary-container (#009FE3)</code>
+          </span>
+        </div>
+
+      </article>
+
+
+      <!-- WARNING -->
+      <article class="flex min-h-[185px] flex-col rounded-2xl
+                      border border-slate-100 bg-white p-6 shadow-sm">
+
+        <app-text-field
+          id="validation-storage"
+          label="Cuota de Almacenamiento"
+          [value]="storageQuota()"
+          [status]="'warning'"
+          statusLabel="88% Uso"
+          hint="Cerca del umbral de aprovisionamiento adicional."
+          (valueChange)="storageQuota.set($event)"
+        />
+
+        <div class="mt-auto pt-5">
+          <span class="inline-block rounded bg-indigo-50 px-2 py-1
+                      text-[10px] text-dsc-navy">
+            Token de borde:
+            <code>secondary (#565E74)</code>
+          </span>
+        </div>
+
+      </article>
+
+
+      <!-- ERROR -->
+      <article class="flex min-h-[185px] flex-col rounded-2xl
+                      border border-slate-100 bg-white p-6 shadow-sm">
+
+        <app-text-field
+          id="validation-api-key"
+          label="Clave de API Secreta"
+          type="text"
+          [value]="apiSecret()"
+          [status]="'error'"
+          statusLabel="Inválido"
+          hint="Formato de hash no coincide con la especificación SHA-256."
+          (valueChange)="apiSecret.set($event)"
+        />
+
+        <div class="mt-auto pt-5">
+          <span class="inline-block rounded bg-indigo-50 px-2 py-1
+                      text-[10px] text-dsc-navy">
+            Token de borde:
+            <code>error (#BA1A1A)</code>
+          </span>
+        </div>
+
+      </article>
+
+    </div>
+  </section>
+
+
+  <!-- ====================================== -->
+  <!-- SELECCIÓN, CONMUTADORES Y BLOQUE TEXTO -->
+  <!-- ====================================== -->
+
+  <div class="mt-8 mb-6">
+        <h2 class="text-lg font-semibold text-dsc-text">
+          Selección, Conmutadores & Bloques multilínea
+        </h2>
+  </div>
+
+  <div class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+    <!-- ==================================== -->
+    <!-- 01. CHECKBOXES -->
+    <!-- ==================================== -->
+
+    <section
+      class="flex min-h-[285px] flex-col rounded-2xl
+             border border-slate-100 bg-white p-6
+             shadow-sm"
+    >
+
+      <div class="mb-5">
+        <h2 class="text-sm font-semibold text-dsc-text">
+          Casillas de Verificación (Checkboxes)
+        </h2>
+
+        <p class="mt-1 text-xs text-slate-500">
+          Soporte de estados seleccionados y deseleccionados.
+        </p>
+      </div>
+
+      <div class="space-y-4">
+
+        <app-checkbox
+          label="Habilitar cifrado TLS 1.3 estricto"
+          description="Bloquea handshakes en versiones heredadas."
+          [checked]="tlsStrict()"
+          (checkedChange)="tlsStrict.set($event)"
+        />
+
+        <app-checkbox
+          label="Registro automático de auditoría"
+          description="Envía logs a DataDog / CloudWatch en streaming."
+          [checked]="auditLogs()"
+          (checkedChange)="auditLogs.set($event)"
+        />
+
+        <app-checkbox
+          label="Modo sandbox sin cuotas"
+          description="Aísla el entorno para pruebas de carga."
+          [checked]="sandboxMode()"
+          (checkedChange)="sandboxMode.set($event)"
+        />
+
+      </div>
+
+      <div class="mt-auto pt-6">
+        <p class="text-[11px] text-slate-500">
+          Token: bg-dsc-primary
+          <span class="font-medium text-dsc-text">
+            (#009FE3)
+          </span>
+        </p>
+      </div>
+
+    </section>
+
+
+    <!-- ==================================== -->
+    <!-- 02. RADIO GROUP -->
+    <!-- ==================================== -->
+
+    <section
+      class="flex min-h-[285px] flex-col rounded-2xl
+             border border-slate-100 bg-white p-6
+             shadow-sm"
+    >
+
+      <div class="mb-5">
+        <h2 class="text-sm font-semibold text-dsc-text">
+          Botones de Opción Única (Radios)
+        </h2>
+
+        <p class="mt-1 text-xs text-slate-500">
+          Punto concéntrico estilizado en el azul corporativo.
+        </p>
+      </div>
+
+      <app-radio-group
+        name="availability"
+        [options]="availabilityOptions"
+        [value]="selectedAvailability()"
+        (valueChange)="selectedAvailability.set($event)"
+      />
+
+      <div class="mt-auto pt-6">
+        <p class="text-[11px] text-slate-500">
+          Indicador central de 8px en #009FE3
+        </p>
+      </div>
+
+    </section>
+
+
+    <!-- ==================================== -->
+    <!-- 03. TOGGLES -->
+    <!-- ==================================== -->
+
+    <section
+      class="flex min-h-[285px] flex-col rounded-2xl
+             border border-slate-100 bg-white p-6
+             shadow-sm"
+    >
+
+      <div class="mb-5">
+        <h2 class="text-sm font-semibold text-dsc-text">
+          Conmutadores (Toggle Switches)
+        </h2>
+
+        <p class="mt-1 text-xs text-slate-500">
+          Acción binaria rápida para opciones de configuración.
+        </p>
+      </div>
+
+      <div class="space-y-4">
+
+        <app-toggle
+          label="Balanceado Dinámico"
+          description="Ajusta el ancho de banda según carga."
+          [checked]="dynamicBalance()"
+          (checkedChange)="dynamicBalance.set($event)"
+        />
+
+        <app-toggle
+          label="Modo Mantenimiento"
+          description="Retiene peticiones entrantes con HTTP 503."
+          [checked]="maintenanceMode()"
+          (checkedChange)="maintenanceMode.set($event)"
+        />
+
+      </div>
+
+      <div class="mt-auto pt-6">
+        <p class="text-[11px] text-slate-500">
+          Transición fluida de 200ms
+        </p>
+      </div>
+
+    </section>
+
+
+    <!-- ==================================== -->
+    <!-- 04. SELECT -->
+    <!-- ==================================== -->
+
+    <section
+      class="flex min-h-[220px] flex-col rounded-2xl
+             border border-slate-100 bg-white p-6
+             shadow-sm"
+    >
+
+      <app-select
+        label="Región Primaria de Despliegue"
+        [options]="regions"
+        [value]="selectedRegion()"
+        placeholder="Seleccionar región"
+        hint="Latencia media estimada: 18ms."
+        (valueChange)="selectedRegion.set($event)"
+      />
+
+      <div class="mt-auto pt-6">
+        <p class="text-[11px] text-slate-500">
+          Soporta navegación nativa con teclado
+        </p>
+      </div>
+
+    </section>
+
+
+    <!-- ==================================== -->
+    <!-- 05. TAG INPUT -->
+    <!-- ==================================== -->
+
+    <section
+      class="flex min-h-[220px] flex-col rounded-2xl
+             border border-slate-100 bg-white p-6
+             shadow-sm"
+    >
+
+      <app-tag-input
+        label="Etiquetas de Servicio (Tags)"
+        [tags]="serviceTags()"
+        placeholder="Añadir..."
+        hint="Escribe y presiona Enter para sumar tags."
+        [maxTags]="8"
+        (tagsChange)="serviceTags.set($event)"
+      />
+
+      <div class="mt-auto pt-6">
+        <p class="text-[11px] text-slate-500">
+          Contenedor adaptativo y flexible
+        </p>
+      </div>
+
+    </section>
+
+
+    <!-- ==================================== -->
+    <!-- 06. TEXTAREA -->
+    <!-- ==================================== -->
+
+    <section
+      class="flex min-h-[220px] flex-col rounded-2xl
+             border border-slate-100 bg-white p-6
+             shadow-sm"
+    >
+
+      <app-textarea
+        label="Descripción de la Versión"
+        [value]="versionDescription()"
+        [maxLength]="300"
+        [rows]="4"
+        placeholder="Escribe una descripción..."
+        hint="Visible para el equipo de Operaciones e Infraestructura."
+        (valueChange)="versionDescription.set($event)"
+      />
+
+      <div class="mt-auto pt-6">
+        <p class="text-[11px] text-slate-500">
+          Contador dinámico en tiempo real
+        </p>
+      </div>
+
+    </section>
+
+  </div>
+
+
+  <!-- ====================================== -->
+  <!-- DATEPICKERS -->
+  <!-- ====================================== -->
+  <section class="space-y-6 mt-8">
+    <div>
+      <h2 class="text-lg font-semibold text-dsc-text">
+        Selectores de fecha
+      </h2>
+
+      <p class="mt-1 text-sm text-slate-500">
+        Componentes para seleccionar fechas individuales.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+
+      <!-- DATE PICKER SIMPLE -->
+      <div class="rounded-xl border border-slate-200 bg-white p-5">
+        <div class="mb-5">
+          <h3 class="text-sm font-semibold text-dsc-text">
+            Datepicker simple
+          </h3>
+
+          <p class="mt-1 text-xs text-slate-500">
+            Selección de una fecha específica.
+          </p>
+        </div>
+
+        <app-date-picker
+          id="demo-date-picker"
+          label="Fecha de nacimiento"
+          [value]="selectedDate()"
+          [required]="true"
+          hint="Selecciona una fecha del calendario."
+          (dateChange)="selectedDate.set($event)"
+        />
+
+        <div class="mt-5 rounded-lg bg-slate-50 p-3">
+          <p class="text-xs text-slate-500">
+            Valor seleccionado:
+          </p>
+
+          <p class="mt-1 text-sm font-medium text-dsc-text">
+            {{ selectedDate() || 'Sin fecha seleccionada' }}
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+
+  <!-- ====================================== -->
+  <!-- INFORMACIÓN FINAL -->
+  <!-- ====================================== -->
+
+  <footer class="mt-8 rounded-xl border border-dsc-border
+                 bg-white p-5">
+
+    <h2 class="text-sm font-semibold text-dsc-text">
+      Información de los componentes
+    </h2>
+
+    <p class="mt-2 text-xs leading-relaxed text-slate-500">
+      Todos los controles de esta sección son componentes
+      independientes y reutilizables. Reciben sus propiedades
+      mediante inputs y comunican sus interacciones mediante
+      outputs, permitiendo que cada formulario controle su
+      propio estado y lógica de negocio.
+    </p>
+
+  </footer>
+
+</div>
