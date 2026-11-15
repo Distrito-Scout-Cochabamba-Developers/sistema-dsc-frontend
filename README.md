@@ -50,6 +50,8 @@ App en http://localhost:4200. Detalle en el README de esa carpeta.
 
 Catálogo: http://localhost:4200/modulos (el formulario se abre al elegir un módulo).
 
+Calendario: http://localhost:4200/calendario (público; inscripción con login). Ver [docs/features/calendario-modulos.md](./docs/features/calendario-modulos.md).
+
 Deep link: http://localhost:4200/asistencia/mod-liderazgo-20241024
 
 El código debe existir como `training_module.code`. En Docker se siembra con `docker/seed-dev-modules.sql`. Ver [docs/features/asistencia-backend-gaps.md](./docs/features/asistencia-backend-gaps.md).

@@ -44,6 +44,11 @@ describe('ModuleCatalog', () => {
     expect(text).not.toContain('Carnet de Identidad');
     expect(text).not.toContain('Registrar Asistencia');
     expect(text).toContain('Registrar asistencia');
+    expect(text).toContain('Calendario');
+    const calendarLink = fixture.nativeElement.querySelector(
+      'a[href="/calendario"]',
+    ) as HTMLAnchorElement | null;
+    expect(calendarLink).toBeTruthy();
 
     const link = fixture.nativeElement.querySelector(
       'a[href="/asistencia/mod-liderazgo-20241024"]',

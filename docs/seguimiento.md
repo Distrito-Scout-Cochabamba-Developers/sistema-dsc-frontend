@@ -1,7 +1,7 @@
 # Seguimiento del proyecto
 
-- **Última actualización:** 2026-10-22
-- **Estado general:** Login **JWT Bearer** (`/api/v1/auth/login` + roles). Catálogo en `/modulos`. Asistencia pública. Registro **según rol** espera `[Authorize]` en attendance. Logout API y Google pendientes.
+- **Última actualización:** 2026-11-15
+- **Estado general:** Login **JWT Bearer**. Catálogo en `/modulos`. Asistencia pública. Calendario `/calendario` (UI + fixtures; API de convocatorias pendiente). Registro **según rol** espera `[Authorize]` en attendance. Logout API y Google pendientes.
 
 Este archivo es el tablero de seguimiento. Márcalo al avanzar (cambia `Pendiente` → `En curso` → `Hecho`).
 
@@ -79,7 +79,7 @@ Detalle: [features/asistencia-registro.md](./features/asistencia-registro.md) ·
 | ID | Ítem | Estado | Notas |
 | -- | ---- | ------ | ----- |
 | P-01 | Landing pública real (contenido DSC) | Pendiente | Placeholder con CTA a `/modulos` |
-| P-02 | Calendario de módulos | Pendiente | Link deshabilitado en nav |
+| P-02 | Calendario de módulos | En curso | UI `/calendario` + inscripción 409. API pendiente. [calendario-modulos.md](./features/calendario-modulos.md) |
 | P-03 | Mapa / ubicaciones | Pendiente | Link deshabilitado en nav |
 | P-04 | Iniciar sesión (pantalla real) | Hecho | **Completado.** Google/registro de cuenta deshabilitados (gaps de API) |
 | P-05 | Área de facilitador (generar QR / lista de asistentes) | Pendiente | Fuera de alcance del participante |
@@ -111,6 +111,7 @@ pnpm start
 
 - Inicio: http://localhost:4200/
 - Módulos: http://localhost:4200/modulos
+- Calendario: http://localhost:4200/calendario (fixtures hasta que exista la API)
 - Login: http://localhost:4200/auth/login
 - Registro (tras elegir un módulo): http://localhost:4200/asistencia/mod-liderazgo-20241024
 - Proxy `/api` → `:5090` (la API no tiene CORS; reescribe cookie a `localhost`)
@@ -128,4 +129,5 @@ Docker siembra `module_type` + 4 `training_module` (`docker/seed-dev-modules.sql
 1. Registro a módulos según rol (A-16/A-17): Authorize + `/me` con persona. Ver [asistencia-registro-por-rol.md](./features/asistencia-registro-por-rol.md).
 2. Logout que invalide el JWT y CORS o reverse proxy same-origin (B-05).
 3. Definir si el QR usa `Code` o `QrToken`.
-4. GET de convocatoria (fecha/horario) si el catálogo deja de ser el módulo curricular.
+4. GET/POST de calendario (`/api/v1/calendar/sessions`) y activar `trainingCalendarApiEnabled`. Ver [calendario-backend-gaps.md](./features/calendario-backend-gaps.md).
+5. GET de convocatoria (fecha/horario) si el catálogo deja de ser el módulo curricular.

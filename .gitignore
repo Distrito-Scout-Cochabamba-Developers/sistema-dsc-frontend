@@ -22,7 +22,7 @@ pnpm-debug.log
 .cursor/
 
 # BMAD — preferencias personales del instalador (nombre de usuario, etc.)
-_bmad/config.user.toml
+_bmad/
 
 # IDEs and editors
 .idea/

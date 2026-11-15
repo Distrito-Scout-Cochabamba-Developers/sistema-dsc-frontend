@@ -8,6 +8,8 @@
 | [features/auth-login.md](./features/auth-login.md) | Login JWT Bearer, Signals, guards |
 | [features/auth-backend-gaps.md](./features/auth-backend-gaps.md) | Límites que quedan (logout, asistencia anónima) |
 | [features/modulos-catalogo.md](./features/modulos-catalogo.md) | Listado `/modulos`; el formulario solo al elegir un módulo |
+| [features/calendario-modulos.md](./features/calendario-modulos.md) | Calendario público `/calendario` e inscripción de dirigentes |
+| [features/calendario-backend-gaps.md](./features/calendario-backend-gaps.md) | GET/POST de convocatorias que faltan |
 | [features/catalogo-admin-modulos.md](./features/catalogo-admin-modulos.md) | Admin `/admin/modulos` (ADMIN / secretaría) |
 | [features/catalogo-admin-backend-gaps.md](./features/catalogo-admin-backend-gaps.md) | POST/PUT y Authorize que faltan |
 | [features/asistencia-registro.md](./features/asistencia-registro.md) | Feature de registro de asistencia (frontend) |
