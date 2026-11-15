@@ -3,7 +3,7 @@
  * Las features se cargan de forma diferida; no importar features de forma eager.
  * Auth vive fuera del shell para coincidir con el login a pantalla completa.
  * `/admin/modulos` usa `authGuard` + `roleGuard` (ADMIN / DISTRICT_SECRETARY).
- * `/modulos` y `/asistencia` siguen públicos: la API de asistencia es anónima.
+ * `/modulos`, `/calendario` y `/asistencia` siguen públicos.
  */
 import { Routes } from '@angular/router';
 
@@ -35,6 +35,13 @@ export const routes: Routes = [
         path: 'modulos',
         loadChildren: () =>
           import('@features/modules/modules.routes').then((m) => m.MODULES_ROUTES),
+      },
+      {
+        path: 'calendario',
+        loadChildren: () =>
+          import('@features/training-calendar/training-calendar.routes').then(
+            (m) => m.TRAINING_CALENDAR_ROUTES,
+          ),
       },
       {
         path: 'admin/modulos',

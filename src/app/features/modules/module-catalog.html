@@ -12,14 +12,22 @@
         entrar a uno.
       </p>
     </div>
-    @if (canManageCatalog()) {
+    <div class="flex flex-wrap gap-2">
       <a
-        class="rounded-lg bg-dsc px-4 py-2 text-sm font-semibold text-white no-underline transition hover:bg-dsc-dark"
-        routerLink="/admin/modulos"
+        class="rounded-lg border border-dsc px-4 py-2 text-sm font-semibold text-dsc no-underline transition hover:bg-dsc-soft"
+        routerLink="/calendario"
       >
-        Administrar módulos
+        Calendario
       </a>
-    }
+      @if (canManageCatalog()) {
+        <a
+          class="rounded-lg bg-dsc px-4 py-2 text-sm font-semibold text-white no-underline transition hover:bg-dsc-dark"
+          routerLink="/admin/modulos"
+        >
+          Administrar módulos
+        </a>
+      }
+    </div>
   </div>
 
   @if (loading()) {

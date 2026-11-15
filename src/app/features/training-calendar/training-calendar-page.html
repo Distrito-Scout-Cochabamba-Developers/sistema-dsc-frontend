@@ -1,0 +1,117 @@
+<section class="mx-auto max-w-6xl px-4 py-10 md:px-6">
+  <p class="w-fit rounded-full bg-dsc-soft px-3 py-1 text-xs font-bold tracking-wide text-dsc-dark">
+    FORMACIÓN
+  </p>
+  <div class="mt-4 flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <h1 class="m-0 text-headline-lg font-bold tracking-tight text-ink md:text-headline-lg-desktop">
+        Calendario de módulos
+      </h1>
+      <p class="mt-2 mb-0 max-w-2xl text-body text-muted">
+        Consulta las convocatorias del distrito. Cualquier persona puede verlas;
+        inscribirse requiere iniciar sesión.
+      </p>
+    </div>
+    <div class="flex rounded-lg border border-border bg-elevated p-1" role="group" aria-label="Vista del calendario">
+      <button
+        type="button"
+        class="rounded-md px-3 py-1.5 text-sm font-semibold"
+        [class.bg-dsc]="viewMode() === 'month'"
+        [class.text-white]="viewMode() === 'month'"
+        [class.text-muted]="viewMode() !== 'month'"
+        (click)="setView('month')"
+      >
+        Mes
+      </button>
+      <button
+        type="button"
+        class="rounded-md px-3 py-1.5 text-sm font-semibold"
+        [class.bg-dsc]="viewMode() === 'list'"
+        [class.text-white]="viewMode() === 'list'"
+        [class.text-muted]="viewMode() !== 'list'"
+        (click)="setView('list')"
+      >
+        Lista
+      </button>
+    </div>
+  </div>
+
+  @if (usingFixtures) {
+    <p class="mt-4 rounded-xl border border-dsc/30 bg-dsc-soft px-4 py-3 text-sm text-dsc-dark" role="status">
+      Vista preparada para la API. Mientras no existan
+      <code class="font-mono text-xs">GET/POST /api/v1/calendar/sessions</code>,
+      se muestran convocatorias de demostración.
+    </p>
+  }
+
+  @if (loading()) {
+    <p class="mt-8 text-sm text-muted" role="status">Cargando calendario…</p>
+  } @else if (error()) {
+    <div class="mt-8">
+      <app-state-card title="No se pudo cargar el calendario" ctaLabel="Volver al inicio" ctaLink="/">
+        {{ error() }}
+      </app-state-card>
+      @if (retryable()) {
+        <button
+          type="button"
+          class="mt-4 text-sm font-semibold text-dsc underline"
+          (click)="retry()"
+        >
+          Reintentar
+        </button>
+      }
+    </div>
+  } @else {
+    @if (viewMode() === 'month') {
+      <div class="mt-8">
+        <app-training-calendar-month
+          [year]="year()"
+          [monthIndex]="monthIndex()"
+          [sessions]="sessions()"
+          [selectedIsoDate]="selectedIsoDate()"
+          (monthChange)="onMonthChange($event)"
+          (today)="goToday()"
+          (daySelected)="onDaySelected($event)"
+        />
+      </div>
+    }
+
+    <div class="mt-8">
+      <div class="mb-4 flex flex-wrap items-baseline justify-between gap-2">
+        <h2 class="m-0 text-lg font-bold text-ink">
+          {{ selectedIsoDate() ? 'Convocatorias del día' : 'Módulos próximos' }}
+        </h2>
+        @if (selectedIsoDate()) {
+          <button type="button" class="text-sm font-semibold text-dsc underline" (click)="clearDayFilter()">
+            Ver todos
+          </button>
+        }
+      </div>
+
+      @if (upcoming().length === 0) {
+        <p class="rounded-2xl border border-border bg-elevated p-6 text-sm text-muted">
+          No hay convocatorias próximas en este filtro.
+        </p>
+      } @else {
+        <ul class="m-0 grid list-none gap-4 p-0 sm:grid-cols-2">
+          @for (session of upcoming(); track session.id) {
+            <li>
+              <app-training-calendar-session-card [session]="session" (enroll)="openEnroll($event)" />
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  }
+
+  <app-training-calendar-enroll-dialog
+    [open]="pending() !== null"
+    [session]="pending()"
+    [authenticated]="isAuthenticated()"
+    [enrollError]="enrollError()"
+    [submitting]="submitting()"
+    (closed)="closeEnroll()"
+    (confirmed)="confirmEnroll()"
+    (loginRequested)="goLogin()"
+  />
+</section>
