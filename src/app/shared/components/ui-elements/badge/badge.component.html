@@ -1,0 +1,12 @@
+
+<span [class]="badgeClasses()">
+  @if (dot()) {
+    <span
+      class="h-1.5 w-1.5 shrink-0 rounded-full"
+      [class]="dotClass()"
+      aria-hidden="true"
+    ></span>
+  }
+
+  <ng-content></ng-content>
+</span>

@@ -1,4 +1,3 @@
-
 import {
   ChangeDetectionStrategy,
   Component,
@@ -26,6 +25,9 @@ export interface SelectOption {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SelectComponent {
+
+  /** Identificador único del control interno. */
+  readonly inputId = input.required<string>();
 
   /** Etiqueta del selector. */
   readonly label = input.required<string>();

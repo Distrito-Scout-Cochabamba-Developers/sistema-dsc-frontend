@@ -53,8 +53,8 @@ export class TextFieldComponent {
   // IDENTIFICACIÓN Y CONTENIDO
   // ==========================================
 
-  /** Identificador HTML único del campo. */
-  readonly id = input.required<string>();
+  /** Identificador HTML único del elemento input interno. */
+  readonly inputId = input.required<string>();
 
   /** Etiqueta descriptiva del campo. */
   readonly label = input.required<string>();

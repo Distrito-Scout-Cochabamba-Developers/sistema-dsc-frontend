@@ -1,7 +1,7 @@
 
 <div class="flex flex-col gap-1.5">
   <label
-    [for]="id()"
+    [for]="inputId()"
     class="text-sm font-medium text-dsc-text"
   >
     {{ label() }}
@@ -13,7 +13,7 @@
 
   <div class="relative">
     <input
-      [id]="id()"
+      [id]="inputId()"
       type="date"
       [value]="value()"
       [min]="min() || null"

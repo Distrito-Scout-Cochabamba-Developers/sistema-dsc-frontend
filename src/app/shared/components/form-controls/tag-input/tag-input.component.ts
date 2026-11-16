@@ -1,4 +1,3 @@
-
 import {
   ChangeDetectionStrategy,
   Component,
@@ -21,6 +20,9 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TagInputComponent {
+
+  /** Identificador único del control interno. */
+  readonly inputId = input.required<string>();
 
   /** Etiquetas actuales. */
   readonly tags = input<string[]>([]);

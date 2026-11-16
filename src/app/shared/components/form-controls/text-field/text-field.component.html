@@ -8,7 +8,7 @@
   <div class="mb-2 flex items-center justify-between gap-3">
 
     <label
-      [for]="id()"
+      [for]="inputId()"
       class="text-sm font-medium"
       [class.text-dsc-text]="status() !== 'error'"
       [class.text-[#BA1A1A]]="status() === 'error'"
@@ -59,6 +59,9 @@
   <div
     class="flex min-h-[40px] items-center gap-2
            overflow-hidden rounded-lg border
+           focus-within:border-dsc-primary
+           focus-within:ring-2
+           focus-within:ring-dsc-primary/20
            bg-white px-3 transition-all duration-200"
 
     [class.border-slate-300]="status() === 'default' && !focusedDemo()"
@@ -127,7 +130,7 @@
 
     <!-- Campo de entrada -->
     <input
-      [id]="id()"
+      [id]="inputId()"
       [type]="effectiveType()"
       [value]="value()"
       [placeholder]="placeholder()"
@@ -136,7 +139,7 @@
       [disabled]="disabled()"
       [attr.maxlength]="maxLength() ?? null"
       [attr.aria-invalid]="status() === 'error' ? 'true' : null"
-      [attr.aria-describedby]="hint() ? id() + '-hint' : null"
+      [attr.aria-describedby]="hint() ? inputId() + '-hint' : null"
 
       class="min-w-0 flex-1 bg-transparent py-2
             text-sm text-dsc-text outline-none
@@ -324,7 +327,7 @@
 
   @if (hint()) {
     <p
-      [id]="id() + '-hint'"
+      [id]="inputId() + '-hint'"
       class="mt-1.5 text-[11px] leading-relaxed"
       [class.text-slate-500]="status() === 'default'"
       [class.text-green-700]="status() === 'success'"

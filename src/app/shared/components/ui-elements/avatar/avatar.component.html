@@ -1,0 +1,26 @@
+
+<span
+  [class]="avatarClasses()"
+  role="img"
+  [attr.aria-label]="alt()"
+>
+  @if (showImage()) {
+    <img
+      [src]="src()"
+      [alt]="alt()"
+      class="h-full w-full object-cover"
+      (error)="onImageError()"
+    />
+  } @else {
+    <span aria-hidden="true">
+      {{ initials() }}
+    </span>
+  }
+
+  @if (status() !== 'none') {
+    <span
+      [class]="statusClass()"
+      aria-hidden="true"
+    ></span>
+  }
+</span>

@@ -1,4 +1,3 @@
-
 import {
   ChangeDetectionStrategy,
   Component,
@@ -19,6 +18,9 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TextareaComponent {
+
+  /** Identificador único del control interno. */
+  readonly inputId = input.required<string>();
 
   /** Etiqueta del campo. */
   readonly label = input.required<string>();

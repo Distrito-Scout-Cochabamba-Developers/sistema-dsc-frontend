@@ -1,16 +1,18 @@
-
 <div class="w-full">
 
   <!-- Etiqueta y contador -->
   <div class="mb-2 flex items-center justify-between gap-3">
 
-    <label class="text-sm font-medium text-dsc-text">
+    <label
+      class="text-sm font-medium text-dsc-text"
+      [for]="inputId()"
+    >
       {{ label() }}
     </label>
 
     <span
       class="text-xs tabular-nums"
-      [class.text-slate-400]="characterCount() <= maxLength()"
+      [class.text-slate-500]="characterCount() <= maxLength()"
       [class.text-red-600]="characterCount() > maxLength()"
     >
       {{ characterCount() }} / {{ maxLength() }}
@@ -20,6 +22,8 @@
 
   <!-- Área de texto -->
   <textarea
+    [id]="inputId()"
+    [attr.aria-describedby]="hint() ? inputId() + '-hint' : null"
     class="w-full resize-y rounded-lg border
            border-slate-300 bg-white px-3 py-2.5
            text-sm leading-relaxed text-dsc-text
@@ -39,7 +43,10 @@
   ></textarea>
 
   @if (hint()) {
-    <p class="mt-1.5 text-xs text-slate-500">
+    <p
+      class="mt-1.5 text-xs text-slate-500"
+      [id]="inputId() + '-hint'"
+    >
       {{ hint() }}
     </p>
   }

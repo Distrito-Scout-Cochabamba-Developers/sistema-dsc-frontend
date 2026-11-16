@@ -1,0 +1,30 @@
+
+<article [class]="cardClasses()">
+
+  @if (header() && (title() || subtitle())) {
+    <header class="border-b border-slate-100 px-5 py-4">
+      @if (title()) {
+        <h3 class="text-base font-semibold text-dsc-text">
+          {{ title() }}
+        </h3>
+      }
+
+      @if (subtitle()) {
+        <p class="mt-1 text-sm text-slate-500">
+          {{ subtitle() }}
+        </p>
+      }
+    </header>
+  }
+
+  <div [class]="contentClasses()">
+    <ng-content></ng-content>
+  </div>
+
+  @if (footer()) {
+    <footer class="border-t border-slate-100 px-5 py-3">
+      <ng-content select="[card-footer]"></ng-content>
+    </footer>
+  }
+
+</article>

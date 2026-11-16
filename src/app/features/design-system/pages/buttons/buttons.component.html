@@ -1,0 +1,622 @@
+
+<div class="space-y-10 pb-10">
+
+  <!-- ENCABEZADO -->
+  <header class="space-y-2">
+    <h1 class="text-3xl font-bold tracking-tight text-dsc-text">
+      Botones
+    </h1>
+
+    <p class="text-sm text-slate-500">
+      Componentes de acción para interacciones clave
+      dentro de la aplicación.
+    </p>
+  </header>
+
+  <!-- 1. VARIANTES -->
+  <section class="space-y-4">
+    <div>
+      <h2 class="text-lg font-semibold text-dsc-text">
+        Variantes de estilo
+      </h2>
+
+      <p class="mt-1 text-sm text-slate-500">
+        Diferentes presentaciones visuales según la importancia
+        y el contexto de la acción.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+
+      <!-- SOLID -->
+      <article class="rounded-xl border border-dsc-border bg-white p-5">
+        <h3 class="font-semibold text-dsc-text">Solid</h3>
+        <p class="mb-5 mt-1 text-xs text-slate-500">
+          Acción principal con fondo de color.
+        </p>
+
+        <div class="flex flex-col gap-3">
+          <app-button label="Botón primario" />
+          <app-button
+            label="Botón secundario"
+            color="secondary"
+          />
+          <app-button
+            label="Botón peligro"
+            color="danger"
+          />
+        </div>
+      </article>
+
+      <!-- OUTLINE -->
+      <article class="rounded-xl border border-dsc-border bg-white p-5">
+        <h3 class="font-semibold text-dsc-text">Outline</h3>
+        <p class="mb-5 mt-1 text-xs text-slate-500">
+          Botón con borde y fondo transparente.
+        </p>
+
+        <div class="flex flex-col gap-3">
+          <app-button
+            label="Botón primario"
+            variant="outline"
+          />
+          <app-button
+            label="Botón secundario"
+            variant="outline"
+            color="secondary"
+          />
+          <app-button
+            label="Botón peligro"
+            variant="outline"
+            color="danger"
+          />
+        </div>
+      </article>
+
+      <!-- TEXT -->
+      <article class="rounded-xl border border-dsc-border bg-white p-5">
+        <h3 class="font-semibold text-dsc-text">Sólo texto</h3>
+        <p class="mb-5 mt-1 text-xs text-slate-500">
+          Botón sin fondo ni borde.
+        </p>
+
+        <div class="flex flex-col items-start gap-3">
+          <app-button
+            label="Botón primario"
+            variant="text"
+          >
+            <span button-icon-right aria-hidden="true">→</span>
+          </app-button>
+
+          <app-button
+            label="Botón secundario"
+            variant="text"
+            color="secondary"
+          />
+
+          <app-button
+            label="Botón peligro"
+            variant="text"
+            color="danger"
+          >
+            <span button-icon-right aria-hidden="true">→</span>
+          </app-button>
+        </div>
+      </article>
+
+      <!-- SECONDARY -->
+      <article class="rounded-xl border border-dsc-border bg-white p-5">
+        <h3 class="font-semibold text-dsc-text">Secondary</h3>
+        <p class="mb-5 mt-1 text-xs text-slate-500">
+          Botón de apoyo con fondo suave.
+        </p>
+
+        <div class="flex flex-col gap-3">
+          <app-button
+            label="Botón primario"
+            variant="secondary"
+          />
+          <app-button
+            label="Botón secundario"
+            variant="secondary"
+            color="secondary"
+          />
+          <app-button
+            label="Botón peligro"
+            variant="secondary"
+            color="danger"
+          />
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- 2. ESTADOS DE COLOR -->
+  <section class="space-y-4">
+    <div>
+      <h2 class="text-lg font-semibold text-dsc-text">
+        Estados de color
+      </h2>
+
+      <p class="mt-1 text-sm text-slate-500">
+        Comportamiento visual de cada color en diferentes estados.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+
+      <!-- PRIMARY -->
+      <article class="rounded-xl border border-dsc-border bg-white p-5">
+        <h3 class="mb-4 text-sm font-semibold text-dsc-text">
+          Primario (Azul)
+        </h3>
+
+        <div class="flex flex-wrap gap-2">
+          <app-button label="Normal" size="sm" />
+          <app-button label="Hover" size="sm" />
+          <app-button
+            label="Focus"
+            size="sm"
+            variant="outline"
+          />
+          <app-button
+            label="Disabled"
+            size="sm"
+            [disabled]="true"
+          />
+        </div>
+      </article>
+
+      <!-- SECONDARY -->
+      <article class="rounded-xl border border-dsc-border bg-white p-5">
+        <h3 class="mb-4 text-sm font-semibold text-dsc-text">
+          Secundario (Amarillo)
+        </h3>
+
+        <div class="flex flex-wrap gap-2">
+          <app-button
+            label="Normal"
+            color="secondary"
+            size="sm"
+          />
+          <app-button
+            label="Hover"
+            color="secondary"
+            size="sm"
+          />
+          <app-button
+            label="Focus"
+            color="secondary"
+            variant="outline"
+            size="sm"
+          />
+          <app-button
+            label="Disabled"
+            color="secondary"
+            size="sm"
+            [disabled]="true"
+          />
+        </div>
+      </article>
+
+      <!-- DANGER -->
+      <article class="rounded-xl border border-dsc-border bg-white p-5">
+        <h3 class="mb-4 text-sm font-semibold text-dsc-text">
+          Peligro (Rojo)
+        </h3>
+
+        <div class="flex flex-wrap gap-2">
+          <app-button
+            label="Normal"
+            color="danger"
+            size="sm"
+          />
+          <app-button
+            label="Hover"
+            color="danger"
+            size="sm"
+          />
+          <app-button
+            label="Focus"
+            color="danger"
+            variant="outline"
+            size="sm"
+          />
+          <app-button
+            label="Disabled"
+            color="danger"
+            size="sm"
+            [disabled]="true"
+          />
+        </div>
+      </article>
+
+      <!-- SUCCESS -->
+      <article class="rounded-xl border border-dsc-border bg-white p-5">
+        <h3 class="mb-4 text-sm font-semibold text-dsc-text">
+          Éxito (Verde)
+        </h3>
+
+        <div class="flex flex-wrap gap-2">
+          <app-button
+            label="Normal"
+            color="success"
+            size="sm"
+          />
+          <app-button
+            label="Hover"
+            color="success"
+            size="sm"
+          />
+          <app-button
+            label="Focus"
+            color="success"
+            variant="outline"
+            size="sm"
+          />
+          <app-button
+            label="Disabled"
+            color="success"
+            size="sm"
+            [disabled]="true"
+          />
+        </div>
+      </article>
+
+    </div>
+
+    <p class="text-xs text-slate-500">
+      Nota: Hover y Focus se visualizan al interactuar con los botones.
+      Para probar Focus, utiliza la tecla Tab.
+    </p>
+  </section>
+
+  <!-- 3. TAMAÑOS -->
+  <section class="space-y-4">
+    <div>
+      <h2 class="text-lg font-semibold text-dsc-text">
+        Tamaños
+      </h2>
+
+      <p class="mt-1 text-sm text-slate-500">
+        Diferentes dimensiones para adaptarse a la jerarquía
+        y al espacio disponible.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+
+      @for (item of sizes; track item.size) {
+      <article class="rounded-xl border border-dsc-border bg-white p-5">
+        <h3 class="mb-5 text-sm font-semibold text-dsc-text">
+          {{ item.name }}
+        </h3>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <app-button
+            label="Botón"
+            [size]="item.size"
+          />
+
+          <app-button
+            label="Botón"
+            variant="outline"
+            [size]="item.size"
+          />
+
+          <app-button
+            label="Botón"
+            variant="text"
+            [size]="item.size"
+          />
+        </div>
+      </article>
+      }
+
+    </div>
+  </section>
+
+  <!-- 4. ICONOGRAFÍA -->
+  <section class="space-y-4">
+    <div>
+      <h2 class="text-lg font-semibold text-dsc-text">
+        Con iconografía
+      </h2>
+
+      <p class="mt-1 text-sm text-slate-500">
+        Uso de iconos para reforzar visualmente el significado
+        de las acciones.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+
+      <!-- ICONO IZQUIERDA -->
+      <article class="rounded-xl border border-dsc-border bg-white p-5">
+        <h3 class="mb-5 text-sm font-semibold text-dsc-text">
+          Icono a la izquierda
+        </h3>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <app-button label="Crear">
+            <span button-icon-left aria-hidden="true">+</span>
+          </app-button>
+
+          <app-button
+            label="Crear"
+            variant="outline"
+          >
+            <span button-icon-left aria-hidden="true">+</span>
+          </app-button>
+
+          <app-button
+            label="Crear"
+            variant="text"
+          >
+            <span button-icon-left aria-hidden="true">+</span>
+          </app-button>
+        </div>
+      </article>
+
+      <!-- ICONO DERECHA -->
+      <article class="rounded-xl border border-dsc-border bg-white p-5">
+        <h3 class="mb-5 text-sm font-semibold text-dsc-text">
+          Icono a la derecha
+        </h3>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <app-button label="Exportar">
+            <span button-icon-right aria-hidden="true">↓</span>
+          </app-button>
+
+          <app-button
+            label="Exportar"
+            variant="outline"
+          >
+            <span button-icon-right aria-hidden="true">↓</span>
+          </app-button>
+
+          <app-button
+            label="Exportar"
+            variant="text"
+          >
+            <span button-icon-right aria-hidden="true">↓</span>
+          </app-button>
+        </div>
+      </article>
+
+      <!-- ICONOS MIXTOS -->
+      <article class="rounded-xl border border-dsc-border bg-white p-5">
+        <h3 class="mb-5 text-sm font-semibold text-dsc-text">
+          Acciones con iconos
+        </h3>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <app-button label="Editar">
+            <span button-icon-left aria-hidden="true">✎</span>
+          </app-button>
+
+          <app-button
+            label="Eliminar"
+            variant="outline"
+            color="danger"
+          >
+            <span button-icon-left aria-hidden="true">⌫</span>
+          </app-button>
+
+          <app-button
+            label="Ver más"
+            variant="text"
+          >
+            <span button-icon-right aria-hidden="true">→</span>
+          </app-button>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- 5. BOTONES DE ICONO -->
+  <section class="space-y-4">
+    <div>
+      <h2 class="text-lg font-semibold text-dsc-text">
+        Botones de icono
+      </h2>
+
+      <p class="mt-1 text-sm text-slate-500">
+        Acciones compactas que utilizan exclusivamente un icono.
+        Deben tener una etiqueta accesible.
+      </p>
+    </div>
+
+    <article class="rounded-xl border border-dsc-border bg-white p-5">
+      <div class="flex flex-wrap items-center gap-3">
+        <app-button
+          ariaLabel="Agregar"
+          size="sm"
+        >
+          <span aria-hidden="true">+</span>
+        </app-button>
+
+        <app-button
+          ariaLabel="Editar"
+          variant="outline"
+        >
+          <span aria-hidden="true">✎</span>
+        </app-button>
+
+        <app-button
+          ariaLabel="Eliminar"
+          variant="secondary"
+          color="danger"
+        >
+          <span aria-hidden="true">⌫</span>
+        </app-button>
+
+        <app-button
+          ariaLabel="Más opciones"
+          variant="text"
+          color="secondary"
+        >
+          <span aria-hidden="true">⋯</span>
+        </app-button>
+
+        <app-button
+          ariaLabel="Cerrar"
+          variant="text"
+          color="secondary"
+          size="lg"
+        >
+          <span aria-hidden="true">×</span>
+        </app-button>
+      </div>
+    </article>
+  </section>
+
+  <!-- 6. ESTADOS Y COMPORTAMIENTOS -->
+  <section class="space-y-4">
+    <div>
+      <h2 class="text-lg font-semibold text-dsc-text">
+        Estados y comportamientos
+      </h2>
+
+      <p class="mt-1 text-sm text-slate-500">
+        Estados adicionales para representar procesos
+        y restricciones de interacción.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+
+      <!-- LOADING -->
+      <article class="rounded-xl border border-dsc-border bg-white p-5">
+        <h3 class="mb-2 font-semibold text-dsc-text">
+          Estado de carga
+        </h3>
+
+        <p class="mb-5 text-xs text-slate-500">
+          El botón muestra un indicador y bloquea nuevos clics
+          mientras se ejecuta una operación.
+        </p>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <app-button
+            label="Guardando..."
+            [loading]="true"
+          />
+
+          <app-button
+            label="Exportando..."
+            [loading]="true"
+            variant="outline"
+            color="secondary"
+          />
+        </div>
+      </article>
+
+      <!-- FULL WIDTH -->
+      <article class="rounded-xl border border-dsc-border bg-white p-5">
+        <h3 class="mb-2 font-semibold text-dsc-text">
+          Ancho completo
+        </h3>
+
+        <p class="mb-5 text-xs text-slate-500">
+          Útil para acciones principales en formularios
+          y diseños de una sola columna.
+        </p>
+
+        <div class="flex flex-col gap-3">
+          <app-button
+            label="Guardar cambios"
+            [fullWidth]="true"
+          />
+
+          <app-button
+            label="Cancelar"
+            variant="outline"
+            color="secondary"
+            [fullWidth]="true"
+          />
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- 7. BOTONES AGRUPADOS -->
+  <section class="space-y-4">
+    <div>
+      <h2 class="text-lg font-semibold text-dsc-text">
+        Botones agrupados
+      </h2>
+
+      <p class="mt-1 text-sm text-slate-500">
+        Conjunto de acciones relacionadas dentro de una misma
+        interfaz.
+      </p>
+    </div>
+
+    <article class="rounded-xl border border-dsc-border bg-white p-5">
+      <div class="flex flex-wrap items-center gap-2">
+        <app-button
+          label="Ver"
+          variant="outline"
+          color="secondary"
+        />
+
+        <app-button
+          label="Editar"
+          variant="outline"
+          color="secondary"
+        />
+
+        <app-button
+          label="Eliminar"
+          variant="outline"
+          color="danger"
+        />
+      </div>
+    </article>
+  </section>
+
+  <!-- 8. DEMOSTRACIÓN INTERACTIVA -->
+  <section class="space-y-4">
+    <div>
+      <h2 class="text-lg font-semibold text-dsc-text">
+        Interacción del componente
+      </h2>
+
+      <p class="mt-1 text-sm text-slate-500">
+        Prueba los eventos emitidos por el componente.
+      </p>
+    </div>
+
+    <article class="rounded-xl border border-dsc-border bg-white p-5">
+      <div class="flex flex-wrap items-center gap-3">
+        <app-button
+          label="Ejecutar acción"
+          (clicked)="onDemoClick()"
+        />
+
+        <app-button
+          label="Restablecer"
+          variant="outline"
+          color="secondary"
+          (clicked)="resetDemo()"
+        />
+      </div>
+
+      <div class="mt-5 rounded-lg bg-slate-50 p-4">
+        <p class="text-sm text-slate-500">
+          Cantidad de clics registrados:
+        </p>
+
+        <p class="mt-1 text-2xl font-bold text-dsc-primary">
+          {{ clickCount() }}
+        </p>
+      </div>
+    </article>
+  </section>
+
+</div>

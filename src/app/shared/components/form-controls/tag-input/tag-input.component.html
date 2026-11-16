@@ -1,7 +1,9 @@
-
 <div class="w-full">
 
-  <label class="mb-2 block text-sm font-medium text-dsc-text">
+  <label
+    class="mb-2 block text-sm font-medium text-dsc-text"
+    [for]="inputId()"
+  >
     {{ label() }}
   </label>
 
@@ -53,7 +55,9 @@
 
     <!-- Entrada de texto -->
     <input
+      [id]="inputId()"
       type="text"
+      [attr.aria-describedby]="hint() ? inputId() + '-hint' : null"
       class="min-w-[100px] flex-1 bg-transparent
              px-1 py-1 text-xs text-dsc-text
              outline-none placeholder:text-slate-400"
@@ -80,7 +84,10 @@
   </div>
 
   @if (hint()) {
-    <p class="mt-1.5 text-xs text-slate-500">
+    <p
+      class="mt-1.5 text-xs text-slate-500"
+      [id]="inputId() + '-hint'"
+    >
       {{ hint() }}
     </p>
   }

@@ -13,8 +13,8 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DatePickerComponent {
-  // Identificador único del control.
-  readonly id = input.required<string>();
+  /** Identificador HTML único del elemento input interno. */
+  readonly inputId = input.required<string>();
 
   // Texto que aparece encima del selector.
   readonly label = input.required<string>();

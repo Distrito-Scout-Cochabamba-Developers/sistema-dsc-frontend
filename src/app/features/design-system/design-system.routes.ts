@@ -42,8 +42,20 @@ export const DESIGN_SYSTEM_ROUTES: Routes = [
         title: 'Botones | DSC Design System',
         loadComponent: () =>
           import(
-            './pages/buttons-page/buttons-page'
-          ).then(m => m.ButtonsPage),
+            './pages/buttons/buttons.component'
+          ).then(m => m.ButtonsComponent),
+      },
+      {
+        path: 'ui-elements',
+        loadComponent: () =>
+          import('./pages/ui-elements/ui-elements.component')
+            .then(m => m.UIElementsComponent)
+      },
+      {
+        path: 'indicators',
+        loadComponent: () =>
+          import('./pages/indicators/indicators.component')
+            .then(m => m.IndicatorsComponent)
       },
     ],
   },

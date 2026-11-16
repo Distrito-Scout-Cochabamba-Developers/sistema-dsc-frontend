@@ -1,8 +1,10 @@
-<div class="flex min-h-screen bg-dsc-surface">
+<div class="flex min-h-screen w-full min-w-0 flex-col bg-dsc-surface lg:flex-row">
 
+  <!-- NAVEGACIÓN -->
   <aside
-    class="w-64 shrink-0 border-r
-           border-dsc-border bg-white p-6"
+    class="w-full min-w-0 shrink-0 border-b
+           border-dsc-border bg-white p-4
+           sm:p-6 lg:w-64 lg:border-b-0 lg:border-r"
   >
     <h1 class="text-xl font-bold text-dsc-navy">
       DSC Design System
@@ -12,45 +14,81 @@
       Catálogo interno de componentes
     </p>
 
-    <h2 class="mt-3 text-black font-bold text-dsc-muted">FUNDAMENTOS</h2>
+    <!-- FUNDAMENTOS -->
+    <section class="mt-5 lg:mt-8">
+      <h2 class="text-xs font-bold text-dsc-muted">
+        FUNDAMENTOS
+      </h2>
 
-    <nav aria-label="Colores & Tokens" class="mt-3 space-y-2">
-
-      <a
-        routerLink="colors"
-        routerLinkActive="bg-sky-100 text-dsc-primary"
-        class="block rounded-lg px-4 py-2
-               text-sm hover:bg-slate-100"
+      <nav
+        aria-label="Colores & Tokens"
+        class="mt-2 flex flex-wrap gap-2 lg:flex-col lg:gap-2"
       >
-        Colores & Tokens
-      </a>
+        <a
+          routerLink="colors"
+          routerLinkActive="bg-sky-100 text-slate-800"
+          class="block min-w-0 rounded-lg px-3 py-2
+                 text-sm hover:bg-slate-100"
+        >
+          Colores & Tokens
+        </a>
+      </nav>
+    </section>
 
-    </nav>
+    <!-- COMPONENTES -->
+    <section class="mt-5 lg:mt-8">
+      <h2 class="text-xs font-bold text-dsc-muted">
+        COMPONENTES
+      </h2>
 
-    <h2 class="mt-8 text-black font-bold text-dsc-muted">COMPONENTES</h2>
-
-    <nav aria-label="Componentes" class="mt-3 space-y-2">
-      <a
-        routerLink="formularios"
-        routerLinkActive="bg-sky-100 text-dsc-primary"
-        class="block rounded-lg px-4 py-2
-               text-sm hover:bg-slate-100"
+      <nav
+        aria-label="Componentes"
+        class="mt-2 flex flex-wrap gap-2 lg:flex-col lg:gap-2"
       >
-        Formularios & Entradas
-      </a>
-      <a
-        routerLink="buttons"
-        routerLinkActive="bg-sky-100 text-dsc-primary"
-        class="block rounded-lg px-4 py-2
-               text-sm hover:bg-slate-100"
-      >
-        Botones
-      </a>
+        <a
+          routerLink="formularios"
+          routerLinkActive="bg-sky-100 text-slate-800"
+          class="block min-w-0 rounded-lg px-3 py-2
+                 text-sm hover:bg-slate-100"
+        >
+          Formularios & Entradas
+        </a>
 
-    </nav>
+        <a
+          routerLink="buttons"
+          routerLinkActive="bg-sky-100 text-slate-800"
+          class="block min-w-0 rounded-lg px-3 py-2
+                 text-sm hover:bg-slate-100"
+        >
+          Botones
+        </a>
+
+        <a
+          routerLink="ui-elements"
+          routerLinkActive="bg-sky-100 text-slate-800"
+          class="block min-w-0 rounded-lg px-3 py-2
+                 text-sm hover:bg-slate-100"
+        >
+          Elementos de interfaz
+        </a>
+
+        <a
+          routerLink="indicators"
+          routerLinkActive="bg-sky-100 text-slate-800"
+          class="block min-w-0 rounded-lg px-3 py-2
+                 text-sm hover:bg-slate-100"
+        >
+          Indicadores
+        </a>
+      </nav>
+    </section>
   </aside>
 
-  <main class="min-w-0 flex-1 p-8">
+  <!-- CONTENIDO PRINCIPAL -->
+  <main
+    class="w-full min-w-0 max-w-full flex-1 p-4
+           sm:p-6 lg:p-8"
+  >
     <router-outlet />
   </main>
 

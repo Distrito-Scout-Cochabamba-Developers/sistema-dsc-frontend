@@ -1,0 +1,33 @@
+
+<button
+  [type]="type()"
+  [class]="buttonClasses()"
+  [disabled]="isDisabled()"
+  [attr.aria-label]="ariaLabel() || null"
+  [attr.aria-busy]="loading() ? 'true' : null"
+  (click)="onClick($event)"
+>
+  <!-- Indicador de carga -->
+  @if (loading()) {
+    <span
+      class="h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent"
+      aria-hidden="true"
+    ></span>
+  } @else {
+    <!-- Icono izquierdo -->
+    <ng-content select="[button-icon-left]"></ng-content>
+  }
+
+  <!-- Texto del botón -->
+  @if (label()) {
+    <span>{{ loading() ? label() : label() }}</span>
+  } @else {
+    <ng-content></ng-content>
+  }
+
+  <!-- Icono derecho -->
+  @if (!loading()) {
+    <ng-content select="[button-icon-right]"></ng-content>
+  }
+</button>
+

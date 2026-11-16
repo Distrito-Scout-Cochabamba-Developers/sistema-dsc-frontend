@@ -1,12 +1,11 @@
-
-<div class="min-h-screen bg-dsc-surface p-5 sm:p-8">
+<div class="w-full min-w-0 max-w-full bg-dsc-surface">
 
   <!-- ====================================== -->
   <!-- ENCABEZADO -->
   <!-- ====================================== -->
 
   <header class="mb-8">
-    <h1 class="text-3xl font-semibold text-dsc-navy">
+    <h1 class="text-3xl font-bold tracking-tight text-dsc-text">
       Formularios & Entradas
     </h1>
 
@@ -33,16 +32,13 @@
           Campos de Texto Básicos
         </h2>
 
-        <span class="text-xs text-slate-500">
-          32px / 40px de altura estándar
-        </span>
       </div>
 
       <div class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
 
         <!-- DEFAULT -->
         <article class="flex min-h-[205px] flex-col rounded-2xl
-                        border border-slate-100 bg-white p-6 shadow-sm">
+                        border border-slate-100 bg-white p-4 sm:p-6 shadow-sm">
 
           <div class="mb-3 flex items-center justify-between">
             <span class="text-xs font-semibold uppercase tracking-wide text-dsc-navy">
@@ -55,7 +51,7 @@
           </div>
 
           <app-text-field
-            id="basic-full-name"
+            inputId="basic-full-name"
             label="Nombre Completo"
             placeholder="Ej. Constanza Miranda"
             [value]="fullName()"
@@ -85,7 +81,7 @@
 
         <!-- FOCUS -->
         <article class="flex min-h-[205px] flex-col rounded-2xl
-                        border border-slate-100 bg-white p-6 shadow-sm">
+                        border border-slate-100 bg-white p-4 sm:p-6 shadow-sm">
 
           <div class="mb-3 flex items-center justify-between">
             <span class="text-xs font-semibold uppercase tracking-wide text-sky-700">
@@ -98,7 +94,7 @@
           </div>
 
           <app-text-field
-            id="basic-email"
+            inputId="basic-email"
             label="Correo Electrónico"
             type="email"
             [value]="emailAddress()"
@@ -128,7 +124,7 @@
 
         <!-- READ ONLY -->
         <article class="flex min-h-[205px] flex-col rounded-2xl
-                        border border-slate-100 bg-white p-6 shadow-sm">
+                        border border-slate-100 bg-white p-4 sm:p-6 shadow-sm">
 
           <div class="mb-3 flex items-center justify-between">
             <span class="text-xs font-semibold uppercase tracking-wide text-dsc-navy">
@@ -141,7 +137,7 @@
           </div>
 
           <app-text-field
-            id="basic-tenant"
+            inputId="basic-tenant"
             label="Identificador de Tenant"
             [value]="tenantId()"
             [readonlyMode]="true"
@@ -190,10 +186,10 @@
 
       <!-- SEARCH -->
       <article class="flex min-h-[155px] flex-col rounded-2xl
-                      border border-slate-100 bg-white p-6 shadow-sm">
+                      border border-slate-100 bg-white p-4 sm:p-6 shadow-sm">
 
         <app-text-field
-          id="assisted-search"
+          inputId="assisted-search"
           label="Búsqueda Global"
           type="search"
           leadingIcon="search"
@@ -208,10 +204,10 @@
 
       <!-- CURRENCY -->
       <article class="flex min-h-[155px] flex-col rounded-2xl
-                      border border-slate-100 bg-white p-6 shadow-sm">
+                      border border-slate-100 bg-white p-4 sm:p-6 shadow-sm">
 
         <app-text-field
-          id="assisted-budget"
+          inputId="assisted-budget"
           label="Límite de Presupuesto"
           type="text"
           prefix="USD $"
@@ -226,10 +222,10 @@
 
       <!-- EMAIL -->
       <article class="flex min-h-[155px] flex-col rounded-2xl
-                      border border-slate-100 bg-white p-6 shadow-sm">
+                      border border-slate-100 bg-white p-4 sm:p-6 shadow-sm">
 
         <app-text-field
-          id="assisted-contact"
+          inputId="assisted-contact"
           label="Email de Contacto"
           type="email"
           leadingIcon="at"
@@ -244,10 +240,10 @@
 
       <!-- PASSWORD -->
       <article class="flex min-h-[155px] flex-col rounded-2xl
-                      border border-slate-100 bg-white p-6 shadow-sm">
+                      border border-slate-100 bg-white p-4 sm:p-6 shadow-sm">
 
         <app-text-field
-          id="assisted-password"
+          inputId="assisted-password"
           label="Contraseña Maestra"
           type="password"
           leadingIcon="key"
@@ -274,20 +270,16 @@
         Estados de Validación & Feedback
       </h2>
 
-      <span class="text-xs text-slate-500">
-        Roles ARIA: alert & status
-      </span>
-
     </div>
 
     <div class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
 
       <!-- SUCCESS -->
       <article class="flex min-h-[185px] flex-col rounded-2xl
-                      border border-slate-100 bg-white p-6 shadow-sm">
+                      border border-slate-100 bg-white p-4 sm:p-6 shadow-sm">
 
         <app-text-field
-          id="validation-subdomain"
+          inputId="validation-subdomain"
           label="Subdominio de Instancia"
           [value]="subdomain()"
           [status]="'success'"
@@ -296,23 +288,15 @@
           (valueChange)="subdomain.set($event)"
         />
 
-        <div class="mt-auto pt-5">
-          <span class="inline-block rounded bg-indigo-50 px-2 py-1
-                      text-[10px] text-dsc-navy">
-            Token de borde:
-            <code>primary-container (#009FE3)</code>
-          </span>
-        </div>
-
       </article>
 
 
       <!-- WARNING -->
       <article class="flex min-h-[185px] flex-col rounded-2xl
-                      border border-slate-100 bg-white p-6 shadow-sm">
+                      border border-slate-100 bg-white p-4 sm:p-6 shadow-sm">
 
         <app-text-field
-          id="validation-storage"
+          inputId="validation-storage"
           label="Cuota de Almacenamiento"
           [value]="storageQuota()"
           [status]="'warning'"
@@ -321,23 +305,15 @@
           (valueChange)="storageQuota.set($event)"
         />
 
-        <div class="mt-auto pt-5">
-          <span class="inline-block rounded bg-indigo-50 px-2 py-1
-                      text-[10px] text-dsc-navy">
-            Token de borde:
-            <code>secondary (#565E74)</code>
-          </span>
-        </div>
-
       </article>
 
 
       <!-- ERROR -->
       <article class="flex min-h-[185px] flex-col rounded-2xl
-                      border border-slate-100 bg-white p-6 shadow-sm">
+                      border border-slate-100 bg-white p-4 sm:p-6 shadow-sm">
 
         <app-text-field
-          id="validation-api-key"
+          inputId="validation-api-key"
           label="Clave de API Secreta"
           type="text"
           [value]="apiSecret()"
@@ -346,14 +322,6 @@
           hint="Formato de hash no coincide con la especificación SHA-256."
           (valueChange)="apiSecret.set($event)"
         />
-
-        <div class="mt-auto pt-5">
-          <span class="inline-block rounded bg-indigo-50 px-2 py-1
-                      text-[10px] text-dsc-navy">
-            Token de borde:
-            <code>error (#BA1A1A)</code>
-          </span>
-        </div>
 
       </article>
 
@@ -378,7 +346,7 @@
 
     <section
       class="flex min-h-[285px] flex-col rounded-2xl
-             border border-slate-100 bg-white p-6
+             border border-slate-100 bg-white p-4 sm:p-6
              shadow-sm"
     >
 
@@ -417,15 +385,6 @@
 
       </div>
 
-      <div class="mt-auto pt-6">
-        <p class="text-[11px] text-slate-500">
-          Token: bg-dsc-primary
-          <span class="font-medium text-dsc-text">
-            (#009FE3)
-          </span>
-        </p>
-      </div>
-
     </section>
 
 
@@ -435,7 +394,7 @@
 
     <section
       class="flex min-h-[285px] flex-col rounded-2xl
-             border border-slate-100 bg-white p-6
+             border border-slate-100 bg-white p-4 sm:p-6
              shadow-sm"
     >
 
@@ -456,12 +415,6 @@
         (valueChange)="selectedAvailability.set($event)"
       />
 
-      <div class="mt-auto pt-6">
-        <p class="text-[11px] text-slate-500">
-          Indicador central de 8px en #009FE3
-        </p>
-      </div>
-
     </section>
 
 
@@ -471,7 +424,7 @@
 
     <section
       class="flex min-h-[285px] flex-col rounded-2xl
-             border border-slate-100 bg-white p-6
+             border border-slate-100 bg-white p-4 sm:p-6
              shadow-sm"
     >
 
@@ -503,12 +456,6 @@
 
       </div>
 
-      <div class="mt-auto pt-6">
-        <p class="text-[11px] text-slate-500">
-          Transición fluida de 200ms
-        </p>
-      </div>
-
     </section>
 
 
@@ -518,11 +465,12 @@
 
     <section
       class="flex min-h-[220px] flex-col rounded-2xl
-             border border-slate-100 bg-white p-6
+             border border-slate-100 bg-white p-4 sm:p-6
              shadow-sm"
     >
 
       <app-select
+        inputId="demo-region"
         label="Región Primaria de Despliegue"
         [options]="regions"
         [value]="selectedRegion()"
@@ -546,11 +494,12 @@
 
     <section
       class="flex min-h-[220px] flex-col rounded-2xl
-             border border-slate-100 bg-white p-6
+             border border-slate-100 bg-white p-4 sm:p-6
              shadow-sm"
     >
 
       <app-tag-input
+        inputId="demo-tags"
         label="Etiquetas de Servicio (Tags)"
         [tags]="serviceTags()"
         placeholder="Añadir..."
@@ -574,11 +523,12 @@
 
     <section
       class="flex min-h-[220px] flex-col rounded-2xl
-             border border-slate-100 bg-white p-6
+             border border-slate-100 bg-white p-4 sm:p-6
              shadow-sm"
     >
 
       <app-textarea
+        inputId="demo-description"
         label="Descripción de la Versión"
         [value]="versionDescription()"
         [maxLength]="300"
@@ -616,7 +566,7 @@
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
 
       <!-- DATE PICKER SIMPLE -->
-      <div class="rounded-xl border border-slate-200 bg-white p-5">
+      <div class="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
         <div class="mb-5">
           <h3 class="text-sm font-semibold text-dsc-text">
             Datepicker simple
@@ -628,7 +578,7 @@
         </div>
 
         <app-date-picker
-          id="demo-date-picker"
+          inputId="demo-date-picker"
           label="Fecha de nacimiento"
           [value]="selectedDate()"
           [required]="true"
