@@ -1,5 +1,6 @@
 /**
- * Administración del catálogo de módulos (solo ADMIN y DISTRICT_SECRETARY).
+ * Administración del catálogo de módulos y alta de convocatorias
+ * (solo ADMIN y DISTRICT_SECRETARY).
  */
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -13,8 +14,13 @@ import { StateCard } from '@shared/components/state-card';
 import { TrainingCatalogDeleteDialog } from './components/training-catalog-delete-dialog';
 import { TrainingCatalogFormModal } from './components/training-catalog-form-modal';
 import { TrainingCatalogList } from './components/training-catalog-list';
+import { TrainingCatalogSessionModal } from './components/training-catalog-session-modal';
 import { TrainingModuleService } from './services/training-module';
-import type { ModuleTypeApiDto, WriteTrainingModuleDto } from './training-catalog.models';
+import type {
+  CatalogTrainingLineDto,
+  ConvocatoriaDraft,
+  WriteTrainingModuleDto,
+} from './training-catalog.models';
 
 @Component({
   selector: 'app-training-catalog-page',
@@ -25,6 +31,7 @@ import type { ModuleTypeApiDto, WriteTrainingModuleDto } from './training-catalo
     TrainingCatalogList,
     TrainingCatalogFormModal,
     TrainingCatalogDeleteDialog,
+    TrainingCatalogSessionModal,
   ],
   templateUrl: './training-catalog-page.html',
 })
@@ -33,7 +40,7 @@ export class TrainingCatalogPage {
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly modules = signal<readonly TrainingModuleApiDto[]>([]);
-  protected readonly moduleTypes = signal<readonly ModuleTypeApiDto[]>([]);
+  protected readonly trainingLines = signal<readonly CatalogTrainingLineDto[]>([]);
   protected readonly loading = signal(true);
   protected readonly error = signal('');
   protected readonly retryable = signal(false);
@@ -44,6 +51,10 @@ export class TrainingCatalogPage {
   protected readonly deleting = signal<TrainingModuleApiDto | null>(null);
   protected readonly deleteError = signal('');
   protected readonly deleteSubmitting = signal(false);
+  protected readonly sessionModule = signal<TrainingModuleApiDto | null>(null);
+  protected readonly sessionError = signal('');
+  protected readonly sessionSubmitting = signal(false);
+  protected readonly sessionNotice = signal('');
 
   constructor() {
     this.load();
@@ -97,7 +108,25 @@ export class TrainingCatalogPage {
     this.deleteSubmitting.set(false);
   }
 
-  /** `DELETE /api/v1/admin/modules/{code}`. */
+  /**
+   * Abre el modal de convocatoria para un módulo del catálogo.
+   *
+   * @param module - Fila elegida.
+   */
+  protected openSession(module: TrainingModuleApiDto): void {
+    this.sessionError.set('');
+    this.sessionNotice.set('');
+    this.sessionModule.set(module);
+  }
+
+  /** Cierra el modal de convocatoria. */
+  protected closeSession(): void {
+    this.sessionModule.set(null);
+    this.sessionError.set('');
+    this.sessionSubmitting.set(false);
+  }
+
+  /** `DELETE /api/v1/admin/modules/{id}`. */
   protected confirmDelete(): void {
     const current = this.deleting();
     if (!current) {
@@ -107,7 +136,7 @@ export class TrainingCatalogPage {
     this.deleteSubmitting.set(true);
     this.deleteError.set('');
     this.catalog
-      .remove(current.code)
+      .remove(current.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
@@ -134,7 +163,7 @@ export class TrainingCatalogPage {
     this.saveError.set('');
     const current = this.editing();
     const request$ = current
-      ? this.catalog.update(current.code, draft)
+      ? this.catalog.update(current.id, draft)
       : this.catalog.create(draft);
 
     request$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
@@ -152,19 +181,61 @@ export class TrainingCatalogPage {
     });
   }
 
+  /**
+   * Publica una convocatoria con los bloques de horario.
+   *
+   * @param draft - Fecha, horas e inscripción abierta.
+   */
+  protected saveSession(draft: ConvocatoriaDraft): void {
+    const module = this.sessionModule();
+    if (!module) {
+      return;
+    }
+
+    this.sessionSubmitting.set(true);
+    this.sessionError.set('');
+    this.catalog
+      .createSession(module.id, {
+        statusCode: 'OPEN',
+        isRegistrationOpen: draft.isRegistrationOpen,
+        schedules: draft.schedules.map((block, index) => ({
+          sessionDate: block.sessionDate,
+          startTime: toTimeApi(block.startTime),
+          endTime: toTimeApi(block.endTime),
+          partNumber: index + 1,
+        })),
+      })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.sessionSubmitting.set(false);
+          this.sessionNotice.set(
+            `Convocatoria de «${module.name}» publicada. Ya aparece en el calendario.`,
+          );
+          this.closeSession();
+        },
+        error: (err: unknown) => {
+          this.sessionSubmitting.set(false);
+          this.sessionError.set(
+            problemDetailMessage(err, 'No se pudo abrir la convocatoria. Intenta de nuevo.'),
+          );
+        },
+      });
+  }
+
   private load(): void {
     this.loading.set(true);
     this.error.set('');
     this.retryable.set(false);
     forkJoin({
       modules: this.catalog.list(),
-      types: this.catalog.listTypes(),
+      lines: this.catalog.listLines(),
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: ({ modules, types }) => {
+        next: ({ modules, lines }) => {
           this.modules.set(modules);
-          this.moduleTypes.set(types);
+          this.trainingLines.set(lines);
           this.loading.set(false);
         },
         error: (err: unknown) => {
@@ -176,4 +247,8 @@ export class TrainingCatalogPage {
         },
       });
   }
+}
+
+function toTimeApi(value: string): string {
+  return value.length === 5 ? `${value}:00` : value;
 }

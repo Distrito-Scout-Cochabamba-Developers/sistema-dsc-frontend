@@ -10,11 +10,9 @@ describe('TrainingModuleService', () => {
 
   const sample = {
     id: 1,
-    code: 'mod-liderazgo-20241024',
     name: 'Módulo de Liderazgo y Servicio',
     description: 'Taller',
-    moduleTypeCode: 'AE',
-    moduleTypeName: 'Adultos en el Escultismo',
+    trainingLines: [{ id: 1, code: 'AE', name: 'Adultos en el Escultismo', description: null }],
   };
 
   beforeEach(() => {
@@ -31,7 +29,7 @@ describe('TrainingModuleService', () => {
 
   it('GET /api/v1/admin/modules', () => {
     service.list().subscribe((items) => {
-      expect(items[0]?.code).toBe('mod-liderazgo-20241024');
+      expect(items[0]?.name).toBe('Módulo de Liderazgo y Servicio');
     });
 
     const req = http.expectOne('/api/v1/admin/modules');
@@ -41,34 +39,52 @@ describe('TrainingModuleService', () => {
 
   it('POST /api/v1/admin/modules', () => {
     const body = {
-      code: 'mod-nuevo',
       name: 'Nuevo',
       description: '',
-      moduleTypeCode: 'AE',
+      trainingLineCodes: ['AE'],
     };
     service.create(body).subscribe((dto) => {
-      expect(dto.code).toBe('mod-nuevo');
+      expect(dto.name).toBe('Nuevo');
     });
 
     const req = http.expectOne('/api/v1/admin/modules');
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual(body);
-    req.flush({ ...sample, code: 'mod-nuevo', name: 'Nuevo' });
+    req.flush({ ...sample, name: 'Nuevo' });
   });
 
-  it('PUT /api/v1/admin/modules/{code}', () => {
+  it('PUT /api/v1/admin/modules/{id}', () => {
     const body = {
-      code: 'mod-liderazgo-20241024',
       name: 'Actualizado',
       description: 'x',
-      moduleTypeCode: 'PJ',
+      trainingLineCodes: ['PJ'],
     };
-    service.update('mod-liderazgo-20241024', body).subscribe((dto) => {
+    service.update(1, body).subscribe((dto) => {
       expect(dto.name).toBe('Actualizado');
     });
 
-    const req = http.expectOne('/api/v1/admin/modules/mod-liderazgo-20241024');
+    const req = http.expectOne('/api/v1/admin/modules/1');
     expect(req.request.method).toBe('PUT');
-    req.flush({ ...sample, name: 'Actualizado', moduleTypeCode: 'PJ' });
+    req.flush({ ...sample, name: 'Actualizado' });
+  });
+
+  it('POST /api/v1/admin/modules/{id}/sessions', () => {
+    const body = {
+      statusCode: 'OPEN',
+      isRegistrationOpen: true,
+      schedules: [
+        {
+          sessionDate: '2026-12-01',
+          startTime: '08:30:00',
+          endTime: '12:30:00',
+          partNumber: 1,
+        },
+      ],
+    };
+    service.createSession(1, body).subscribe();
+    const req = http.expectOne('/api/v1/admin/modules/1/sessions');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual(body);
+    req.flush({ id: 10 });
   });
 });

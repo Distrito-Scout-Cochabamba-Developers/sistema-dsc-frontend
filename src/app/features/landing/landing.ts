@@ -1,5 +1,5 @@
 /**
- * Página landing (inicio) con acceso al registro de asistencia demo.
+ * Página landing (inicio): acceso a módulos y al calendario de convocatorias.
  */
 import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
@@ -21,12 +21,20 @@ import { RouterLink } from '@angular/router';
       <p class="m-0 max-w-xl text-body text-muted">
         {{ subtitle() }}
       </p>
-      <a
-        class="inline-flex w-fit items-center justify-center rounded-xl bg-dsc px-5 py-3 text-sm font-bold text-white no-underline hover:bg-dsc-dark"
-        routerLink="/modulos"
-      >
-        Ver módulos e inscribirse
-      </a>
+      <div class="flex flex-wrap gap-3">
+        <a
+          class="inline-flex w-fit items-center justify-center rounded-xl bg-dsc px-5 py-3 text-sm font-bold text-white no-underline hover:bg-dsc-dark"
+          routerLink="/modulos"
+        >
+          Ver módulos e inscribirse
+        </a>
+        <a
+          class="inline-flex w-fit items-center justify-center rounded-xl border border-dsc px-5 py-3 text-sm font-bold text-dsc no-underline hover:bg-dsc-soft"
+          routerLink="/calendario"
+        >
+          Ver calendario
+        </a>
+      </div>
     </section>
   `,
 })
@@ -36,6 +44,6 @@ export class Landing {
 
   /** Texto de apoyo de la vista inicial. */
   protected readonly subtitle = signal(
-    'Elige un módulo de formación y registra tu asistencia. El formulario se abre al entrar a cada módulo.',
+    'Consulta el calendario de convocatorias o elige un módulo para registrar asistencia.',
   );
 }

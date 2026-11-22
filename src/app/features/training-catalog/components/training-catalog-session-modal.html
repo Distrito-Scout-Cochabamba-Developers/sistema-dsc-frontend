@@ -1,0 +1,131 @@
+<dialog
+  #dialog
+  aria-modal="true"
+  class="fixed inset-0 z-50 m-auto h-fit max-h-[min(90dvh,44rem)] w-[min(calc(100%-2rem),34rem)] overflow-y-auto rounded-2xl border border-border bg-elevated p-0 shadow-xl backdrop:bg-ink/55"
+  (close)="onNativeClose()"
+>
+  <form class="p-6" (submit)="onSubmit($event)" novalidate>
+    <h2 class="m-0 text-xl font-bold text-ink">Abrir convocatoria</h2>
+    <p class="mt-2 mb-0 text-sm text-muted">
+      Módulo:
+      <span class="font-semibold text-ink">{{ module()?.name }}</span>.
+      La fecha y las horas se guardan en el horario de la sesión, no en el catálogo.
+    </p>
+
+    @if (saveError()) {
+      <p class="mt-3 rounded-md bg-danger-soft px-3 py-2 text-sm text-danger" role="alert">
+        {{ saveError() }}
+      </p>
+    }
+    @if (timeError()) {
+      <p class="mt-3 rounded-md bg-danger-soft px-3 py-2 text-sm text-danger" role="alert">
+        {{ timeError() }}
+      </p>
+    }
+
+    <div class="mt-5 space-y-4">
+      <div>
+        <label class="mb-1.5 block text-sm font-medium text-ink" for="session-date">Fecha</label>
+        <input
+          id="session-date"
+          type="date"
+          class="w-full rounded-md border border-border bg-surface px-3 py-2.5 text-sm text-ink outline-none ring-dsc/30 focus:ring-2"
+          [formField]="scheduleForm.sessionDate"
+        />
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-ink" for="session-start">Inicio</label>
+          <input
+            id="session-start"
+            type="time"
+            class="w-full rounded-md border border-border bg-surface px-3 py-2.5 text-sm text-ink outline-none ring-dsc/30 focus:ring-2"
+            [formField]="scheduleForm.startTime"
+          />
+        </div>
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-ink" for="session-end">Fin</label>
+          <input
+            id="session-end"
+            type="time"
+            class="w-full rounded-md border border-border bg-surface px-3 py-2.5 text-sm text-ink outline-none ring-dsc/30 focus:ring-2"
+            [formField]="scheduleForm.endTime"
+          />
+        </div>
+      </div>
+
+      @for (block of extraBlocks(); track $index) {
+        <div class="rounded-xl border border-border p-3">
+          <div class="mb-2 flex items-center justify-between">
+            <p class="m-0 text-xs font-semibold tracking-wide text-muted uppercase">
+              Bloque {{ $index + 2 }}
+            </p>
+            <button
+              type="button"
+              class="text-xs font-semibold text-danger hover:underline"
+              (click)="removeBlock($index)"
+            >
+              Quitar
+            </button>
+          </div>
+          <label class="mb-1.5 block text-sm font-medium text-ink">Fecha</label>
+          <input
+            type="date"
+            class="mb-3 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm"
+            [value]="block.sessionDate"
+            (input)="patchExtra($index, 'sessionDate', $event)"
+          />
+          <div class="grid grid-cols-2 gap-3">
+            <input
+              type="time"
+              class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm"
+              [value]="block.startTime"
+              (input)="patchExtra($index, 'startTime', $event)"
+            />
+            <input
+              type="time"
+              class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm"
+              [value]="block.endTime"
+              (input)="patchExtra($index, 'endTime', $event)"
+            />
+          </div>
+        </div>
+      }
+
+      <button
+        type="button"
+        class="text-sm font-semibold text-dsc hover:underline"
+        (click)="addBlock()"
+      >
+        Añadir otro bloque
+      </button>
+
+      <label class="flex items-center gap-2 text-sm text-ink">
+        <input
+          type="checkbox"
+          class="rounded border-border"
+          [checked]="isRegistrationOpen()"
+          (change)="onRegistrationToggle($event)"
+        />
+        Inscripción abierta
+      </label>
+    </div>
+
+    <div class="mt-6 flex justify-end gap-3">
+      <button
+        type="button"
+        class="rounded-lg border border-border px-4 py-2 text-sm font-medium text-ink hover:bg-surface"
+        (click)="closed.emit()"
+      >
+        Cancelar
+      </button>
+      <button
+        type="submit"
+        class="rounded-lg bg-dsc px-4 py-2 text-sm font-semibold text-white transition hover:bg-dsc-dark disabled:cursor-not-allowed disabled:opacity-70"
+        [disabled]="submitting()"
+      >
+        {{ submitting() ? 'Publicando…' : 'Publicar en el calendario' }}
+      </button>
+    </div>
+  </form>
+</dialog>

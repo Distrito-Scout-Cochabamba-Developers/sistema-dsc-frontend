@@ -1,0 +1,64 @@
+<div class="rounded-2xl border border-border bg-elevated p-4 shadow-sm md:p-5">
+  <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <h2 class="m-0 text-lg font-bold text-ink">{{ title() }}</h2>
+    <div class="flex items-center gap-2">
+      <button
+        type="button"
+        class="rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-ink hover:bg-surface"
+        (click)="monthChange.emit(-1)"
+        aria-label="Mes anterior"
+      >
+        ←
+      </button>
+      <button
+        type="button"
+        class="rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-ink hover:bg-surface"
+        (click)="today.emit()"
+      >
+        Hoy
+      </button>
+      <button
+        type="button"
+        class="rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-ink hover:bg-surface"
+        (click)="monthChange.emit(1)"
+        aria-label="Mes siguiente"
+      >
+        →
+      </button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-7 gap-1 text-center text-xs font-semibold uppercase tracking-wide text-muted">
+    @for (label of weekdayLabels; track label) {
+      <div class="py-1">{{ label }}</div>
+    }
+  </div>
+
+  <div class="mt-1 grid grid-cols-7 gap-1">
+    @for (day of grid(); track day.isoDate) {
+      @let daySessions = sessionsOn(day.isoDate);
+      <button
+        type="button"
+        class="flex min-h-16 flex-col rounded-lg border p-1 text-left transition md:min-h-20"
+        [class.border-transparent]="selectedIsoDate() !== day.isoDate"
+        [class.bg-surface]="day.inMonth"
+        [class.bg-transparent]="!day.inMonth"
+        [class.text-muted]="!day.inMonth"
+        [class.border-dsc]="selectedIsoDate() === day.isoDate"
+        [class.bg-dsc-soft]="selectedIsoDate() === day.isoDate"
+        [class.ring-1]="day.isoDate === todayIso"
+        [class.ring-dsc]="day.isoDate === todayIso"
+        (click)="daySelected.emit(day.isoDate)"
+      >
+        <span class="text-xs font-semibold" [class.text-dsc]="day.isoDate === todayIso">
+          {{ day.date.getDate() }}
+        </span>
+        @if (daySessions.length > 0) {
+          <span class="mt-auto inline-flex size-5 items-center justify-center rounded-full bg-dsc text-[10px] font-bold text-white">
+            {{ daySessions.length }}
+          </span>
+        }
+      </button>
+    }
+  </div>
+</div>

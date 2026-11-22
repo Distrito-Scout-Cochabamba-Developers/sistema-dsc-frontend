@@ -9,8 +9,18 @@
     Catálogo de módulos
   </h1>
   <p class="mt-2 max-w-2xl text-body text-muted">
-    Solo administradores y secretaría de distrito. Crear, editar y eliminar se guardan en la API.
+    El catálogo no tiene fecha. Desde cada módulo puedes abrir una convocatoria
+    (fecha y horas) que se publica en el calendario.
   </p>
+
+  @if (sessionNotice()) {
+    <p class="mt-4 rounded-xl border border-dsc/30 bg-dsc-soft px-4 py-3 text-sm text-dsc-dark" role="status">
+      {{ sessionNotice() }}
+      <a class="ml-2 font-semibold text-dsc no-underline hover:underline" routerLink="/calendario">
+        Ver calendario
+      </a>
+    </p>
+  }
 
   @if (loading()) {
     <p class="mt-8 text-sm text-muted" role="status">Cargando catálogo…</p>
@@ -49,6 +59,7 @@
         (create)="openCreate()"
         (edit)="openEdit($event)"
         (remove)="openDelete($event)"
+        (openSession)="openSession($event)"
       />
     </div>
   }
@@ -56,7 +67,7 @@
   <app-training-catalog-form-modal
     [open]="modalOpen()"
     [module]="editing()"
-    [moduleTypes]="moduleTypes()"
+    [trainingLines]="trainingLines()"
     [saveError]="saveError()"
     [submitting]="submitting()"
     (closed)="closeModal()"
@@ -70,5 +81,14 @@
     [submitting]="deleteSubmitting()"
     (closed)="closeDelete()"
     (confirmed)="confirmDelete()"
+  />
+
+  <app-training-catalog-session-modal
+    [open]="sessionModule() !== null"
+    [module]="sessionModule()"
+    [saveError]="sessionError()"
+    [submitting]="sessionSubmitting()"
+    (closed)="closeSession()"
+    (saved)="saveSession($event)"
   />
 </section>

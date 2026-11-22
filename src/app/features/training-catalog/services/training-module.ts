@@ -9,7 +9,11 @@ import { Observable } from 'rxjs';
 import type { TrainingModuleApiDto } from '@core/models/attendance-api.models';
 import { apiUrl } from '@core/utils/api-url.utils';
 
-import type { ModuleTypeApiDto, WriteTrainingModuleDto } from '../training-catalog.models';
+import type {
+  CatalogTrainingLineDto,
+  WriteTrainingModuleDto,
+  WriteTrainingModuleSessionDto,
+} from '../training-catalog.models';
 
 @Injectable({ providedIn: 'root' })
 export class TrainingModuleService {
@@ -23,42 +27,50 @@ export class TrainingModuleService {
   }
 
   /**
-   * Tipos de módulo para el select (`GET /api/v1/admin/module-types`).
+   * Líneas de formación (`GET /api/v1/admin/training-lines`).
    */
-  listTypes(): Observable<readonly ModuleTypeApiDto[]> {
-    return this.http.get<ModuleTypeApiDto[]>(apiUrl('/api/v1/admin/module-types'));
+  listLines(): Observable<readonly CatalogTrainingLineDto[]> {
+    return this.http.get<CatalogTrainingLineDto[]>(apiUrl('/api/v1/admin/training-lines'));
   }
 
   /**
    * Alta (`POST /api/v1/admin/modules`).
    *
-   * @param body - Código, nombre, descripción y tipo.
+   * @param body - Nombre, descripción y códigos de línea.
    */
   create(body: WriteTrainingModuleDto): Observable<TrainingModuleApiDto> {
     return this.http.post<TrainingModuleApiDto>(apiUrl('/api/v1/admin/modules'), body);
   }
 
   /**
-   * Edición (`PUT /api/v1/admin/modules/{code}`). El código de la ruta no cambia.
+   * Edición (`PUT /api/v1/admin/modules/{id}`).
    *
-   * @param code - Código actual.
-   * @param body - Nombre, descripción y tipo.
+   * @param id - Identificador del módulo.
+   * @param body - Nombre, descripción y líneas.
    */
-  update(code: string, body: WriteTrainingModuleDto): Observable<TrainingModuleApiDto> {
-    return this.http.put<TrainingModuleApiDto>(
-      apiUrl(`/api/v1/admin/modules/${encodeURIComponent(code.trim())}`),
-      body,
-    );
+  update(id: number, body: WriteTrainingModuleDto): Observable<TrainingModuleApiDto> {
+    return this.http.put<TrainingModuleApiDto>(apiUrl(`/api/v1/admin/modules/${id}`), body);
   }
 
   /**
-   * Baja (`DELETE /api/v1/admin/modules/{code}`).
+   * Baja (`DELETE /api/v1/admin/modules/{id}`).
    *
-   * @param code - Código del módulo.
+   * @param id - Identificador del módulo.
    */
-  remove(code: string): Observable<void> {
-    return this.http.delete<void>(
-      apiUrl(`/api/v1/admin/modules/${encodeURIComponent(code.trim())}`),
-    );
+  remove(id: number): Observable<void> {
+    return this.http.delete<void>(apiUrl(`/api/v1/admin/modules/${id}`));
+  }
+
+  /**
+   * Abre una convocatoria con fecha y horas (`POST .../modules/{id}/sessions`).
+   *
+   * @param moduleId - Módulo del catálogo.
+   * @param body - Horarios y estado de inscripción.
+   */
+  createSession(
+    moduleId: number,
+    body: WriteTrainingModuleSessionDto,
+  ): Observable<unknown> {
+    return this.http.post(apiUrl(`/api/v1/admin/modules/${moduleId}/sessions`), body);
   }
 }

@@ -12,11 +12,9 @@ const SESSION_ID = 'mod-liderazgo-20241024';
 
 const MODULE_DTO = {
   id: 1,
-  code: SESSION_ID,
   name: 'Módulo de Liderazgo y Servicio',
   description: 'Formación de liderazgo',
-  moduleTypeCode: 'AE',
-  moduleTypeName: 'Adultos en el Escultismo',
+  trainingLines: [{ id: 1, code: 'AE', name: 'Adultos en el Escultismo', description: null }],
 };
 
 function flushModuleMeta(http: HttpTestingController): void {

@@ -10,12 +10,11 @@
 </div>
 
 <div class="mt-4 overflow-x-auto rounded-2xl border border-border bg-elevated shadow-sm">
-  <table class="w-full min-w-[40rem] border-collapse text-left text-sm">
+  <table class="w-full min-w-[44rem] border-collapse text-left text-sm">
     <thead class="border-b border-border bg-dsc-soft/60 text-xs tracking-wide text-dsc-dark uppercase">
       <tr>
-        <th class="px-4 py-3 font-semibold">Código</th>
         <th class="px-4 py-3 font-semibold">Nombre</th>
-        <th class="px-4 py-3 font-semibold">Tipo</th>
+        <th class="px-4 py-3 font-semibold">Líneas</th>
         <th class="px-4 py-3 font-semibold">Descripción</th>
         <th class="px-4 py-3 font-semibold">
           <span class="sr-only">Acciones</span>
@@ -23,29 +22,39 @@
       </tr>
     </thead>
     <tbody>
-      @for (module of modules(); track module.code) {
+      @for (module of modules(); track module.id) {
         <tr class="border-b border-border last:border-b-0">
-          <td class="px-4 py-3 font-mono text-xs text-ink">{{ module.code }}</td>
           <td class="px-4 py-3 font-medium text-ink">{{ module.name }}</td>
-          <td class="px-4 py-3 text-muted">{{ module.moduleTypeName }}</td>
+          <td class="px-4 py-3 text-muted">{{ linesOf(module) }}</td>
           <td class="max-w-xs truncate px-4 py-3 text-muted">
             {{ module.description || '—' }}
           </td>
           <td class="px-4 py-3 text-right">
-            <div class="flex justify-end gap-3">
+            <div class="flex flex-wrap justify-end gap-3">
               <button
                 type="button"
                 class="font-semibold text-dsc hover:underline"
-                (click)="edit.emit(module)"
+                (click)="openSession.emit(module)"
               >
-                Editar
+                Abrir convocatoria
               </button>
               <button
                 type="button"
-                class="font-semibold text-danger hover:underline"
+                class="inline-flex size-9 items-center justify-center rounded-lg text-dsc transition hover:bg-dsc-soft"
+                aria-label="Editar"
+                title="Editar"
+                (click)="edit.emit(module)"
+              >
+                <ng-icon name="lucidePencil" size="18" />
+              </button>
+              <button
+                type="button"
+                class="inline-flex size-9 items-center justify-center rounded-lg text-danger transition hover:bg-danger-soft"
+                aria-label="Eliminar"
+                title="Eliminar"
                 (click)="remove.emit(module)"
               >
-                Eliminar
+                <ng-icon name="lucideTrash2" size="18" />
               </button>
             </div>
           </td>

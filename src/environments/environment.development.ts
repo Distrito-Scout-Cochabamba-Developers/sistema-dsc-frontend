@@ -3,4 +3,8 @@
  */
 export const environment = {
   apiBaseUrl: '',
+  /**
+   * `true`: HttpClient contra GET/POST `/api/v1/calendar/sessions`.
+   */
+  trainingCalendarApiEnabled: true,
 };
