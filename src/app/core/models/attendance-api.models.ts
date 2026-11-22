@@ -35,14 +35,20 @@ export interface ModuleAttendanceResultApiDto {
   readonly isPartialRegistration: boolean;
 }
 
-/** `GET api/attendance/modules` y `GET api/attendance/modules/{code}`. */
-export interface TrainingModuleApiDto {
+/** Línea de formación (`training_line`) embebida en el módulo. */
+export interface TrainingLineApiDto {
   readonly id: number;
   readonly code: string;
   readonly name: string;
   readonly description: string | null;
-  readonly moduleTypeCode: string;
-  readonly moduleTypeName: string;
+}
+
+/** `GET api/attendance/modules` y `GET api/v1/admin/modules`. */
+export interface TrainingModuleApiDto {
+  readonly id: number;
+  readonly name: string;
+  readonly description: string | null;
+  readonly trainingLines: readonly TrainingLineApiDto[];
 }
 
 /** RFC 7807 Problem Details. */

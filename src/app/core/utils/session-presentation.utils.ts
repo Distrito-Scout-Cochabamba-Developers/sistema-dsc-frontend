@@ -16,7 +16,7 @@ const FALLBACK_MODULE_IMAGE =
  */
 export function toModuleSession(dto: TrainingModuleApiDto): ModuleSession {
   return {
-    sessionId: dto.code,
+    sessionId: String(dto.id),
     moduleTitle: 'Registro de Participantes',
     moduleName: dto.name,
     description:

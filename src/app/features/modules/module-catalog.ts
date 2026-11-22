@@ -45,6 +45,16 @@ export class ModuleCatalog {
     this.load();
   }
 
+  /**
+   * Líneas de formación para la tarjeta.
+   *
+   * @param module - Ítem del catálogo.
+   */
+  protected linesOf(module: TrainingModuleApiDto): string {
+    const lines = module.trainingLines ?? [];
+    return lines.length ? lines.map((line) => line.code).join(' · ') : 'Formación';
+  }
+
   /** Recarga el catálogo tras un error transitorio. */
   protected retry(): void {
     this.load();

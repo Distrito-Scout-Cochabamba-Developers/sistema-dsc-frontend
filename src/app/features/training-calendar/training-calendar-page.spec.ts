@@ -18,7 +18,12 @@ describe('TrainingCalendarPage', () => {
     beforeEach(async () => {
       await TestBed.configureTestingModule({
         imports: [TrainingCalendarPage],
-        providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
+        providers: [
+          provideRouter([]),
+          provideHttpClient(),
+          provideHttpClientTesting(),
+          { provide: TRAINING_CALENDAR_API_ENABLED, useValue: false },
+        ],
       }).compileComponents();
     });
 
@@ -134,6 +139,7 @@ describe('TrainingCalendarPage', () => {
       fixture.detectChanges();
 
       expect(textOf(fixture)).toContain('Sesión HTTP');
+      expect(textOf(fixture)).toContain('Abrir convocatoria');
 
       const enroll = [
         ...(fixture.nativeElement as HTMLElement).querySelectorAll('button'),

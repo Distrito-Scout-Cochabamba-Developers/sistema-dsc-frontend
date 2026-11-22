@@ -54,14 +54,14 @@
     </p>
   } @else {
     <ul class="mt-8 grid list-none gap-4 p-0 sm:grid-cols-2">
-      @for (module of modules(); track module.code) {
+      @for (module of modules(); track module.id) {
         <li>
           <a
             class="flex h-full flex-col rounded-2xl border border-border bg-elevated p-5 no-underline shadow-sm transition hover:border-dsc hover:shadow-md"
-            [routerLink]="['/asistencia', module.code]"
+            [routerLink]="['/asistencia', module.id]"
           >
             <p class="m-0 text-xs font-semibold tracking-wide text-dsc">
-              {{ module.moduleTypeName }}
+              {{ linesOf(module) }}
             </p>
             <h2 class="mt-2 m-0 text-lg font-bold text-ink">{{ module.name }}</h2>
             @if (module.description) {

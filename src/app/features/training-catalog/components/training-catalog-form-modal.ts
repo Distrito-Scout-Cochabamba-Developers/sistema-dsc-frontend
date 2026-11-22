@@ -18,7 +18,7 @@ import { FormField, form, required, submit } from '@angular/forms/signals';
 
 import type { TrainingModuleApiDto } from '@core/models/attendance-api.models';
 
-import type { ModuleTypeApiDto, WriteTrainingModuleDto } from '../training-catalog.models';
+import type { CatalogTrainingLineDto, WriteTrainingModuleDto } from '../training-catalog.models';
 
 @Component({
   selector: 'app-training-catalog-form-modal',
@@ -39,8 +39,8 @@ export class TrainingCatalogFormModal {
   /** Módulo a editar; `null` es alta. */
   readonly module = input<TrainingModuleApiDto | null>(null);
 
-  /** Tipos de `GET /api/v1/admin/module-types`. */
-  readonly moduleTypes = input<readonly ModuleTypeApiDto[]>([]);
+  /** Líneas de `GET /api/v1/admin/training-lines`. */
+  readonly trainingLines = input<readonly CatalogTrainingLineDto[]>([]);
 
   /** Error RFC 7807 de un intento de guardar. */
   readonly saveError = input('');
@@ -57,17 +57,16 @@ export class TrainingCatalogFormModal {
   private readonly dialog = viewChild<ElementRef<HTMLDialogElement>>('dialog');
 
   protected readonly formModel = signal<WriteTrainingModuleDto>({
-    code: '',
     name: '',
     description: '',
-    moduleTypeCode: '',
+    trainingLineCodes: [],
   });
 
   protected readonly catalogForm = form(this.formModel, (p) => {
-    required(p.code, { message: 'El código es obligatorio' });
     required(p.name, { message: 'El nombre es obligatorio' });
-    required(p.moduleTypeCode, { message: 'El tipo es obligatorio' });
   });
+
+  protected readonly lineError = signal('');
 
   protected readonly isEdit = computed(() => this.module() !== null);
 
@@ -82,11 +81,11 @@ export class TrainingCatalogFormModal {
 
     effect(() => {
       const current = this.module();
+      this.lineError.set('');
       this.formModel.set({
-        code: current?.code ?? '',
         name: current?.name ?? '',
         description: current?.description ?? '',
-        moduleTypeCode: current?.moduleTypeCode ?? '',
+        trainingLineCodes: current?.trainingLines.map((line) => line.code) ?? [],
       });
     });
 
@@ -109,6 +108,41 @@ export class TrainingCatalogFormModal {
     });
   }
 
+  /**
+   * Marca o desmarca una línea de formación.
+   *
+   * @param code - Código PJ / GI / AE.
+   * @param checked - Estado del checkbox.
+   */
+  /**
+   * Marca o desmarca una línea de formación.
+   *
+   * @param code - Código PJ / GI / AE.
+   * @param event - Change del checkbox.
+   */
+  protected onLineToggle(code: string, event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    this.formModel.update((draft) => {
+      const next = new Set(draft.trainingLineCodes);
+      if (checked) {
+        next.add(code);
+      } else {
+        next.delete(code);
+      }
+      return { ...draft, trainingLineCodes: [...next] };
+    });
+    this.lineError.set('');
+  }
+
+  /**
+   * Indica si una línea está seleccionada.
+   *
+   * @param code - Código de línea.
+   */
+  protected isLineSelected(code: string): boolean {
+    return this.formModel().trainingLineCodes.includes(code);
+  }
+
   /** El usuario cerró el diálogo nativo. */
   protected onNativeClose(): void {
     if (this.open()) {
@@ -125,11 +159,14 @@ export class TrainingCatalogFormModal {
     event.preventDefault();
     void submit(this.catalogForm, async () => {
       const draft = this.formModel();
+      if (draft.trainingLineCodes.length === 0) {
+        this.lineError.set('Elige al menos una línea de formación.');
+        return;
+      }
       this.saved.emit({
-        code: draft.code.trim(),
         name: draft.name.trim(),
         description: draft.description.trim(),
-        moduleTypeCode: draft.moduleTypeCode.trim(),
+        trainingLineCodes: draft.trainingLineCodes,
       });
     });
   }

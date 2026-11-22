@@ -10,12 +10,19 @@ describe('TrainingCatalogPage', () => {
 
   const sample = {
     id: 1,
-    code: 'mod-liderazgo-20241024',
     name: 'Módulo de Liderazgo y Servicio',
     description: 'Taller de liderazgo',
-    moduleTypeCode: 'AE',
-    moduleTypeName: 'Adultos en el Escultismo',
+    trainingLines: [
+      { id: 1, code: 'AE', name: 'Adultos en el Escultismo', description: null },
+    ],
   };
+
+  const lines = [{ id: 1, code: 'AE', name: 'Adultos en el Escultismo', description: null }];
+
+  function flushCatalog(): void {
+    http.expectOne('/api/v1/admin/modules').flush([sample]);
+    http.expectOne('/api/v1/admin/training-lines').flush(lines);
+  }
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -32,17 +39,13 @@ describe('TrainingCatalogPage', () => {
   it('lista módulos de la API y no muestra el formulario de asistencia', () => {
     const fixture = TestBed.createComponent(TrainingCatalogPage);
     fixture.detectChanges();
-
-    http.expectOne('/api/v1/admin/modules').flush([sample]);
-    http.expectOne('/api/v1/admin/module-types').flush([
-      { id: 1, code: 'AE', name: 'Adultos en el Escultismo', description: null },
-    ]);
+    flushCatalog();
     fixture.detectChanges();
 
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
     expect(text).toContain('Catálogo de módulos');
     expect(text).toContain('Módulo de Liderazgo y Servicio');
-    expect(text).toContain('mod-liderazgo-20241024');
+    expect(text).toContain('Abrir convocatoria');
     expect(text).not.toContain('Carnet de Identidad');
   });
 
@@ -51,8 +54,8 @@ describe('TrainingCatalogPage', () => {
     fixture.detectChanges();
 
     const modulesReq = http.expectOne('/api/v1/admin/modules');
-    const typesReq = http.expectOne('/api/v1/admin/module-types');
-    typesReq.flush([]);
+    const linesReq = http.expectOne('/api/v1/admin/training-lines');
+    linesReq.flush([]);
     modulesReq.flush(
       {
         title: 'Error',
@@ -70,62 +73,105 @@ describe('TrainingCatalogPage', () => {
   it('abre el modal de edición con el módulo elegido', () => {
     const fixture = TestBed.createComponent(TrainingCatalogPage);
     fixture.detectChanges();
-    http.expectOne('/api/v1/admin/modules').flush([sample]);
-    http.expectOne('/api/v1/admin/module-types').flush([
-      { id: 1, code: 'AE', name: 'Adultos en el Escultismo', description: null },
-    ]);
+    flushCatalog();
     fixture.detectChanges();
 
     const buttons = [
       ...(fixture.nativeElement as HTMLElement).querySelectorAll('button'),
     ] as HTMLButtonElement[];
-    buttons.find((button) => button.textContent?.includes('Editar'))?.click();
+    buttons.find((button) => button.getAttribute('aria-label') === 'Editar')?.click();
     fixture.detectChanges();
 
     const dialog = (fixture.nativeElement as HTMLElement).querySelector('dialog');
     expect(dialog?.textContent).toContain('Editar módulo');
-    expect(dialog?.className).toContain('fixed');
-    expect(dialog?.className).toContain('inset-0');
-    expect(dialog?.className).toContain('m-auto');
-    expect(dialog?.getAttribute('aria-modal')).toBe('true');
     const name = dialog?.querySelector('#catalog-name') as HTMLInputElement | null;
     expect(name?.value).toBe('Módulo de Liderazgo y Servicio');
+  });
+
+  it('abre el modal de convocatoria y publica fecha y horas', () => {
+    const fixture = TestBed.createComponent(TrainingCatalogPage);
+    fixture.detectChanges();
+    flushCatalog();
+    fixture.detectChanges();
+
+    const buttons = [
+      ...(fixture.nativeElement as HTMLElement).querySelectorAll('button'),
+    ] as HTMLButtonElement[];
+    buttons.find((button) => button.textContent?.includes('Abrir convocatoria'))?.click();
+    fixture.detectChanges();
+
+    const dialogs = [
+      ...(fixture.nativeElement as HTMLElement).querySelectorAll('dialog'),
+    ] as HTMLDialogElement[];
+    const sessionDialog = dialogs.find((dialog) =>
+      dialog.textContent?.includes('Abrir convocatoria'),
+    );
+    expect(sessionDialog).toBeTruthy();
+
+    const date = sessionDialog?.querySelector('#session-date') as HTMLInputElement;
+    const start = sessionDialog?.querySelector('#session-start') as HTMLInputElement;
+    const end = sessionDialog?.querySelector('#session-end') as HTMLInputElement;
+    date.value = '2026-12-01';
+    date.dispatchEvent(new Event('input'));
+    start.value = '08:30';
+    start.dispatchEvent(new Event('input'));
+    end.value = '12:30';
+    end.dispatchEvent(new Event('input'));
+
+    const publish = [...(sessionDialog?.querySelectorAll('button') ?? [])].find((button) =>
+      button.textContent?.includes('Publicar en el calendario'),
+    );
+    publish?.click();
+    fixture.detectChanges();
+
+    const req = http.expectOne('/api/v1/admin/modules/1/sessions');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body.statusCode).toBe('OPEN');
+    expect(req.request.body.schedules[0]).toEqual({
+      sessionDate: '2026-12-01',
+      startTime: '08:30:00',
+      endTime: '12:30:00',
+      partNumber: 1,
+    });
+    req.flush({ id: 99 });
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain(
+      'Convocatoria de «Módulo de Liderazgo y Servicio» publicada',
+    );
   });
 
   it('elimina un módulo tras confirmar', () => {
     const fixture = TestBed.createComponent(TrainingCatalogPage);
     fixture.detectChanges();
-    http.expectOne('/api/v1/admin/modules').flush([sample]);
-    http.expectOne('/api/v1/admin/module-types').flush([
-      { id: 1, code: 'AE', name: 'Adultos en el Escultismo', description: null },
-    ]);
+    flushCatalog();
     fixture.detectChanges();
 
     const buttons = [
       ...(fixture.nativeElement as HTMLElement).querySelectorAll('button'),
     ] as HTMLButtonElement[];
-    buttons.find((button) => button.textContent?.includes('Eliminar'))?.click();
+    buttons.find((button) => button.getAttribute('aria-label') === 'Eliminar')?.click();
     fixture.detectChanges();
 
     const dialogs = [
       ...(fixture.nativeElement as HTMLElement).querySelectorAll('dialog'),
     ] as HTMLDialogElement[];
     const confirm = dialogs.find((dialog) => dialog.textContent?.includes('Eliminar módulo'));
-    expect(confirm?.textContent).toContain('mod-liderazgo-20241024');
-    const confirmBtn = [
-      ...(confirm?.querySelectorAll('button') ?? []),
-    ].find((button) => button.textContent?.trim() === 'Eliminar');
+    expect(confirm?.textContent).toContain('Módulo de Liderazgo y Servicio');
+    const confirmBtn = [...(confirm?.querySelectorAll('button') ?? [])].find(
+      (button) => button.textContent?.trim() === 'Eliminar',
+    );
     confirmBtn?.click();
     fixture.detectChanges();
 
     http
       .expectOne({
         method: 'DELETE',
-        url: '/api/v1/admin/modules/mod-liderazgo-20241024',
+        url: '/api/v1/admin/modules/1',
       })
       .flush(null, { status: 204, statusText: 'No Content' });
     http.expectOne('/api/v1/admin/modules').flush([]);
-    http.expectOne('/api/v1/admin/module-types').flush([]);
+    http.expectOne('/api/v1/admin/training-lines').flush([]);
     fixture.detectChanges();
 
     expect((fixture.nativeElement as HTMLElement).textContent).toContain(

@@ -11,9 +11,10 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 
+import { TRAINING_CATALOG_ROLES } from '@core/models/auth-roles';
 import { AuthSessionService } from '@core/services/auth-session.service';
 import { isRetryableHttpError, problemDetailMessage } from '@core/utils/http-error.utils';
 import { StateCard } from '@shared/components/state-card';
@@ -33,6 +34,7 @@ import type {
   selector: 'app-training-calendar-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    RouterLink,
     StateCard,
     TrainingCalendarEnrollDialog,
     TrainingCalendarMonth,
@@ -62,6 +64,9 @@ export class TrainingCalendarPage {
 
   protected readonly usingFixtures = this.calendar.isUsingFixtures();
   protected readonly isAuthenticated = this.auth.isAuthenticated;
+  protected readonly canOpenSessions = computed(() =>
+    TRAINING_CATALOG_ROLES.some((role) => this.auth.hasRole(role)),
+  );
 
   protected readonly upcoming = computed(() => {
     const start = startOfLocalDay(new Date()).getTime();
@@ -185,10 +190,14 @@ export class TrainingCalendarPage {
         error: (err: unknown) => {
           this.submitting.set(false);
           if (err instanceof HttpErrorResponse && err.status === 409) {
-            this.markFull(session.id);
-            this.enrollError.set(
-              problemDetailMessage(err, 'El cupo de esta sesión se agotó. Elige otra fecha.'),
+            const detail = problemDetailMessage(
+              err,
+              'El cupo de esta sesión se agotó. Elige otra fecha.',
             );
+            if (!/inscrit/i.test(detail)) {
+              this.markFull(session.id);
+            }
+            this.enrollError.set(detail);
             return;
           }
           this.enrollError.set(

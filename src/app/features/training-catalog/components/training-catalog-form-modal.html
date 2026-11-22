@@ -6,6 +6,9 @@
 >
   <form class="p-6" (submit)="onSubmit($event)" novalidate>
     <h2 class="m-0 text-xl font-bold text-ink">{{ title() }}</h2>
+    <p class="mt-2 mb-0 text-sm text-muted">
+      Esto es el catálogo (sin fecha). La convocatoria con horario se abre aparte.
+    </p>
 
     @if (saveError()) {
       <p class="mt-2 rounded-md bg-danger-soft px-3 py-2 text-sm text-danger" role="alert">
@@ -15,16 +18,6 @@
 
     <div class="mt-5 space-y-4">
       <div>
-        <label class="mb-1.5 block text-sm font-medium text-ink" for="catalog-code">Código</label>
-        <input
-          id="catalog-code"
-          type="text"
-          class="w-full rounded-md border border-border bg-surface px-3 py-2.5 text-sm text-ink outline-none ring-dsc/30 focus:ring-2"
-          [readOnly]="isEdit()"
-          [formField]="catalogForm.code"
-        />
-      </div>
-      <div>
         <label class="mb-1.5 block text-sm font-medium text-ink" for="catalog-name">Nombre</label>
         <input
           id="catalog-name"
@@ -33,19 +26,25 @@
           [formField]="catalogForm.name"
         />
       </div>
-      <div>
-        <label class="mb-1.5 block text-sm font-medium text-ink" for="catalog-type">Tipo</label>
-        <select
-          id="catalog-type"
-          class="w-full rounded-md border border-border bg-surface px-3 py-2.5 text-sm text-ink outline-none ring-dsc/30 focus:ring-2"
-          [formField]="catalogForm.moduleTypeCode"
-        >
-          <option value="">Selecciona un tipo</option>
-          @for (type of moduleTypes(); track type.code) {
-            <option [value]="type.code">{{ type.name }} ({{ type.code }})</option>
+      <fieldset>
+        <legend class="mb-1.5 text-sm font-medium text-ink">Líneas de formación</legend>
+        <div class="space-y-2">
+          @for (line of trainingLines(); track line.code) {
+            <label class="flex items-center gap-2 text-sm text-ink">
+              <input
+                type="checkbox"
+                class="rounded border-border"
+                [checked]="isLineSelected(line.code)"
+                (change)="onLineToggle(line.code, $event)"
+              />
+              {{ line.name }} ({{ line.code }})
+            </label>
           }
-        </select>
-      </div>
+        </div>
+        @if (lineError()) {
+          <p class="mt-1 text-sm text-danger">{{ lineError() }}</p>
+        }
+      </fieldset>
       <div>
         <label class="mb-1.5 block text-sm font-medium text-ink" for="catalog-description">
           Descripción

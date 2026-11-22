@@ -22,12 +22,12 @@ export class TrainingModulesService {
   }
 
   /**
-   * Obtiene un módulo por código o `null` si no existe (404).
+   * Obtiene un módulo por id o `null` si no existe (404).
    *
-   * @param code - `TrainingModule.Code`.
+   * @param id - `training_module.id` (también en la ruta de asistencia).
    */
-  getByCode(code: string): Observable<TrainingModuleApiDto | null> {
-    const normalized = code.trim();
+  getById(id: string): Observable<TrainingModuleApiDto | null> {
+    const normalized = id.trim();
     if (!normalized) {
       return of(null);
     }
@@ -49,10 +49,10 @@ export class TrainingModulesService {
   /**
    * Vista de sesión para el formulario de asistencia.
    *
-   * @param sessionId - Código del módulo en la URL.
+   * @param sessionId - Id del módulo en la URL.
    */
   getModuleSession(sessionId: string): Observable<ModuleSession | null> {
-    return this.getByCode(sessionId).pipe(
+    return this.getById(sessionId).pipe(
       map((dto) => (dto ? toModuleSession(dto) : null)),
     );
   }

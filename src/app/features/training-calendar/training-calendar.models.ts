@@ -1,7 +1,6 @@
 /**
- * Contratos del calendario de convocatorias e inscripción digital.
- * El backend aún no publica estos endpoints; el servicio usa fixtures
- * hasta que `environment.trainingCalendarApiEnabled` sea `true`.
+ * Contratos del calendario (`GET /api/v1/calendar/sessions`).
+ * `moduleCode` es el id del módulo en texto (el catálogo ya no tiene `code`).
  */
 
 /** Estado de convocatoria alineado a `TrainingModuleSessionStatus`. */

@@ -1,7 +1,6 @@
 /**
  * Calendario de convocatorias e inscripción digital.
- * Mientras `TRAINING_CALENDAR_API_ENABLED` sea falso usa fixtures locales
- * (misma forma que el contrato HTTP documentado).
+ * Si `TRAINING_CALENDAR_API_ENABLED` es falso, usa fixtures con la misma forma.
  */
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, InjectionToken, inject } from '@angular/core';

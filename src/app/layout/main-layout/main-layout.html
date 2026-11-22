@@ -40,6 +40,15 @@
         >
           Módulos
         </a>
+        @if (canManageCatalog()) {
+          <a
+            routerLink="/admin/modulos"
+            routerLinkActive="text-dsc-dark border-b-2 border-dsc"
+            class="border-b-2 border-transparent pb-0.5 text-ink no-underline hover:text-dsc-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dsc focus-visible:ring-offset-2"
+          >
+            Catálogo
+          </a>
+        }
         @if (canManageCurriculum()) {
           <a
             routerLink="/admin/requisitos-formacion"

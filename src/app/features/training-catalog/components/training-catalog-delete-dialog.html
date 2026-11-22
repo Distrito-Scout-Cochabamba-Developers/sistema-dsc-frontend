@@ -8,9 +8,8 @@
     <h2 class="m-0 text-xl font-bold text-ink">Eliminar módulo</h2>
     <p class="mt-3 m-0 text-sm text-muted">
       ¿Eliminar
-      <span class="font-semibold text-ink">{{ module()?.name }}</span>
-      (<span class="font-mono text-xs">{{ module()?.code }}</span>)? Esta acción no se puede
-      deshacer.
+      <span class="font-semibold text-ink">{{ module()?.name }}</span>? Esta acción no se puede
+      deshacer. No se borra si ya tiene convocatorias o asistencia.
     </p>
 
     @if (deleteError()) {

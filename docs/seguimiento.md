@@ -129,5 +129,5 @@ Docker siembra `module_type` + 4 `training_module` (`docker/seed-dev-modules.sql
 1. Registro a módulos según rol (A-16/A-17): Authorize + `/me` con persona. Ver [asistencia-registro-por-rol.md](./features/asistencia-registro-por-rol.md).
 2. Logout que invalide el JWT y CORS o reverse proxy same-origin (B-05).
 3. Definir si el QR usa `Code` o `QrToken`.
-4. GET/POST de calendario (`/api/v1/calendar/sessions`) y activar `trainingCalendarApiEnabled`. Ver [calendario-backend-gaps.md](./features/calendario-backend-gaps.md).
+4. ~~GET/POST de calendario~~ entregado (2026-11-21). `trainingCalendarApiEnabled: true`.
 5. GET de convocatoria (fecha/horario) si el catálogo deja de ser el módulo curricular.

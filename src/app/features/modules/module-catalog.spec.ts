@@ -30,11 +30,11 @@ describe('ModuleCatalog', () => {
     req.flush([
       {
         id: 1,
-        code: 'mod-liderazgo-20241024',
         name: 'Módulo de Liderazgo y Servicio',
         description: 'Taller de liderazgo',
-        moduleTypeCode: 'AE',
-        moduleTypeName: 'Adultos en el Escultismo',
+        trainingLines: [
+          { id: 1, code: 'AE', name: 'Adultos en el Escultismo', description: null },
+        ],
       },
     ]);
     fixture.detectChanges();
@@ -51,7 +51,7 @@ describe('ModuleCatalog', () => {
     expect(calendarLink).toBeTruthy();
 
     const link = fixture.nativeElement.querySelector(
-      'a[href="/asistencia/mod-liderazgo-20241024"]',
+      'a[href="/asistencia/1"]',
     ) as HTMLAnchorElement | null;
     expect(link).toBeTruthy();
     expect(text).not.toContain('Administrar módulos');
