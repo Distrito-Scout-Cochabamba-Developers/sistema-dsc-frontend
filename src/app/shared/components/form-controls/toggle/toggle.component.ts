@@ -1,15 +1,20 @@
-
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   input,
-  output
+  model,
+  output,
+  viewChild
 } from '@angular/core';
+
+import { FormCheckboxControl } from '@angular/forms/signals';
 
 /**
  * Conmutador binario para activar o desactivar configuraciones.
  *
- * El estado es controlado externamente por el componente padre.
+ * Implementa FormCheckboxControl para integrarse con Angular Signal Forms.
+ * Permite controlar el estado, la interacción y el foco.
  */
 @Component({
   selector: 'app-toggle',
@@ -17,7 +22,7 @@ import {
   templateUrl: './toggle.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ToggleComponent {
+export class ToggleComponent implements FormCheckboxControl {
 
   /** Nombre de la configuración. */
   readonly label = input.required<string>();
@@ -26,20 +31,44 @@ export class ToggleComponent {
   readonly description = input<string>('');
 
   /** Estado actual del conmutador. */
-  readonly checked = input<boolean>(false);
+  readonly checked = model<boolean>(false);
 
   /** Indica si el conmutador está deshabilitado. */
   readonly disabled = input<boolean>(false);
 
-  /** Notifica el nuevo estado. */
-  readonly checkedChange = output<boolean>();
+  /** Indica si la selección es obligatoria. */
+  readonly required = input<boolean>(false);
+
+  /** Estado de interacción del control. */
+  readonly touched = input<boolean>(false);
+
+  /** Notifica cuando el control pierde el foco. */
+  readonly touch = output<void>();
+
+  /** Referencia al botón del conmutador. */
+  private readonly toggleElement =
+    viewChild.required<ElementRef<HTMLButtonElement>>('toggleElement');
 
   /**
    * Alterna el estado del conmutador.
    */
   toggle(): void {
     if (!this.disabled()) {
-      this.checkedChange.emit(!this.checked());
+      this.checked.update(value => !value);
     }
+  }
+
+  /**
+   * Notifica que el usuario salió del control.
+   */
+  onBlur(): void {
+    this.touch.emit();
+  }
+
+  /**
+   * Coloca el foco en el conmutador.
+   */
+  focus(options?: FocusOptions): void {
+    this.toggleElement().nativeElement.focus(options);
   }
 }

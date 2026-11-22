@@ -1,10 +1,13 @@
-
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   input,
-  output
+  model,
+  output,
+  viewChild
 } from '@angular/core';
+import { FormValueControl } from '@angular/forms/signals';
 
 /**
  * Estructura de una opción disponible en el grupo de radios.
@@ -19,8 +22,8 @@ export interface RadioOption {
 /**
  * Grupo de opciones de selección única.
  *
- * Recibe las opciones y el valor seleccionado desde el padre.
- * Emite el valor elegido sin administrar reglas de negocio.
+ * Implementa FormValueControl para integrarse con Angular Signal Forms.
+ * El valor seleccionado es administrado mediante un ModelSignal.
  */
 @Component({
   selector: 'app-radio-group',
@@ -28,7 +31,7 @@ export interface RadioOption {
   templateUrl: './radio-group.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RadioGroupComponent {
+export class RadioGroupComponent implements FormValueControl<string> {
 
   /** Identificador único del grupo de radios. */
   readonly name = input.required<string>();
@@ -36,19 +39,52 @@ export class RadioGroupComponent {
   /** Opciones disponibles para seleccionar. */
   readonly options = input.required<RadioOption[]>();
 
-  /** Valor actualmente seleccionado. */
-  readonly value = input<string>('');
+  /** Valor seleccionado. */
+  readonly value = model<string>('');
 
   /** Deshabilita todas las opciones. */
   readonly disabled = input<boolean>(false);
 
-  /** Notifica el valor seleccionado. */
-  readonly valueChange = output<string>();
+  /** Indica si la selección es obligatoria. */
+  readonly required = input<boolean>(false);
+
+  /** Indica si el control fue visitado. */
+  readonly touched = input<boolean>(false);
+
+  /** Notifica cuando el control pierde el foco. */
+  readonly touch = output<void>();
+
+  /** Referencia al primer radio disponible para gestionar el foco. */
+  private readonly radioInput =
+    viewChild<ElementRef<HTMLInputElement>>('radioInput');
 
   /**
-   * Emite el valor de la opción seleccionada.
+   * Enfoca la primera opción disponible.
+   */
+  focus(options?: FocusOptions): void {
+    this.radioInput()?.nativeElement.focus(options);
+  }
+
+  /**
+   * Actualiza el valor seleccionado.
    */
   selectOption(value: string): void {
-    this.valueChange.emit(value);
+    if (this.disabled()) {
+      return;
+    }
+
+    this.value.set(value);
+  }
+
+  /**
+   * Notifica touch únicamente cuando el foco sale de todo el grupo.
+   */
+  onFocusOut(event: FocusEvent): void {
+    const container = event.currentTarget as HTMLElement;
+    const nextFocusedElement = event.relatedTarget as Node | null;
+
+    if (!nextFocusedElement || !container.contains(nextFocusedElement)) {
+      this.touch.emit();
+    }
   }
 }

@@ -130,6 +130,7 @@
 
     <!-- Campo de entrada -->
     <input
+      #inputElement
       [id]="inputId()"
       [type]="effectiveType()"
       [value]="value()"
@@ -149,6 +150,7 @@
             read-only:cursor-default"
 
       (input)="onInput($event)"
+      (blur)="onBlur()"
     />
 
 

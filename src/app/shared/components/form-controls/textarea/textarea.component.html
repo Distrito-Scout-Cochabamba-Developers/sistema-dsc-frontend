@@ -8,21 +8,33 @@
       [for]="inputId()"
     >
       {{ label() }}
+
+      @if (required()) {
+        <span class="text-red-600" aria-hidden="true">*</span>
+      }
     </label>
 
     <span
       class="text-xs tabular-nums"
-      [class.text-slate-500]="characterCount() <= maxLength()"
-      [class.text-red-600]="characterCount() > maxLength()"
+      [class.text-slate-500]="!exceedsMaxLength()"
+      [class.text-red-600]="exceedsMaxLength()"
+      aria-live="polite"
     >
-      {{ characterCount() }} / {{ maxLength() }}
+      {{ characterCount() }} / {{ maxLength() ?? '∞' }}
     </span>
 
   </div>
 
   <!-- Área de texto -->
   <textarea
+    #textareaElement
     [id]="inputId()"
+    [value]="value()"
+    [rows]="rows()"
+    [attr.maxlength]="maxLength() ?? null"
+    [placeholder]="placeholder()"
+    [required]="required()"
+    [disabled]="disabled()"
     [attr.aria-describedby]="hint() ? inputId() + '-hint' : null"
     class="w-full resize-y rounded-lg border
            border-slate-300 bg-white px-3 py-2.5
@@ -34,12 +46,8 @@
            disabled:cursor-not-allowed
            disabled:bg-slate-100
            disabled:text-slate-400"
-    [value]="value()"
-    [rows]="rows()"
-    [maxLength]="maxLength()"
-    [placeholder]="placeholder()"
-    [disabled]="disabled()"
     (input)="onInput($event)"
+    (blur)="onBlur()"
   ></textarea>
 
   @if (hint()) {

@@ -1,43 +1,50 @@
 <div class="w-full">
 
+  <!-- Etiqueta -->
   <label
     class="mb-2 block text-sm font-medium text-dsc-text"
     [for]="inputId()"
   >
     {{ label() }}
+
+    @if (required()) {
+      <span class="ml-0.5 text-red-600" aria-hidden="true">*</span>
+    }
   </label>
 
+  <!-- Contenedor de etiquetas -->
   <div
     class="flex min-h-[58px] flex-wrap items-center gap-2
-           rounded-lg border border-slate-300 bg-white p-2
-           transition-colors
+           rounded-xl border border-slate-300 bg-white p-2
+           shadow-sm transition-all duration-200
            focus-within:border-dsc-primary
-           focus-within:ring-2
-           focus-within:ring-dsc-primary/15"
+           focus-within:ring-4
+           focus-within:ring-dsc-primary/10"
     [class.opacity-60]="disabled()"
   >
 
-    <!-- Etiquetas -->
-    @for (tag of tags(); track $index) {
+    <!-- Etiquetas existentes -->
+    @for (tag of value(); track $index) {
       <span
         class="inline-flex items-center gap-1.5 rounded-full
-               bg-indigo-100 px-2.5 py-1
-               text-xs font-medium text-indigo-900"
+               border border-sky-200 bg-sky-50
+               px-2.5 py-1 text-xs font-medium text-sky-900"
       >
         {{ tag }}
 
         <button
           type="button"
-          class="rounded-full text-indigo-700
+          class="rounded-full text-sky-700
                  transition-colors hover:text-red-600
                  focus-visible:outline-none
-                 focus-visible:ring-2 focus-visible:ring-dsc-primary"
+                 focus-visible:ring-2
+                 focus-visible:ring-dsc-primary"
           [disabled]="disabled()"
           [attr.aria-label]="'Eliminar etiqueta ' + tag"
           (click)="removeTag($index)"
         >
           <svg
-            class="h-3 w-3"
+            class="h-3.5 w-3.5"
             viewBox="0 0 16 16"
             fill="none"
             aria-hidden="true"
@@ -55,25 +62,34 @@
 
     <!-- Entrada de texto -->
     <input
+      #inputElement
       [id]="inputId()"
       type="text"
-      [attr.aria-describedby]="hint() ? inputId() + '-hint' : null"
-      class="min-w-[100px] flex-1 bg-transparent
-             px-1 py-1 text-xs text-dsc-text
-             outline-none placeholder:text-slate-400"
       [value]="draft()"
       [placeholder]="placeholder()"
-      [disabled]="disabled() || tags().length >= maxTags()"
+      [disabled]="!canAddTag()"
+      [attr.aria-describedby]="hint() ? inputId() + '-hint' : null"
+      [attr.aria-label]="label()"
+      [attr.aria-invalid]="false"
+      class="min-w-[100px] flex-1 bg-transparent
+             px-1 py-1 text-sm text-dsc-text
+             outline-none placeholder:text-slate-400
+             disabled:cursor-not-allowed"
       (input)="updateDraft($event)"
       (keydown)="onKeydown($event)"
+      (blur)="onBlur()"
     />
 
-    @if (draft().trim() && tags().length < maxTags()) {
+    <!-- Botón para agregar -->
+    @if (draft().trim() && canAddTag()) {
       <button
         type="button"
-        class="rounded-md px-2 py-1 text-xs
+        class="rounded-lg px-3 py-1.5 text-xs
                font-medium text-dsc-primary
-               hover:bg-sky-50"
+               transition-colors hover:bg-sky-50
+               focus-visible:outline-none
+               focus-visible:ring-2
+               focus-visible:ring-dsc-primary"
         [disabled]="disabled()"
         (click)="addTag()"
       >
@@ -83,13 +99,22 @@
 
   </div>
 
-  @if (hint()) {
-    <p
-      class="mt-1.5 text-xs text-slate-500"
-      [id]="inputId() + '-hint'"
-    >
-      {{ hint() }}
-    </p>
-  }
+  <!-- Información adicional -->
+  <div class="mt-1.5 flex items-center justify-between gap-2">
+
+    @if (hint()) {
+      <p
+        class="text-xs text-slate-500"
+        [id]="inputId() + '-hint'"
+      >
+        {{ hint() }}
+      </p>
+    }
+
+    <span class="ml-auto text-xs tabular-nums text-slate-500">
+      {{ value().length }} / {{ maxTags() }}
+    </span>
+
+  </div>
 
 </div>

@@ -2,11 +2,16 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   computed,
   input,
+  model,
   output,
-  signal
+  signal,
+  viewChild
 } from '@angular/core';
+
+import { FormValueControl } from '@angular/forms/signals';
 
 /**
  * Estados visuales disponibles para el campo.
@@ -36,10 +41,10 @@ export type TextFieldIcon =
  * Permite representar diferentes variantes de campos:
  * texto, búsqueda, correo, contraseña y valores monetarios.
  *
- * Es un componente Dumb:
- * - Recibe su configuración mediante inputs.
- * - Emite cambios mediante outputs.
- * - No contiene lógica de negocio.
+ * Implementa FormValueControl para integrarse con Signal Forms.
+ *
+ * También permite su utilización independiente mediante
+ * model() y el enlace bidireccional [(value)].
  */
 @Component({
   selector: 'app-text-field',
@@ -47,7 +52,7 @@ export type TextFieldIcon =
   templateUrl: './text-field.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TextFieldComponent {
+export class TextFieldComponent implements FormValueControl<string> {
 
   // ==========================================
   // IDENTIFICACIÓN Y CONTENIDO
@@ -59,15 +64,14 @@ export class TextFieldComponent {
   /** Etiqueta descriptiva del campo. */
   readonly label = input.required<string>();
 
-  /** Valor actual del campo. */
-  readonly value = input<string>('');
+  /** Valor sincronizado con Signal Forms. */
+  readonly value = model<string>('');
 
   /** Texto mostrado cuando el campo está vacío. */
   readonly placeholder = input<string>('');
 
   /** Descripción o mensaje de ayuda. */
   readonly hint = input<string>('');
-
 
   // ==========================================
   // CONFIGURACIÓN
@@ -88,8 +92,17 @@ export class TextFieldComponent {
   readonly disabled = input<boolean>(false);
 
   /** Cantidad máxima de caracteres. */
-  readonly maxLength = input<number | null>(null);
+  readonly maxLength = input<number | undefined>(undefined);
 
+  // ==========================================
+  // ESTADO DE SIGNAL FORMS
+  // ==========================================
+
+  /** Indica si el campo ya fue visitado. */
+  readonly touched = input<boolean>(false);
+
+  /** Notifica cuando el usuario abandona el control. */
+  readonly touch = output<void>();
 
   // ==========================================
   // APARIENCIA
@@ -116,14 +129,13 @@ export class TextFieldComponent {
   /** Texto ubicado después del valor. */
   readonly suffix = input<string>('');
 
-
   // ==========================================
-  // EVENTOS
+  // REFERENCIA AL CONTROL INTERNO
   // ==========================================
 
-  /** Emite el nuevo valor del campo. */
-  readonly valueChange = output<string>();
-
+  /** Referencia al input HTML interno. */
+  private readonly inputElement =
+    viewChild.required<ElementRef<HTMLInputElement>>('inputElement');
 
   // ==========================================
   // ESTADO INTERNO DE PRESENTACIÓN
@@ -149,17 +161,30 @@ export class TextFieldComponent {
     () => this.type() === 'password'
   );
 
-
   // ==========================================
   // MÉTODOS
   // ==========================================
 
   /**
-   * Emite el contenido actualizado del campo.
+   * Actualiza el valor del campo.
    */
   onInput(event: Event): void {
     const target = event.target as HTMLInputElement;
-    this.valueChange.emit(target.value);
+    this.value.set(target.value);
+  }
+
+  /**
+   * Notifica que el usuario abandonó el campo.
+   */
+  onBlur(): void {
+    this.touch.emit();
+  }
+
+  /**
+   * Enfoca el input interno.
+   */
+  focus(options?: FocusOptions): void {
+    this.inputElement().nativeElement.focus(options);
   }
 
   /**

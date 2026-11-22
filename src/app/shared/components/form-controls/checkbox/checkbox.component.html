@@ -1,27 +1,31 @@
-
 <label
   class="group flex cursor-pointer items-start gap-3"
   [class.cursor-not-allowed]="disabled()"
   [class.opacity-50]="disabled()"
 >
   <input
+    #checkboxElement
     type="checkbox"
     class="peer sr-only"
     [checked]="checked()"
     [disabled]="disabled()"
+    [required]="required()"
     (change)="onChange($event)"
+    (blur)="onBlur()"
   />
 
   <!-- Indicador visual -->
   <span
-    class="mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center
-           justify-center rounded-[5px] border border-dsc-border
-           bg-white transition-all duration-200
+    class="mt-0.5 flex h-[18px] w-[18px] shrink-0
+           items-center justify-center rounded-[5px]
+           border border-dsc-border bg-white
+           transition-all duration-200
            peer-checked:border-dsc-primary
            peer-checked:bg-dsc-primary
            peer-focus-visible:ring-2
            peer-focus-visible:ring-dsc-primary/30
-           group-hover:border-dsc-primary"
+           group-hover:border-dsc-primary
+           peer-disabled:cursor-not-allowed"
   >
     @if (checked()) {
       <svg
@@ -45,6 +49,10 @@
   <span class="min-w-0">
     <span class="block text-sm font-medium text-dsc-text">
       {{ label() }}
+
+      @if (required()) {
+        <span class="text-red-600" aria-hidden="true">*</span>
+      }
     </span>
 
     @if (description()) {
