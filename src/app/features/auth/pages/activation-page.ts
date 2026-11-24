@@ -21,6 +21,10 @@ export class ActivationPage {
   // El fragmento no viaja al servidor. Nunca se copia a parámetros, almacenamiento o mensajes.
   private token = new URLSearchParams(inject(ActivatedRoute).snapshot.fragment ?? '').get('token');
 
+  constructor() {
+    this.location.replaceState(this.location.path());
+  }
+
   protected readonly hasToken = signal(/^[A-Za-z0-9_-]{43}$/.test(this.token ?? ''));
   protected readonly submitting = signal(false);
   protected readonly activated = signal(false);
@@ -72,7 +76,6 @@ export class ActivationPage {
         next: () => {
           password.value = confirmation.value = '';
           this.token = null;
-          this.location.replaceState('/auth/activar');
           this.activated.set(true);
         },
         error: (response: unknown) => {
