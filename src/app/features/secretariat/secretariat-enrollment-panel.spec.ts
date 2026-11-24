@@ -160,6 +160,36 @@ describe('Consulta de Secretaría', () => {
     expect(root.textContent).not.toContain('No se encontró ninguna persona');
   });
 
+  it('crea e inscribe solo tras búsqueda sin coincidencias', async () => {
+    const { harness, root } = await openPanel();
+    search(root).flush({ type: 'urn:dsc:secretariat:participant-not-found' }, { status: 404, statusText: 'Not Found' });
+    harness.detectChanges();
+    for (const [name, value] of Object.entries({ firstName: 'Ana', lastName: 'Prueba', phone: '70000000', email: 'ana@example.test' })) {
+      root.querySelector<HTMLInputElement>(`input[name="${name}"]`)!.value = value;
+    }
+    root.querySelectorAll('form')[1]!.dispatchEvent(new Event('submit', { cancelable: true }));
+    const request = http.expectOne('/api/v1/secretariat/participants/sessions/42/enrollments');
+    expect(request.request.body).toEqual({ ci: '5556667', extension: null, firstName: 'Ana', lastName: 'Prueba', phone: '70000000', email: 'ana@example.test' });
+    request.flush({ enrollmentId: 1 });
+    harness.detectChanges();
+    expect(root.textContent).toContain('Inscripción confirmada');
+    expect(root.textContent).toContain('activación de acceso está pendiente');
+  });
+
+  it('invalida el alta ante conflicto de identidad', async () => {
+    const { harness, root } = await openPanel();
+    search(root).flush({ type: 'urn:dsc:secretariat:participant-not-found' }, { status: 404, statusText: 'Not Found' });
+    harness.detectChanges();
+    for (const [name, value] of Object.entries({ firstName: 'Ana', lastName: 'Prueba', phone: '70000000', email: 'ana@example.test' })) {
+      root.querySelector<HTMLInputElement>(`input[name="${name}"]`)!.value = value;
+    }
+    root.querySelectorAll('form')[1]!.dispatchEvent(new Event('submit', { cancelable: true }));
+    http.expectOne('/api/v1/secretariat/participants/sessions/42/enrollments').flush({ type: 'urn:dsc:secretariat:identity-changed' }, { status: 409, statusText: 'Conflict' });
+    harness.detectChanges();
+    expect(root.textContent).toContain('Vuelve a buscar');
+    expect(root.querySelector('input[name="firstName"]')).toBeNull();
+  });
+
   it('no permite a un administrador sin rol de Secretaría abrir el panel', async () => {
     TestBed.inject(AuthSessionService).applyAuthenticatedProfile({
       id: 1,

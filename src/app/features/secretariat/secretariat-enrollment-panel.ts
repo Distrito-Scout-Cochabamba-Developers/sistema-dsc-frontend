@@ -52,6 +52,7 @@ export class SecretariatEnrollmentPanel {
   protected readonly busy = signal(false);
   protected readonly confirming = signal(false);
   protected readonly participant = signal<Participant | null>(null);
+  protected readonly canCreate = signal(false);
   protected readonly message = signal('');
   private lookup: Subscription | undefined;
   private confirmation: Subscription | undefined;
@@ -82,7 +83,7 @@ export class SecretariatEnrollmentPanel {
     if (!person?.isScoutLeader || this.busy() || !this.session() || !this.auth.hasRole('DISTRICT_SECRETARY')) return;
     this.busy.set(true);
     this.confirming.set(true);
-    this.confirmation = this.http.post(apiUrl(`/api/v1/secretariat/participants/${person.personId}/sessions/${this.session()}/enrollments`), {})
+    this.confirmation = this.http.post(apiUrl(`/api/v1/secretariat/participants/${person.personId}/sessions/${this.session()}/enrollments`), { ci: this.ci().trim(), extension: this.extension() || null })
       .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: () => { this.confirming.set(false); this.participant.set(null); this.busy.set(false); this.message.set('Inscripción confirmada.'); },
         error: (error: unknown) => {
@@ -97,12 +98,46 @@ export class SecretariatEnrollmentPanel {
           if (type === 'urn:dsc:enrollment:session-full') this.message.set('Sin cupo en esta convocatoria.');
           else if (type === 'urn:dsc:enrollment:enrollment-closed') this.message.set('La inscripción está cerrada.');
           else if (type === 'urn:dsc:enrollment:already-enrolled') this.message.set('La persona ya está inscrita.');
-          else {
+          else if (type === 'urn:dsc:secretariat:identity-changed') {
+            this.participant.set(null);
+            this.message.set('La identidad cambió. Vuelve a buscar antes de confirmar.');
+          } else {
             this.participant.set(null);
             this.message.set('El resultado de la confirmación es incierto. Verifica la inscripción antes de reintentar.');
           }
         },
       });
+  }
+
+  /** Crea el perfil mínimo junto con la inscripción, nunca por separado. */
+  protected create(event: Event): void {
+    event.preventDefault();
+    if (!this.canCreate() || this.busy() || !this.auth.hasRole('DISTRICT_SECRETARY')) return;
+    const form = event.currentTarget as HTMLFormElement;
+    if (!form.reportValidity()) return;
+    const values = new FormData(form);
+    if (['firstName', 'lastName', 'phone', 'email'].some((name) => !String(values.get(name) ?? '').trim())) {
+      this.message.set('Completa nombres, apellidos, celular y correo.');
+      return;
+    }
+    this.busy.set(true);
+    this.confirming.set(true);
+    this.confirmation = this.http.post(apiUrl(`/api/v1/secretariat/participants/sessions/${this.session()}/enrollments`), {
+      ci: this.ci().trim(), extension: this.extension() || null,
+      firstName: values.get('firstName'), lastName: values.get('lastName'), phone: values.get('phone'), email: values.get('email'),
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => { this.confirming.set(false); this.busy.set(false); this.canCreate.set(false); this.message.set('Inscripción confirmada. La activación de acceso está pendiente.'); },
+      error: (error: unknown) => {
+        this.confirming.set(false); this.busy.set(false);
+        const type = error instanceof HttpErrorResponse ? error.error?.type : '';
+        if (type === 'urn:dsc:secretariat:identity-changed') { this.canCreate.set(false); this.message.set('El CI ya tiene coincidencias. Vuelve a buscar.'); }
+        else if (type === 'urn:dsc:enrollment:session-full') this.message.set('Sin cupo en esta convocatoria.');
+        else if (type === 'urn:dsc:enrollment:enrollment-closed') this.message.set('La inscripción está cerrada.');
+        else if (error instanceof HttpErrorResponse && error.status === 400) this.message.set('Revisa los datos obligatorios.');
+        else if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403)) { this.canCreate.set(false); this.message.set('La inscripción requiere una sesión activa de Secretaría.'); }
+        else { this.canCreate.set(false); this.message.set('El resultado de la confirmación es incierto. Verifica la inscripción antes de reintentar.'); }
+      },
+    });
   }
 
   /** Al cambiar de convocatoria elimina los datos de la consulta previa. */
@@ -182,6 +217,8 @@ export class SecretariatEnrollmentPanel {
         error.status === 404 &&
         error.error?.type === 'urn:dsc:secretariat:participant-not-found'
       ) {
+        if (triedExtension) { this.message.set('No hay coincidencia con ese complemento. Verifica el CI antes de crear un perfil.'); return; }
+        this.canCreate.set(true);
         this.message.set('No se encontró ninguna persona con los datos indicados.');
         return;
       }
@@ -200,6 +237,7 @@ export class SecretariatEnrollmentPanel {
     this.confirmation?.unsubscribe();
     this.lookup = undefined;
     this.participant.set(null);
+    this.canCreate.set(false);
     this.message.set('');
     this.busy.set(false);
   }
