@@ -25,6 +25,7 @@ interface SessionOption {
 interface Participant {
   readonly personId: number;
   readonly isScoutLeader: boolean;
+  readonly hasAccount: boolean;
   readonly firstName: string;
   readonly lastName: string;
   readonly ciNumber: string;
@@ -52,6 +53,7 @@ export class SecretariatEnrollmentPanel {
   protected readonly busy = signal(false);
   protected readonly confirming = signal(false);
   protected readonly participant = signal<Participant | null>(null);
+  protected readonly rover = signal(false);
   protected readonly message = signal('');
   private lookup: Subscription | undefined;
   private confirmation: Subscription | undefined;
@@ -79,10 +81,10 @@ export class SecretariatEnrollmentPanel {
   /** Confirma explícitamente la inscripción de la persona y convocatoria seleccionadas. */
   protected confirm(): void {
     const person = this.participant();
-    if (!person?.isScoutLeader || this.busy() || !this.session() || !this.auth.hasRole('DISTRICT_SECRETARY')) return;
+    if (!person || (!person.isScoutLeader && !this.rover()) || this.busy() || !this.session() || !this.auth.hasRole('DISTRICT_SECRETARY')) return;
     this.busy.set(true);
     this.confirming.set(true);
-    this.confirmation = this.http.post(apiUrl(`/api/v1/secretariat/participants/${person.personId}/sessions/${this.session()}/enrollments`), {})
+    this.confirmation = this.http.post(apiUrl(`/api/v1/secretariat/participants/${person.personId}/sessions/${this.session()}/enrollments`), this.rover() ? { modality: 'ROVER_WITHOUT_ACCOUNT' } : {})
       .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: () => { this.confirming.set(false); this.participant.set(null); this.busy.set(false); this.message.set('Inscripción confirmada.'); },
         error: (error: unknown) => {
@@ -94,7 +96,8 @@ export class SecretariatEnrollmentPanel {
             return;
           }
           const type = error instanceof HttpErrorResponse ? error.error?.type : '';
-          if (type === 'urn:dsc:enrollment:session-full') this.message.set('Sin cupo en esta convocatoria.');
+          if (type === 'urn:dsc:enrollment:rover-has-account') this.message.set('La persona ya tiene cuenta. No puede inscribirse como Rover sin cuenta.');
+          else if (type === 'urn:dsc:enrollment:session-full') this.message.set('Sin cupo en esta convocatoria.');
           else if (type === 'urn:dsc:enrollment:enrollment-closed') this.message.set('La inscripción está cerrada.');
           else if (type === 'urn:dsc:enrollment:already-enrolled') this.message.set('La persona ya está inscrita.');
           else {
@@ -200,6 +203,7 @@ export class SecretariatEnrollmentPanel {
     this.confirmation?.unsubscribe();
     this.lookup = undefined;
     this.participant.set(null);
+    this.rover.set(false);
     this.message.set('');
     this.busy.set(false);
   }

@@ -70,6 +70,36 @@ describe('Consulta de Secretaría', () => {
     expect(root.querySelector('input[name="ci"]')).toBeNull();
   });
 
+  it('permite confirmar modalidad Rover sin cuenta para una persona existente', async () => {
+    const { harness, root } = await openPanel();
+    search(root).flush({ personId: 8, isScoutLeader: false, firstName: 'Persona', lastName: 'Ficticia', ciNumber: '5556667' });
+    harness.detectChanges();
+    const rover = root.querySelector<HTMLInputElement>('input[value="ROVER_WITHOUT_ACCOUNT"]')!;
+    expect(rover.labels?.[0]?.textContent).toContain('Rover sin cuenta');
+    rover.click();
+    harness.detectChanges();
+    root.querySelector<HTMLButtonElement>('app-secretariat-enrollment-panel button[type="button"]')!.click();
+    const request = http.expectOne('/api/v1/secretariat/participants/8/sessions/42/enrollments');
+    expect(request.request.body).toEqual({ modality: 'ROVER_WITHOUT_ACCOUNT' });
+    request.flush({ enrollmentId: 1 });
+  });
+
+  it('explica el rechazo de una cuenta sin exponer el detalle del servidor', async () => {
+    const { harness, root } = await openPanel();
+    search(root).flush({ personId: 8, isScoutLeader: false, firstName: 'Persona', lastName: 'Ficticia', ciNumber: '5556667' });
+    harness.detectChanges();
+    root.querySelector<HTMLInputElement>('input[value="ROVER_WITHOUT_ACCOUNT"]')!.click();
+    harness.detectChanges();
+    root.querySelector<HTMLButtonElement>('app-secretariat-enrollment-panel button[type="button"]')!.click();
+    http.expectOne('/api/v1/secretariat/participants/8/sessions/42/enrollments').flush(
+      { type: 'urn:dsc:enrollment:rover-has-account', detail: 'dato privado' },
+      { status: 409, statusText: 'Conflict' },
+    );
+    harness.detectChanges();
+    expect(root.textContent).toContain('ya tiene cuenta');
+    expect(root.textContent).not.toContain('dato privado');
+  });
+
   it('confirma la inscripción y distingue los conflictos', async () => {
     const { harness, root } = await openPanel();
     search(root).flush({ personId: 8, isScoutLeader: true, firstName: 'Persona', lastName: 'Ficticia', ciNumber: '5556667' });
