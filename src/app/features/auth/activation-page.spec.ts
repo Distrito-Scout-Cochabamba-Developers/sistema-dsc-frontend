@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
@@ -85,6 +86,7 @@ describe('Activación de cuenta', () => {
 
   it('un canje rechazado conserva el enlace para reintentar', async () => {
     const harness = await RouterTestingHarness.create(`/auth/activar#token=${token}`);
+    expect(TestBed.inject(Location).path(true)).toBe('/auth/activar');
     const page = harness.routeNativeElement!;
     for (const input of page.querySelectorAll<HTMLInputElement>('input[type=password]')) {
       input.value = password;
@@ -93,6 +95,7 @@ describe('Activación de cuenta', () => {
     page.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true }));
     const rejected = http.expectOne({ method: 'POST', url: endpoint });
     rejected.flush({}, { status: 400, statusText: 'Bad Request' });
+    expect(TestBed.inject(Location).path(true)).toBe('/auth/activar');
     harness.detectChanges();
     expect(page.querySelector('[role=alert]')?.textContent).toContain(
       'no es válido, caducó o ya se usó',
