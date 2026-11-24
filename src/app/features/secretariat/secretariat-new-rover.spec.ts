@@ -37,6 +37,7 @@ describe('Alta de Rover nuevo desde Secretaría (#160)', () => {
     http
       .expectOne({ method: 'GET', url: '/api/v1/calendar/sessions' })
       .flush([{ id: 42, moduleName: 'Convocatoria ficticia', startsAt: '2026-11-29T10:00:00-04:00' }]);
+    http.expectOne({ method: 'GET', url: '/api/v1/secretariat/invitations/pending' }).flush([]);
     harness.detectChanges();
     const select = root.querySelector<HTMLSelectElement>('select[name="session"]')!;
     select.value = '42';
@@ -114,6 +115,20 @@ describe('Alta de Rover nuevo desde Secretaría (#160)', () => {
     harness.detectChanges();
     expect(root.querySelector<HTMLButtonElement>('form[name="new-rover"] button')!.disabled).toBe(true);
     request.flush({ enrollmentId: 7 }, { status: 201, statusText: 'Created' });
+  });
+
+  it('pide el complemento cuando el CI del Rover existe con otro complemento', async () => {
+    const { harness, root } = await openWithNoMatch();
+    type(root, 'firstName', 'Rover');
+    type(root, 'lastName', 'Ficticio');
+    submitRover(root);
+    http
+      .expectOne({ method: 'POST', url: createPath })
+      .flush({ type: 'urn:dsc:secretariat:extension-required' }, { status: 409, statusText: 'Conflict' });
+    harness.detectChanges();
+    expect(root.textContent).toContain('Selecciona el complemento');
+    expect(root.querySelector('select[name="extension"]')).not.toBeNull();
+    expect(root.querySelector('form[name="new-rover"]')).toBeNull();
   });
 
   it.each([

@@ -13,6 +13,15 @@ import type { Subscription } from 'rxjs';
 
 import { AuthSessionService } from '@core/services/auth-session.service';
 import { apiUrl } from '@core/utils/api-url.utils';
+import {
+  EXTENSION_REQUIRED_MESSAGE,
+  EXTENSION_REQUIRED_TYPE,
+  FORBIDDEN_MESSAGE,
+  SESSION_EXPIRED_MESSAGE,
+  UNCERTAIN_RESULT_MESSAGE,
+  enrollmentConflictMessage,
+  problemType,
+} from './secretariat-enrollment-messages';
 import { SecretariatNewRoverForm, type NewRoverOutcome } from './secretariat-new-rover-form';
 
 /** Campos de la convocatoria que identifican la opción en el selector. */
@@ -33,6 +42,12 @@ interface Participant {
   readonly extension: string;
   readonly phone: string;
 }
+
+/** Respuestas del reintento que cierran la invitación pendiente en lugar de mantenerla. */
+const RETRY_RESOLUTIONS: ReadonlyMap<string, string> = new Map([
+  ['urn:dsc:invitation:already-sent', 'El correo de activación fue enviado.'],
+  ['urn:dsc:invitation:not-eligible', 'La cuenta ya no admite una invitación.'],
+]);
 
 /** Busca una persona sin modificar su perfil ni inscribirla en la convocatoria elegida. */
 @Component({
@@ -59,8 +74,11 @@ export class SecretariatEnrollmentPanel {
   /** La última búsqueda confirmó que no existe nadie con ese CI: habilita el alta de Rover nuevo. */
   protected readonly noMatch = signal(false);
   protected readonly message = signal('');
-  /** Inscripción cuyo correo de activación sigue pendiente. Solo un identificador, sin datos personales. */
-  protected readonly pendingInvitation = signal<number | null>(null);
+  /**
+   * Inscripciones cuyo correo de activación sigue pendiente (cargadas al iniciar o creadas en esta sesión).
+   * Solo identificadores, sin datos personales; la búsqueda no los descarta.
+   */
+  protected readonly pendingInvitations = signal<readonly number[]>([]);
   private lookup: Subscription | undefined;
   private confirmation: Subscription | undefined;
 
@@ -72,6 +90,15 @@ export class SecretariatEnrollmentPanel {
       .subscribe({
         next: (sessions) => this.sessions.set(sessions),
         error: () => this.sessionsFailed.set(true),
+      });
+
+    // Permite reintentar tras recargar la página: solo se conservan identificadores de inscripción.
+    this.http
+      .get<readonly { readonly enrollmentId: number }[]>(apiUrl('/api/v1/secretariat/invitations/pending'))
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: (pending) => this.pendingInvitations.set(pending.map(({ enrollmentId }) => enrollmentId)),
+        error: () => undefined,
       });
 
     // El shell puede cerrar sesión sin desmontar la página.
@@ -98,20 +125,20 @@ export class SecretariatEnrollmentPanel {
           this.busy.set(false);
           if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403)) {
             this.editCi('');
-            this.message.set(error.status === 401 ? 'La sesión ha caducado. Inicia sesión nuevamente.' : 'No tienes autorización para confirmar inscripciones.');
+            this.message.set(error.status === 401 ? SESSION_EXPIRED_MESSAGE : FORBIDDEN_MESSAGE);
             return;
           }
-          const type = error instanceof HttpErrorResponse ? error.error?.type : '';
-          if (type === 'urn:dsc:enrollment:rover-has-account') this.message.set('La persona ya tiene cuenta. No puede inscribirse como Rover sin cuenta.');
-          else if (type === 'urn:dsc:enrollment:session-full') this.message.set('Sin cupo en esta convocatoria.');
-          else if (type === 'urn:dsc:enrollment:enrollment-closed') this.message.set('La inscripción está cerrada.');
-          else if (type === 'urn:dsc:enrollment:already-enrolled') this.message.set('La persona ya está inscrita.');
+          const type = problemType(error);
+          const conflict = enrollmentConflictMessage(type);
+          if (conflict) this.message.set(conflict);
+          else if (type === EXTENSION_REQUIRED_TYPE) this.askForComplement();
+          else if (type === 'urn:dsc:enrollment:rover-has-account') this.message.set('La persona ya tiene cuenta. No puede inscribirse como Rover sin cuenta.');
           else if (type === 'urn:dsc:secretariat:identity-changed') {
             this.participant.set(null);
             this.message.set('La identidad cambió. Vuelve a buscar antes de confirmar.');
           } else {
             this.participant.set(null);
-            this.message.set('El resultado de la confirmación es incierto. Verifica la inscripción antes de reintentar.');
+            this.message.set(UNCERTAIN_RESULT_MESSAGE);
           }
         },
       });
@@ -139,61 +166,80 @@ export class SecretariatEnrollmentPanel {
         const { enrollmentId, invitation } = result as { enrollmentId?: number; invitation?: string };
         if (invitation === 'SENT') this.message.set('Inscripción confirmada. El correo de activación fue enviado.');
         else {
-          this.pendingInvitation.set(typeof enrollmentId === 'number' ? enrollmentId : null);
+          if (typeof enrollmentId === 'number') this.addPending(enrollmentId);
           this.message.set('Inscripción confirmada. El correo de activación quedó pendiente; puedes reintentar el envío.');
         }
       },
       error: (error: unknown) => {
         this.confirming.set(false); this.busy.set(false);
-        const type = error instanceof HttpErrorResponse ? error.error?.type : '';
-        if (type === 'urn:dsc:secretariat:identity-changed') { this.canCreate.set(false); this.noMatch.set(false); this.message.set('El CI ya tiene coincidencias. Vuelve a buscar.'); }
+        const type = problemType(error);
+        const status = error instanceof HttpErrorResponse ? error.status : 0;
+        const conflict = enrollmentConflictMessage(type);
+        if (type === 'urn:dsc:secretariat:identity-changed') { this.closeCreation(); this.message.set('El CI ya tiene coincidencias. Vuelve a buscar.'); }
+        else if (type === EXTENSION_REQUIRED_TYPE) this.askForComplement();
         else if (type === 'urn:dsc:secretariat:email-in-use') this.message.set('El correo ya pertenece a otra cuenta. Usa otro correo; no se creó nada.');
-        else if (type === 'urn:dsc:enrollment:session-full') this.message.set('Sin cupo en esta convocatoria.');
-        else if (type === 'urn:dsc:enrollment:enrollment-closed') this.message.set('La inscripción está cerrada.');
-        else if (error instanceof HttpErrorResponse && error.status === 400) this.message.set('Revisa los datos obligatorios.');
-        else if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403)) { this.canCreate.set(false); this.noMatch.set(false); this.message.set('La inscripción requiere una sesión activa de Secretaría.'); }
-        else { this.canCreate.set(false); this.noMatch.set(false); this.message.set('El resultado de la confirmación es incierto. Verifica la inscripción antes de reintentar.'); }
+        else if (conflict) this.message.set(conflict);
+        else if (status === 400) this.message.set('Revisa los datos obligatorios.');
+        else if (status === 401 || status === 403) { this.closeCreation(); this.message.set('La inscripción requiere una sesión activa de Secretaría.'); }
+        else { this.closeCreation(); this.message.set(UNCERTAIN_RESULT_MESSAGE); }
       },
     });
   }
 
   /** Reintento manual del correo; nunca vuelve a inscribir. */
-  protected retryInvitation(): void {
-    const id = this.pendingInvitation();
-    if (id === null || this.busy() || !this.auth.hasRole('DISTRICT_SECRETARY')) return;
+  protected retryInvitation(id: number): void {
+    if (this.busy() || !this.auth.hasRole('DISTRICT_SECRETARY')) return;
     this.busy.set(true);
     this.http.post(apiUrl(`/api/v1/secretariat/invitations/${id}/retry`), null)
       .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-        next: () => { this.busy.set(false); this.pendingInvitation.set(null); this.message.set('El correo de activación fue enviado.'); },
+        next: () => this.invitationResolved(id, 'El correo de activación fue enviado.'),
         error: (error: unknown) => {
-          this.busy.set(false);
           const status = error instanceof HttpErrorResponse ? error.status : 0;
-          const type = error instanceof HttpErrorResponse ? error.error?.type : '';
-          if (type === 'urn:dsc:invitation:already-sent') { this.pendingInvitation.set(null); this.message.set('El correo de activación fue enviado.'); }
-          else if (type === 'urn:dsc:invitation:not-eligible') { this.pendingInvitation.set(null); this.message.set('La cuenta ya no admite una invitación.'); }
-          else if (status === 401 || status === 403) { this.pendingInvitation.set(null); this.message.set('El reintento requiere una sesión activa de Secretaría.'); }
-          else this.message.set('No se pudo entregar el correo. Sigue pendiente; puedes reintentar.');
+          const resolved = RETRY_RESOLUTIONS.get(problemType(error));
+          if (resolved) this.invitationResolved(id, resolved);
+          else if (status === 401 || status === 403) this.invitationResolved(id, 'El reintento requiere una sesión activa de Secretaría.');
+          else {
+            this.busy.set(false);
+            this.message.set('No se pudo entregar el correo. Sigue pendiente; puedes reintentar.');
+          }
         },
       });
+  }
+
+  private addPending(id: number): void {
+    this.pendingInvitations.update((ids) => (ids.includes(id) ? ids : [...ids, id]));
+  }
+
+  private invitationResolved(id: number, message: string): void {
+    this.busy.set(false);
+    this.pendingInvitations.update((ids) => ids.filter((x) => x !== id));
+    this.message.set(message);
+  }
+
+  /** Ante un CI ambiguo o existente bajo otros complementos, vuelve a la búsqueda pidiendo el complemento. */
+  private askForComplement(): void {
+    this.participant.set(null);
+    this.closeCreation();
+    this.needsExtension.set(true);
+    this.message.set(EXTENSION_REQUIRED_MESSAGE);
+  }
+
+  private closeCreation(): void {
+    this.canCreate.set(false);
+    this.noMatch.set(false);
   }
 
   /** Refleja el resultado del alta de Rover nuevo sin conservar datos personales. */
   protected newRoverFinished(outcome: NewRoverOutcome): void {
     this.noMatch.set(false);
     if (outcome === 'enrolled') this.message.set('Rover inscrito.');
+    else if (outcome === 'extension-required') this.askForComplement();
     else if (outcome === 'person-exists')
       this.message.set('Ya existe una persona con ese CI. Vuelve a buscar para inscribirla.');
     else if (outcome === 'unauthorized' || outcome === 'forbidden') {
       this.editCi('');
-      this.message.set(
-        outcome === 'unauthorized'
-          ? 'La sesión ha caducado. Inicia sesión nuevamente.'
-          : 'No tienes autorización para confirmar inscripciones.',
-      );
-    } else
-      this.message.set(
-        'El resultado de la confirmación es incierto. Verifica la inscripción antes de reintentar.',
-      );
+      this.message.set(outcome === 'unauthorized' ? SESSION_EXPIRED_MESSAGE : FORBIDDEN_MESSAGE);
+    } else this.message.set(UNCERTAIN_RESULT_MESSAGE);
   }
 
   /** Al cambiar de convocatoria elimina los datos de la consulta previa. */
@@ -298,7 +344,6 @@ export class SecretariatEnrollmentPanel {
     this.rover.set(false);
     this.noMatch.set(false);
     this.message.set('');
-    this.pendingInvitation.set(null);
     this.busy.set(false);
   }
 }

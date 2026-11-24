@@ -11,11 +11,17 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { apiUrl } from '@core/utils/api-url.utils';
+import {
+  EXTENSION_REQUIRED_TYPE,
+  enrollmentConflictMessage,
+  problemType,
+} from './secretariat-enrollment-messages';
 
 /** Resultado que el panel anfitrión debe reflejar; nunca incluye datos personales. */
 export type NewRoverOutcome =
   | 'enrolled'
   | 'person-exists'
+  | 'extension-required'
   | 'unauthorized'
   | 'forbidden'
   | 'uncertain';
@@ -84,11 +90,11 @@ export class SecretariatNewRoverForm {
       return;
     }
     if (error.status === 409) {
-      const type = error.error?.type;
+      const type = problemType(error);
       if (type === 'urn:dsc:enrollment:person-exists') return this.finished.emit('person-exists');
-      if (type === 'urn:dsc:enrollment:session-full') this.message.set('Sin cupo en esta convocatoria.');
-      else if (type === 'urn:dsc:enrollment:enrollment-closed') this.message.set('La inscripción está cerrada.');
-      else if (type === 'urn:dsc:enrollment:already-enrolled') this.message.set('La persona ya está inscrita.');
+      if (type === EXTENSION_REQUIRED_TYPE) return this.finished.emit('extension-required');
+      const message = enrollmentConflictMessage(type);
+      if (message) this.message.set(message);
       else this.finished.emit('uncertain');
       return;
     }

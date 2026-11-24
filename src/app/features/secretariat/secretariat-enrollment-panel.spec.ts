@@ -8,6 +8,7 @@ import { routes } from '../../app.routes';
 import { AuthSessionService } from '@core/services/auth-session.service';
 
 const lookupPath = '/api/v1/secretariat/participants/lookup';
+const pendingPath = '/api/v1/secretariat/invitations/pending';
 
 describe('Consulta de Secretaría', () => {
   let http: HttpTestingController;
@@ -21,7 +22,7 @@ describe('Consulta de Secretaría', () => {
 
   afterEach(() => http.verify());
 
-  async function openPanel() {
+  async function openPanel(pending: readonly object[] = []) {
     TestBed.inject(AuthSessionService).applyAuthenticatedProfile({
       id: 1,
       personId: 1,
@@ -37,6 +38,7 @@ describe('Consulta de Secretaría', () => {
       .flush([
         { id: 42, moduleName: 'Convocatoria ficticia', startsAt: '2026-11-29T10:00:00-04:00' },
       ]);
+    http.expectOne({ method: 'GET', url: pendingPath }).flush(pending);
     harness.detectChanges();
     expect(root.textContent).toContain('Convocatoria ficticia');
     expect(root.querySelector('input[name="ci"]')).toBeNull();
@@ -264,6 +266,65 @@ describe('Consulta de Secretaría', () => {
     harness.detectChanges();
     expect(root.textContent).toContain('correo de activación fue enviado');
     expect(retryButton(root)).toBeUndefined();
+  });
+
+  it('recupera al iniciar las invitaciones pendientes para reintentar tras recargar, sin mostrar datos personales', async () => {
+    TestBed.inject(AuthSessionService).applyAuthenticatedProfile({
+      id: 1, personId: 1, username: 'test-secretaria', email: 'secretaria@example.test', roles: ['DISTRICT_SECRETARY'], displayName: 'Secretaría ficticia',
+    });
+    const harness = await RouterTestingHarness.create('/secretaria/convocatorias');
+    const root = harness.routeNativeElement!;
+    http.expectOne({ method: 'GET', url: '/api/v1/calendar/sessions' }).flush([]);
+    http.expectOne({ method: 'GET', url: pendingPath }).flush([
+      { enrollmentId: 7, attempts: 2, lastFailureCode: 'SmtpException', createdAt: '2026-11-24T10:00:00Z' },
+    ]);
+    harness.detectChanges();
+    expect(retryButton(root)).toBeDefined();
+    expect(root.textContent).not.toContain('SmtpException');
+
+    retryButton(root)!.click();
+    http.expectOne({ method: 'POST', url: '/api/v1/secretariat/invitations/7/retry' }).flush({ invitation: 'SENT' });
+    harness.detectChanges();
+    expect(root.textContent).toContain('correo de activación fue enviado');
+    expect(retryButton(root)).toBeUndefined();
+  });
+
+  it('conserva las invitaciones pendientes al buscar a otra persona', async () => {
+    const { harness, root } = await openPanel([{ enrollmentId: 9, attempts: 1, lastFailureCode: null, createdAt: '2026-11-24T10:00:00Z' }]);
+    expect(retryButton(root)).toBeDefined();
+    search(root).flush({ type: 'urn:dsc:secretariat:participant-not-found' }, { status: 404, statusText: 'Not Found' });
+    harness.detectChanges();
+    expect(retryButton(root)).toBeDefined();
+  });
+
+  function expectAsksForComplement(root: HTMLElement) {
+    expect(root.textContent).toContain('Selecciona el complemento');
+    expect(root.querySelector('select[name="extension"]')).not.toBeNull();
+    expect(root.querySelector('input[name="firstName"]')).toBeNull();
+  }
+
+  it('pide el complemento cuando el alta de dirigente indica que el CI existe con otro complemento', async () => {
+    const { harness, root } = await createLeader(
+      { type: 'urn:dsc:secretariat:extension-required' },
+      409,
+    );
+    expectAsksForComplement(root);
+    expect(root.textContent).not.toContain('Inscripción confirmada');
+    expect(harness.routeNativeElement).toBe(root);
+  });
+
+  it('pide el complemento cuando confirmar una persona existente es ambiguo', async () => {
+    const { harness, root } = await openPanel();
+    search(root).flush({ personId: 8, isScoutLeader: true, firstName: 'Persona', lastName: 'Ficticia', ciNumber: '5556667' });
+    harness.detectChanges();
+    root.querySelector<HTMLButtonElement>('app-secretariat-enrollment-panel button[type="button"]')!.click();
+    http.expectOne('/api/v1/secretariat/participants/8/sessions/42/enrollments').flush(
+      { type: 'urn:dsc:secretariat:extension-required' },
+      { status: 409, statusText: 'Conflict' },
+    );
+    harness.detectChanges();
+    expectAsksForComplement(root);
+    expect(root.textContent).not.toContain('Persona Ficticia');
   });
 
   it('rechaza el alta si el correo ya pertenece a otra cuenta', async () => {
