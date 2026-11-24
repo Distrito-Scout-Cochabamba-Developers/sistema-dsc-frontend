@@ -50,6 +50,7 @@ export class SecretariatEnrollmentPanel {
   protected readonly extension = signal('');
   protected readonly needsExtension = signal(false);
   protected readonly busy = signal(false);
+  protected readonly confirming = signal(false);
   protected readonly participant = signal<Participant | null>(null);
   protected readonly message = signal('');
   private lookup: Subscription | undefined;
@@ -67,7 +68,11 @@ export class SecretariatEnrollmentPanel {
 
     // El shell puede cerrar sesión sin desmontar la página.
     effect(() => {
-      if (!this.auth.hasRole('DISTRICT_SECRETARY')) this.selectSession('');
+      if (!this.auth.hasRole('DISTRICT_SECRETARY')) {
+        this.session.set('');
+        this.confirming.set(false);
+        this.editCi('');
+      }
     });
   }
 
@@ -76,28 +81,40 @@ export class SecretariatEnrollmentPanel {
     const person = this.participant();
     if (!person?.isScoutLeader || this.busy() || !this.session() || !this.auth.hasRole('DISTRICT_SECRETARY')) return;
     this.busy.set(true);
+    this.confirming.set(true);
     this.confirmation = this.http.post(apiUrl(`/api/v1/secretariat/participants/${person.personId}/sessions/${this.session()}/enrollments`), {})
       .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-        next: () => { this.participant.set(null); this.busy.set(false); this.message.set('Inscripción confirmada.'); },
+        next: () => { this.confirming.set(false); this.participant.set(null); this.busy.set(false); this.message.set('Inscripción confirmada.'); },
         error: (error: unknown) => {
+          this.confirming.set(false);
           this.busy.set(false);
+          if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403)) {
+            this.editCi('');
+            this.message.set(error.status === 401 ? 'La sesión ha caducado. Inicia sesión nuevamente.' : 'No tienes autorización para confirmar inscripciones.');
+            return;
+          }
           const type = error instanceof HttpErrorResponse ? error.error?.type : '';
           if (type === 'urn:dsc:enrollment:session-full') this.message.set('Sin cupo en esta convocatoria.');
           else if (type === 'urn:dsc:enrollment:enrollment-closed') this.message.set('La inscripción está cerrada.');
           else if (type === 'urn:dsc:enrollment:already-enrolled') this.message.set('La persona ya está inscrita.');
-          else this.message.set('No se pudo confirmar la inscripción. Inténtalo de nuevo.');
+          else {
+            this.participant.set(null);
+            this.message.set('El resultado de la confirmación es incierto. Verifica la inscripción antes de reintentar.');
+          }
         },
       });
   }
 
   /** Al cambiar de convocatoria elimina los datos de la consulta previa. */
   protected selectSession(id: string): void {
+    if (this.confirming()) return;
     this.session.set(id);
     this.editCi('');
   }
 
   /** Invalida el resultado y el complemento de la búsqueda anterior. */
   protected editCi(ci: string): void {
+    if (this.confirming()) return;
     this.clearResult();
     this.ci.set(ci);
     this.extension.set('');
@@ -106,6 +123,7 @@ export class SecretariatEnrollmentPanel {
 
   /** Cancela la búsqueda en curso antes de probar otro complemento. */
   protected editExtension(extension: string): void {
+    if (this.confirming()) return;
     this.clearResult();
     this.extension.set(extension);
   }

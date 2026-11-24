@@ -91,6 +91,44 @@ describe('Consulta de Secretaría', () => {
     expect(root.textContent).toContain('Inscripción confirmada');
   });
 
+  it('bloquea cambios durante confirmación y advierte resultado incierto tras error de red', async () => {
+    const { harness, root } = await openPanel();
+    search(root).flush({ personId: 8, isScoutLeader: true, firstName: 'Persona', lastName: 'Ficticia', ciNumber: '5556667' });
+    harness.detectChanges();
+    root.querySelector<HTMLButtonElement>('app-secretariat-enrollment-panel button[type="button"]')!.click();
+    const request = http.expectOne('/api/v1/secretariat/participants/8/sessions/42/enrollments');
+    harness.detectChanges();
+    expect(root.querySelector<HTMLSelectElement>('select[name="session"]')!.disabled).toBe(true);
+    expect(root.querySelector<HTMLInputElement>('input[name="ci"]')!.disabled).toBe(true);
+    request.error(new ProgressEvent('error'));
+    harness.detectChanges();
+    expect(root.textContent).toContain('Verifica la inscripción antes de reintentar');
+    expect(root.querySelector('app-secretariat-enrollment-panel button[type="button"]')).toBeNull();
+  });
+
+  it.each([401, 403])('limpia datos personales ante HTTP %s', async (status) => {
+    const { harness, root } = await openPanel();
+    search(root).flush({ personId: 8, isScoutLeader: true, firstName: 'Persona', lastName: 'Ficticia', ciNumber: '5556667' });
+    harness.detectChanges();
+    root.querySelector<HTMLButtonElement>('app-secretariat-enrollment-panel button[type="button"]')!.click();
+    http.expectOne('/api/v1/secretariat/participants/8/sessions/42/enrollments').flush({}, { status, statusText: 'Error' });
+    harness.detectChanges();
+    expect(root.textContent).not.toContain('Persona Ficticia');
+    expect(root.querySelector<HTMLInputElement>('input[name="ci"]')!.value).toBe('');
+    expect(root.textContent).toContain(status === 401 ? 'sesión' : 'autorización');
+  });
+
+  it('trata un error 500 como resultado incierto sin reintentar', async () => {
+    const { harness, root } = await openPanel();
+    search(root).flush({ personId: 8, isScoutLeader: true, firstName: 'Persona', lastName: 'Ficticia', ciNumber: '5556667' });
+    harness.detectChanges();
+    root.querySelector<HTMLButtonElement>('app-secretariat-enrollment-panel button[type="button"]')!.click();
+    http.expectOne('/api/v1/secretariat/participants/8/sessions/42/enrollments').flush({}, { status: 500, statusText: 'Error' });
+    harness.detectChanges();
+    expect(root.textContent).toContain('Verifica la inscripción antes de reintentar');
+    http.expectNone('/api/v1/secretariat/participants/8/sessions/42/enrollments');
+  });
+
   it('pide complemento ante ambigüedad y no elige si persiste', async () => {
     const { harness, root } = await openPanel();
     search(root).flush({}, { status: 409, statusText: 'Conflict' });
