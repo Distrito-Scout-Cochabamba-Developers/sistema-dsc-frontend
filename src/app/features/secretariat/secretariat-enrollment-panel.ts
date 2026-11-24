@@ -59,6 +59,8 @@ export class SecretariatEnrollmentPanel {
   /** La última búsqueda confirmó que no existe nadie con ese CI: habilita el alta de Rover nuevo. */
   protected readonly noMatch = signal(false);
   protected readonly message = signal('');
+  /** Inscripción cuyo correo de activación sigue pendiente. Solo un identificador, sin datos personales. */
+  protected readonly pendingInvitation = signal<number | null>(null);
   private lookup: Subscription | undefined;
   private confirmation: Subscription | undefined;
 
@@ -132,11 +134,20 @@ export class SecretariatEnrollmentPanel {
       ci: this.ci().trim(), extension: this.extension() || null,
       firstName: values.get('firstName'), lastName: values.get('lastName'), phone: values.get('phone'), email: values.get('email'),
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => { this.confirming.set(false); this.busy.set(false); this.canCreate.set(false); this.noMatch.set(false); this.message.set('Inscripción confirmada. La activación de acceso está pendiente.'); },
+      next: (result) => {
+        this.confirming.set(false); this.busy.set(false); this.canCreate.set(false); this.noMatch.set(false);
+        const { enrollmentId, invitation } = result as { enrollmentId?: number; invitation?: string };
+        if (invitation === 'SENT') this.message.set('Inscripción confirmada. El correo de activación fue enviado.');
+        else {
+          this.pendingInvitation.set(typeof enrollmentId === 'number' ? enrollmentId : null);
+          this.message.set('Inscripción confirmada. El correo de activación quedó pendiente; puedes reintentar el envío.');
+        }
+      },
       error: (error: unknown) => {
         this.confirming.set(false); this.busy.set(false);
         const type = error instanceof HttpErrorResponse ? error.error?.type : '';
         if (type === 'urn:dsc:secretariat:identity-changed') { this.canCreate.set(false); this.noMatch.set(false); this.message.set('El CI ya tiene coincidencias. Vuelve a buscar.'); }
+        else if (type === 'urn:dsc:secretariat:email-in-use') this.message.set('El correo ya pertenece a otra cuenta. Usa otro correo; no se creó nada.');
         else if (type === 'urn:dsc:enrollment:session-full') this.message.set('Sin cupo en esta convocatoria.');
         else if (type === 'urn:dsc:enrollment:enrollment-closed') this.message.set('La inscripción está cerrada.');
         else if (error instanceof HttpErrorResponse && error.status === 400) this.message.set('Revisa los datos obligatorios.');
@@ -144,6 +155,26 @@ export class SecretariatEnrollmentPanel {
         else { this.canCreate.set(false); this.noMatch.set(false); this.message.set('El resultado de la confirmación es incierto. Verifica la inscripción antes de reintentar.'); }
       },
     });
+  }
+
+  /** Reintento manual del correo; nunca vuelve a inscribir. */
+  protected retryInvitation(): void {
+    const id = this.pendingInvitation();
+    if (id === null || this.busy() || !this.auth.hasRole('DISTRICT_SECRETARY')) return;
+    this.busy.set(true);
+    this.http.post(apiUrl(`/api/v1/secretariat/invitations/${id}/retry`), null)
+      .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: () => { this.busy.set(false); this.pendingInvitation.set(null); this.message.set('El correo de activación fue enviado.'); },
+        error: (error: unknown) => {
+          this.busy.set(false);
+          const status = error instanceof HttpErrorResponse ? error.status : 0;
+          const type = error instanceof HttpErrorResponse ? error.error?.type : '';
+          if (type === 'urn:dsc:invitation:already-sent') { this.pendingInvitation.set(null); this.message.set('El correo de activación fue enviado.'); }
+          else if (type === 'urn:dsc:invitation:not-eligible') { this.pendingInvitation.set(null); this.message.set('La cuenta ya no admite una invitación.'); }
+          else if (status === 401 || status === 403) { this.pendingInvitation.set(null); this.message.set('El reintento requiere una sesión activa de Secretaría.'); }
+          else this.message.set('No se pudo entregar el correo. Sigue pendiente; puedes reintentar.');
+        },
+      });
   }
 
   /** Refleja el resultado del alta de Rover nuevo sin conservar datos personales. */
@@ -267,6 +298,7 @@ export class SecretariatEnrollmentPanel {
     this.rover.set(false);
     this.noMatch.set(false);
     this.message.set('');
+    this.pendingInvitation.set(null);
     this.busy.set(false);
   }
 }

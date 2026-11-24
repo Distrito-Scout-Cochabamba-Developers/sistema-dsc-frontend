@@ -7,3 +7,7 @@ Ruta `/secretaria/convocatorias`, enlazada en la navegación exclusivamente para
 3. Con `200` se muestra una persona. Con `409` se solicita complemento (`extension` en el JSON) y, si persiste el conflicto, no se selecciona a nadie. El `404` con `type: urn:dsc:secretariat:participant-not-found` indica ausencia de coincidencia; los demás errores no se interpretan como ausencia.
 
 Cambiar convocatoria, CI, complemento o cerrar sesión descarta la coincidencia previa. No hay alta, confirmación ni inscripción. No se integra con el QR de asistencia.
+
+## Correo de activación tras el alta (AB#161)
+
+Al crear dirigente e inscribir, la respuesta incluye `invitation` (`SENT` o `PENDING`). Si está `PENDING`, el panel conserva solo el identificador de la inscripción y ofrece "Reintentar envío del correo" (`POST /api/v1/secretariat/invitations/{id}/retry`, manual, solo Secretaría). El reintento nunca vuelve a inscribir. Un correo ya usado por otra cuenta (`409 email-in-use`) no crea nada. El panel no muestra ni guarda correo, usuario ni enlace.

@@ -215,10 +215,61 @@ describe('Consulta de Secretaría', () => {
     leaderForm(root).dispatchEvent(new Event('submit', { cancelable: true }));
     const request = http.expectOne('/api/v1/secretariat/participants/sessions/42/enrollments');
     expect(request.request.body).toEqual({ ci: '5556667', extension: null, firstName: 'Ana', lastName: 'Prueba', phone: '70000000', email: 'ana@example.test' });
-    request.flush({ enrollmentId: 1 });
+    request.flush({ enrollmentId: 1, invitation: 'SENT' });
     harness.detectChanges();
     expect(root.textContent).toContain('Inscripción confirmada');
-    expect(root.textContent).toContain('activación de acceso está pendiente');
+    expect(root.textContent).toContain('correo de activación fue enviado');
+  });
+
+  async function createLeader(flush: object, status = 201) {
+    const { harness, root } = await openPanel();
+    search(root).flush({ type: 'urn:dsc:secretariat:participant-not-found' }, { status: 404, statusText: 'Not Found' });
+    harness.detectChanges();
+    for (const [name, value] of Object.entries({ firstName: 'Ana', lastName: 'Prueba', phone: '70000000', email: 'ana@example.test' })) {
+      leaderForm(root).querySelector<HTMLInputElement>(`input[name="${name}"]`)!.value = value;
+    }
+    leaderForm(root).dispatchEvent(new Event('submit', { cancelable: true }));
+    http.expectOne('/api/v1/secretariat/participants/sessions/42/enrollments').flush(flush, { status, statusText: status === 201 ? 'Created' : 'Conflict' });
+    harness.detectChanges();
+    return { harness, root };
+  }
+  const retryButton = (root: HTMLElement) => [...root.querySelectorAll('button')].find((b) => b.textContent?.includes('Reintentar envío'));
+
+  it('indica que el correo de activación quedó pendiente y permite reintentar manualmente sin repetir la inscripción', async () => {
+    const { harness, root } = await createLeader({ enrollmentId: 7, invitation: 'PENDING' });
+    expect(root.textContent).toContain('Inscripción confirmada');
+    expect(root.textContent).toContain('correo de activación quedó pendiente');
+    retryButton(root)!.click();
+    const retry = http.expectOne({ method: 'POST', url: '/api/v1/secretariat/invitations/7/retry' });
+    expect(retry.request.body).toBeNull();
+    retry.flush({ invitation: 'SENT' });
+    harness.detectChanges();
+    expect(root.textContent).toContain('correo de activación fue enviado');
+    expect(retryButton(root)).toBeUndefined();
+  });
+
+  it('mantiene el reintento disponible si el envío vuelve a fallar', async () => {
+    const { harness, root } = await createLeader({ enrollmentId: 7, invitation: 'PENDING' });
+    retryButton(root)!.click();
+    http.expectOne('/api/v1/secretariat/invitations/7/retry').flush({ type: 'urn:dsc:invitation:delivery-failed' }, { status: 502, statusText: 'Bad Gateway' });
+    harness.detectChanges();
+    expect(root.textContent).toContain('No se pudo entregar el correo');
+    expect(retryButton(root)).toBeDefined();
+  });
+
+  it('informa que el correo ya estaba entregado si otro reintento ganó', async () => {
+    const { harness, root } = await createLeader({ enrollmentId: 7, invitation: 'PENDING' });
+    retryButton(root)!.click();
+    http.expectOne('/api/v1/secretariat/invitations/7/retry').flush({ type: 'urn:dsc:invitation:already-sent' }, { status: 409, statusText: 'Conflict' });
+    harness.detectChanges();
+    expect(root.textContent).toContain('correo de activación fue enviado');
+    expect(retryButton(root)).toBeUndefined();
+  });
+
+  it('rechaza el alta si el correo ya pertenece a otra cuenta', async () => {
+    const { root } = await createLeader({ type: 'urn:dsc:secretariat:email-in-use' }, 409);
+    expect(root.textContent).toContain('correo ya pertenece a otra cuenta');
+    expect(root.textContent).not.toContain('Inscripción confirmada');
   });
 
   it('invalida el alta ante conflicto de identidad', async () => {
