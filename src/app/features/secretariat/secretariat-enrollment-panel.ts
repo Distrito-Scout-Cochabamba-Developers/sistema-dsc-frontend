@@ -23,6 +23,8 @@ interface SessionOption {
 
 /** Campos de la coincidencia mostrados por el panel de solo lectura. */
 interface Participant {
+  readonly personId: number;
+  readonly isScoutLeader: boolean;
   readonly firstName: string;
   readonly lastName: string;
   readonly ciNumber: string;
@@ -51,6 +53,7 @@ export class SecretariatEnrollmentPanel {
   protected readonly participant = signal<Participant | null>(null);
   protected readonly message = signal('');
   private lookup: Subscription | undefined;
+  private confirmation: Subscription | undefined;
 
   constructor() {
     // El panel nunca usa las convocatorias de demostración del calendario público.
@@ -66,6 +69,25 @@ export class SecretariatEnrollmentPanel {
     effect(() => {
       if (!this.auth.hasRole('DISTRICT_SECRETARY')) this.selectSession('');
     });
+  }
+
+  /** Confirma explícitamente la inscripción de la persona y convocatoria seleccionadas. */
+  protected confirm(): void {
+    const person = this.participant();
+    if (!person?.isScoutLeader || this.busy() || !this.session() || !this.auth.hasRole('DISTRICT_SECRETARY')) return;
+    this.busy.set(true);
+    this.confirmation = this.http.post(apiUrl(`/api/v1/secretariat/participants/${person.personId}/sessions/${this.session()}/enrollments`), {})
+      .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: () => { this.participant.set(null); this.busy.set(false); this.message.set('Inscripción confirmada.'); },
+        error: (error: unknown) => {
+          this.busy.set(false);
+          const type = error instanceof HttpErrorResponse ? error.error?.type : '';
+          if (type === 'urn:dsc:enrollment:session-full') this.message.set('Sin cupo en esta convocatoria.');
+          else if (type === 'urn:dsc:enrollment:enrollment-closed') this.message.set('La inscripción está cerrada.');
+          else if (type === 'urn:dsc:enrollment:already-enrolled') this.message.set('La persona ya está inscrita.');
+          else this.message.set('No se pudo confirmar la inscripción. Inténtalo de nuevo.');
+        },
+      });
   }
 
   /** Al cambiar de convocatoria elimina los datos de la consulta previa. */
@@ -157,6 +179,7 @@ export class SecretariatEnrollmentPanel {
   /** Descarta datos personales y evita que una respuesta tardía vuelva a mostrarlos. */
   private clearResult(): void {
     this.lookup?.unsubscribe();
+    this.confirmation?.unsubscribe();
     this.lookup = undefined;
     this.participant.set(null);
     this.message.set('');

@@ -70,6 +70,27 @@ describe('Consulta de Secretaría', () => {
     expect(root.querySelector('input[name="ci"]')).toBeNull();
   });
 
+  it('confirma la inscripción y distingue los conflictos', async () => {
+    const { harness, root } = await openPanel();
+    search(root).flush({ personId: 8, isScoutLeader: true, firstName: 'Persona', lastName: 'Ficticia', ciNumber: '5556667' });
+    harness.detectChanges();
+    for (const [type, message] of [
+      ['session-full', 'Sin cupo'],
+      ['enrollment-closed', 'inscripción está cerrada'],
+      ['already-enrolled', 'ya está inscrita'],
+    ]) {
+      root.querySelector<HTMLButtonElement>('app-secretariat-enrollment-panel button[type="button"]')!.click();
+      http.expectOne('/api/v1/secretariat/participants/8/sessions/42/enrollments')
+        .flush({ type: `urn:dsc:enrollment:${type}` }, { status: 409, statusText: 'Conflict' });
+      harness.detectChanges();
+      expect(root.textContent).toContain(message);
+    }
+    root.querySelector<HTMLButtonElement>('app-secretariat-enrollment-panel button[type="button"]')!.click();
+    http.expectOne('/api/v1/secretariat/participants/8/sessions/42/enrollments').flush({ enrollmentId: 1 });
+    harness.detectChanges();
+    expect(root.textContent).toContain('Inscripción confirmada');
+  });
+
   it('pide complemento ante ambigüedad y no elige si persiste', async () => {
     const { harness, root } = await openPanel();
     search(root).flush({}, { status: 409, statusText: 'Conflict' });
