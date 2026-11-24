@@ -84,6 +84,18 @@ describe('Consulta de Secretaría', () => {
     request.flush({ enrollmentId: 1 });
   });
 
+  it('deshabilita Rover para una cuenta conocida con explicación accesible', async () => {
+    const { harness, root } = await openPanel();
+    search(root).flush({ personId: 8, isScoutLeader: false, hasAccount: true, firstName: 'Persona', lastName: 'Ficticia', ciNumber: '5556667' });
+    harness.detectChanges();
+    const checkbox = root.querySelector<HTMLInputElement>('input[value="ROVER_WITHOUT_ACCOUNT"]')!;
+    expect(checkbox.disabled).toBe(true);
+    expect(checkbox.labels?.[0]?.textContent).toContain('Rover sin cuenta');
+    const description = root.querySelector(`#${checkbox.getAttribute('aria-describedby')}`);
+    expect(description?.textContent).toContain('tiene cuenta');
+    expect(root.querySelector('app-secretariat-enrollment-panel button[type="button"]')).toBeNull();
+  });
+
   it('explica el rechazo de una cuenta sin exponer el detalle del servidor', async () => {
     const { harness, root } = await openPanel();
     search(root).flush({ personId: 8, isScoutLeader: false, firstName: 'Persona', lastName: 'Ficticia', ciNumber: '5556667' });

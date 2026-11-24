@@ -81,7 +81,7 @@ export class SecretariatEnrollmentPanel {
   /** Confirma explícitamente la inscripción de la persona y convocatoria seleccionadas. */
   protected confirm(): void {
     const person = this.participant();
-    if (!person || (!person.isScoutLeader && !this.rover()) || this.busy() || !this.session() || !this.auth.hasRole('DISTRICT_SECRETARY')) return;
+    if (!person || (this.rover() && person.hasAccount) || (!person.isScoutLeader && !this.rover()) || this.busy() || !this.session() || !this.auth.hasRole('DISTRICT_SECRETARY')) return;
     this.busy.set(true);
     this.confirming.set(true);
     this.confirmation = this.http.post(apiUrl(`/api/v1/secretariat/participants/${person.personId}/sessions/${this.session()}/enrollments`), this.rover() ? { modality: 'ROVER_WITHOUT_ACCOUNT' } : {})
