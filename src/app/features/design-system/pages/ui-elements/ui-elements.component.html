@@ -1,0 +1,276 @@
+<div class="space-y-10 pb-10">
+
+  <!-- HEADER -->
+  <header class="space-y-2">
+    <h1 class="text-3xl font-bold tracking-tight text-dsc-text">
+      Elementos de interfaz
+    </h1>
+
+    <p class="text-sm text-slate-500">
+      Componentes visuales para identificar usuarios,
+      clasificar información y organizar contenido.
+    </p>
+  </header>
+
+  <!-- BADGES -->
+  <section class="space-y-4">
+    <div>
+      <h2 class="text-lg font-semibold text-dsc-text">Badges</h2>
+      <p class="mt-1 text-sm text-slate-500">
+        Etiquetas compactas para mostrar estados y clasificaciones.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+
+      <app-card title="Variantes de color">
+        <div class="flex flex-wrap gap-2">
+          <app-badge color="primary">Primary</app-badge>
+          <app-badge color="default">Default</app-badge>
+          <app-badge color="success">Success</app-badge>
+          <app-badge color="warning">Warning</app-badge>
+          <app-badge color="danger">Danger</app-badge>
+          <app-badge color="info">Info</app-badge>
+          <app-badge color="secondary">Secondary</app-badge>
+        </div>
+      </app-card>
+
+      <app-card title="Variantes visuales">
+        <div class="flex flex-wrap items-center gap-2">
+          <app-badge variant="solid" color="primary">
+            Solid
+          </app-badge>
+
+          <app-badge variant="soft" color="primary">
+            Soft
+          </app-badge>
+
+          <app-badge variant="outline" color="primary">
+            Outline
+          </app-badge>
+
+          <app-badge variant="outline" color="success">
+            Verificado
+          </app-badge>
+        </div>
+      </app-card>
+
+      <app-card title="Estados con indicador">
+        <div class="flex flex-wrap gap-2">
+          <app-badge color="success" [dot]="true">
+            Activo
+          </app-badge>
+
+          <app-badge color="warning" [dot]="true">
+            Pendiente
+          </app-badge>
+
+          <app-badge color="danger" [dot]="true">
+            Inactivo
+          </app-badge>
+
+          <app-badge color="default" [dot]="true">
+            Desconectado
+          </app-badge>
+        </div>
+      </app-card>
+
+    </div>
+
+    <app-card title="Tamaños">
+      <div class="flex flex-wrap items-center gap-3">
+        <app-badge size="sm">Pequeño</app-badge>
+        <app-badge size="md">Mediano</app-badge>
+        <app-badge size="lg">Grande</app-badge>
+      </div>
+    </app-card>
+  </section>
+
+  <!-- AVATARS -->
+  <section class="space-y-4">
+    <div>
+      <h2 class="text-lg font-semibold text-dsc-text">Avatares</h2>
+      <p class="mt-1 text-sm text-slate-500">
+        Representación visual de personas y estados de disponibilidad.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+
+      <app-card title="Tamaños">
+        <div class="flex flex-wrap items-center gap-3">
+          <app-avatar initials="XS" size="xs" />
+          <app-avatar initials="SM" size="sm" />
+          <app-avatar initials="MD" size="md" />
+          <app-avatar initials="LG" size="lg" />
+          <app-avatar initials="XL" size="xl" />
+        </div>
+      </app-card>
+
+      <app-card title="Formas">
+        <div class="flex items-center gap-4">
+          <app-avatar initials="AV" size="xl" />
+          <app-avatar
+            initials="AV"
+            size="xl"
+            shape="square"
+          />
+        </div>
+      </app-card>
+
+      <app-card title="Estados">
+        <div class="flex flex-wrap items-center gap-4">
+          <app-avatar initials="ON" status="online" size="lg" />
+          <app-avatar initials="OF" status="offline" size="lg" />
+          <app-avatar initials="BS" status="busy" size="lg" />
+          <app-avatar initials="AW" status="away" size="lg" />
+        </div>
+      </app-card>
+
+    </div>
+
+    <app-card
+      title="Grupo de usuarios"
+      subtitle="Ejemplo de integrantes de una unidad."
+    >
+      <div class="flex flex-wrap items-center gap-4">
+        @for (member of members; track member.initials) {
+          <div class="flex flex-col items-center gap-2">
+            <app-avatar
+              [initials]="member.initials"
+              [status]="member.status"
+              size="lg"
+            />
+
+            <span class="text-xs text-slate-600">
+              {{ member.name }}
+            </span>
+          </div>
+        }
+      </div>
+    </app-card>
+  </section>
+
+  <!-- CARDS -->
+  <section class="space-y-4">
+    <div>
+      <h2 class="text-lg font-semibold text-dsc-text">Cards</h2>
+      <p class="mt-1 text-sm text-slate-500">
+        Contenedores para organizar y presentar información.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+
+      <!-- BASIC -->
+      <app-card
+        title="Tarjeta básica"
+        subtitle="Información general"
+      >
+        <p class="text-sm text-slate-600">
+          Esta tarjeta permite agrupar contenido de forma sencilla
+          y mantener una estructura visual consistente.
+        </p>
+      </app-card>
+
+      <!-- ACTION -->
+      <app-card
+        title="Proyecto DSC"
+        subtitle="Actualizado recientemente"
+        variant="elevated"
+        [footer]="true"
+      >
+        <div class="space-y-3">
+          <app-badge color="success" [dot]="true">
+            Activo
+          </app-badge>
+
+          <p class="text-sm text-slate-600">
+            Plataforma de gestión y administración del
+            Distrito Scout Cochabamba.
+          </p>
+        </div>
+
+        <div card-footer class="flex justify-end">
+          <app-button
+            label="Ver detalles"
+            size="sm"
+            variant="outline"
+          />
+        </div>
+      </app-card>
+
+      <!-- PROFILE -->
+      <app-card
+        title="Perfil de usuario"
+        subtitle="Información del integrante"
+      >
+        <div class="flex items-center gap-3">
+          <app-avatar
+            initials="AV"
+            size="xl"
+            status="online"
+          />
+
+          <div>
+            <p class="font-semibold text-dsc-text">
+              Alejandro Vargas
+            </p>
+
+            <p class="text-xs text-slate-500">
+              Responsable de unidad
+            </p>
+
+            <app-badge color="primary" size="sm">
+              Scouter
+            </app-badge>
+          </div>
+        </div>
+      </app-card>
+
+      <!-- STATS -->
+      <app-card title="Estadísticas">
+        <p class="text-xs text-slate-500">
+          Integrantes registrados
+        </p>
+
+        <p class="mt-2 text-3xl font-bold text-dsc-primary">
+          128
+        </p>
+
+        <app-badge color="success" size="sm">
+          +12 este mes
+        </app-badge>
+      </app-card>
+
+      <!-- MEDIA -->
+      <app-card
+        title="Contenido multimedia"
+        subtitle="Ejemplo de tarjeta con imagen"
+      >
+        <div class="flex h-28 items-center justify-center rounded-lg bg-sky-50">
+          <img  class="text-3xl text-sky-400" src="https://www.scout.org/sites/default/files/styles/social_media/public/d7/news_pictures/WhatsApp%20Image%202022-06-24%20at%204.59.06%20PM.jpeg.webp" alt="ASB">
+        </div>
+
+        <p class="mt-6 text-sm text-slate-600">
+          Espacio para imágenes, recursos y contenido visual.
+        </p>
+      </app-card>
+
+      <!-- OUTLINED -->
+      <app-card
+        title="Tarjeta destacada"
+        subtitle="Variante outlined"
+        variant="outlined"
+        padding="lg"
+      >
+        <p class="text-sm text-slate-600">
+          Una tarjeta con borde visible para destacar
+          información dentro de una interfaz.
+        </p>
+      </app-card>
+
+    </div>
+  </section>
+
+</div>

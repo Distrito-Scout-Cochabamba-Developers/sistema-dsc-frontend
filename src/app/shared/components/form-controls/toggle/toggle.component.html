@@ -1,0 +1,56 @@
+<div
+  class="flex items-center justify-between gap-4
+         rounded-xl border border-slate-200
+         bg-slate-50 p-3"
+>
+
+  <!-- Información -->
+  <div class="min-w-0 flex-1">
+    <p class="text-sm font-medium text-dsc-text">
+      {{ label() }}
+
+      @if (required()) {
+        <span class="text-red-600" aria-hidden="true">*</span>
+      }
+    </p>
+
+    @if (description()) {
+      <p class="mt-1 text-xs leading-relaxed text-slate-500">
+        {{ description() }}
+      </p>
+    }
+  </div>
+
+  <!-- Switch -->
+  <button
+    #toggleElement
+    type="button"
+    role="switch"
+    class="relative inline-flex h-6 w-11 shrink-0
+           cursor-pointer items-center rounded-full
+           transition-colors duration-200
+           focus-visible:outline-none
+           focus-visible:ring-2
+           focus-visible:ring-dsc-primary/40
+           focus-visible:ring-offset-2
+           disabled:cursor-not-allowed
+           disabled:opacity-50"
+    [class.bg-dsc-primary]="checked()"
+    [class.bg-slate-300]="!checked()"
+    [attr.aria-checked]="checked()"
+    [attr.aria-label]="label()"
+    [disabled]="disabled()"
+    (click)="toggle()"
+    (blur)="onBlur()"
+  >
+    <span
+      class="inline-block h-5 w-5 rounded-full
+             bg-white shadow-sm
+             transition-transform duration-200"
+      [class.translate-x-5]="checked()"
+      [class.translate-x-0.5]="!checked()"
+      aria-hidden="true"
+    ></span>
+  </button>
+
+</div>

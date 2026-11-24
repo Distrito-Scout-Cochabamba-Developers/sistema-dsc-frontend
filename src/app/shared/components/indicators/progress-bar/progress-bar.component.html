@@ -1,0 +1,34 @@
+
+<div class="w-full">
+  @if (showLabel()) {
+    <div class="mb-2 flex items-center justify-between">
+      <span class="text-xs font-medium text-slate-600">
+        Progreso
+      </span>
+
+      @if (!indeterminate()) {
+        <span class="text-xs font-semibold text-dsc-text">
+          {{ percentage() | number:'1.0-0' }}%
+        </span>
+      }
+    </div>
+  }
+
+  <div
+    class="w-full overflow-hidden rounded-full bg-slate-200"
+    [style.height.px]="height()"
+    role="progressbar"
+    [attr.aria-valuenow]="indeterminate() ? null : percentage()"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    [attr.aria-label]="indeterminate() ? 'Cargando' : 'Progreso'"
+    [attr.aria-busy]="indeterminate()"
+  >
+    <div
+      class="h-full rounded-full transition-all duration-300"
+      [style.width]="indeterminate() ? '35%' : percentage() + '%'"
+      [style.background-color]="progressColor()"
+      [class.animate-pulse]="indeterminate()"
+    ></div>
+  </div>
+</div>
