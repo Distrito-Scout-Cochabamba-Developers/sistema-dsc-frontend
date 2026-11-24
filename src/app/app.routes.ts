@@ -45,6 +45,14 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'secretaria/convocatorias',
+        canActivate: [roleGuard('DISTRICT_SECRETARY')],
+        loadComponent: () =>
+          import('@features/secretariat/secretariat-enrollment-panel').then(
+            (m) => m.SecretariatEnrollmentPanel,
+          ),
+      },
+      {
         path: 'admin/modulos',
         canActivate: [authGuard, roleGuard(...TRAINING_CATALOG_ROLES)],
         loadChildren: () =>
