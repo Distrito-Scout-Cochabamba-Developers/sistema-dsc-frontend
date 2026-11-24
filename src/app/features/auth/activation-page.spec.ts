@@ -48,4 +48,62 @@ describe('Activación de cuenta', () => {
     expect(page.querySelector('[role=status]')?.textContent).toContain('Cuenta activada');
     expect(page.querySelector('a[href="/auth/login"]')).not.toBeNull();
   });
+
+  it('asocia etiquetas y anuncia errores sin enviar el formulario', async () => {
+    const harness = await RouterTestingHarness.create(`/auth/activar#token=${token}`);
+    const page = harness.routeNativeElement!;
+    const passwordInput = page.querySelector<HTMLInputElement>('#new-password')!;
+    const confirmation = page.querySelector<HTMLInputElement>('#confirm-password')!;
+
+    expect(page.querySelector('label[for="new-password"]')?.textContent).toContain(
+      'Nueva contraseña',
+    );
+    expect(page.querySelector('label[for="confirm-password"]')?.textContent).toContain(
+      'Confirma la contraseña',
+    );
+    expect(passwordInput.getAttribute('autocomplete')).toBe('new-password');
+
+    passwordInput.value = 'corta';
+    passwordInput.dispatchEvent(new Event('input', { bubbles: true }));
+    page.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true }));
+    harness.detectChanges();
+    expect(page.querySelector('[role=alert]')?.textContent).toContain('al menos 12 caracteres');
+    expect(passwordInput.getAttribute('aria-invalid')).toBe('true');
+    expect(document.activeElement).toBe(passwordInput);
+
+    passwordInput.value = password;
+    passwordInput.dispatchEvent(new Event('input', { bubbles: true }));
+    confirmation.value = 'Otra contraseña ficticia';
+    confirmation.dispatchEvent(new Event('input', { bubbles: true }));
+    page.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true }));
+    harness.detectChanges();
+    expect(page.querySelector('[role=alert]')?.textContent).toContain('no coinciden');
+    expect(confirmation.getAttribute('aria-invalid')).toBe('true');
+    expect(document.activeElement).toBe(confirmation);
+    http.expectNone(endpoint);
+  });
+
+  it('un canje rechazado conserva el enlace para reintentar', async () => {
+    const harness = await RouterTestingHarness.create(`/auth/activar#token=${token}`);
+    const page = harness.routeNativeElement!;
+    for (const input of page.querySelectorAll<HTMLInputElement>('input[type=password]')) {
+      input.value = password;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    page.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true }));
+    const rejected = http.expectOne({ method: 'POST', url: endpoint });
+    rejected.flush({}, { status: 400, statusText: 'Bad Request' });
+    harness.detectChanges();
+    expect(page.querySelector('[role=alert]')?.textContent).toContain(
+      'no es válido, caducó o ya se usó',
+    );
+    expect(page.querySelector('form')).not.toBeNull();
+
+    page.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true }));
+    const retry = http.expectOne({ method: 'POST', url: endpoint });
+    expect(retry.request.body).toEqual({ token, password });
+    retry.flush(null, { status: 204, statusText: 'No Content' });
+    harness.detectChanges();
+    expect(page.querySelector('[role=status]')?.textContent).toContain('Cuenta activada');
+  });
 });
