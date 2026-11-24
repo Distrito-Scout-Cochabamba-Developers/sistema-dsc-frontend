@@ -202,14 +202,17 @@ describe('Consulta de Secretaría', () => {
     expect(root.textContent).not.toContain('No se encontró ninguna persona');
   });
 
+  // El alta de Rover nuevo (#160) comparte nombres de campo; el de dirigente se ubica por su identificador.
+  const leaderForm = (root: HTMLElement) => root.querySelector('#new-first')!.closest('form')!;
+
   it('crea e inscribe solo tras búsqueda sin coincidencias', async () => {
     const { harness, root } = await openPanel();
     search(root).flush({ type: 'urn:dsc:secretariat:participant-not-found' }, { status: 404, statusText: 'Not Found' });
     harness.detectChanges();
     for (const [name, value] of Object.entries({ firstName: 'Ana', lastName: 'Prueba', phone: '70000000', email: 'ana@example.test' })) {
-      root.querySelector<HTMLInputElement>(`input[name="${name}"]`)!.value = value;
+      leaderForm(root).querySelector<HTMLInputElement>(`input[name="${name}"]`)!.value = value;
     }
-    root.querySelectorAll('form')[1]!.dispatchEvent(new Event('submit', { cancelable: true }));
+    leaderForm(root).dispatchEvent(new Event('submit', { cancelable: true }));
     const request = http.expectOne('/api/v1/secretariat/participants/sessions/42/enrollments');
     expect(request.request.body).toEqual({ ci: '5556667', extension: null, firstName: 'Ana', lastName: 'Prueba', phone: '70000000', email: 'ana@example.test' });
     request.flush({ enrollmentId: 1 });
@@ -223,9 +226,9 @@ describe('Consulta de Secretaría', () => {
     search(root).flush({ type: 'urn:dsc:secretariat:participant-not-found' }, { status: 404, statusText: 'Not Found' });
     harness.detectChanges();
     for (const [name, value] of Object.entries({ firstName: 'Ana', lastName: 'Prueba', phone: '70000000', email: 'ana@example.test' })) {
-      root.querySelector<HTMLInputElement>(`input[name="${name}"]`)!.value = value;
+      leaderForm(root).querySelector<HTMLInputElement>(`input[name="${name}"]`)!.value = value;
     }
-    root.querySelectorAll('form')[1]!.dispatchEvent(new Event('submit', { cancelable: true }));
+    leaderForm(root).dispatchEvent(new Event('submit', { cancelable: true }));
     http.expectOne('/api/v1/secretariat/participants/sessions/42/enrollments').flush({ type: 'urn:dsc:secretariat:identity-changed' }, { status: 409, statusText: 'Conflict' });
     harness.detectChanges();
     expect(root.textContent).toContain('Vuelve a buscar');

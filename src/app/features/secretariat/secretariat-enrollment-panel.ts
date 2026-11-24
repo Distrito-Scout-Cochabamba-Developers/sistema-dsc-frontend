@@ -13,6 +13,7 @@ import type { Subscription } from 'rxjs';
 
 import { AuthSessionService } from '@core/services/auth-session.service';
 import { apiUrl } from '@core/utils/api-url.utils';
+import { SecretariatNewRoverForm, type NewRoverOutcome } from './secretariat-new-rover-form';
 
 /** Campos de la convocatoria que identifican la opción en el selector. */
 interface SessionOption {
@@ -37,7 +38,7 @@ interface Participant {
 @Component({
   selector: 'app-secretariat-enrollment-panel',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DatePipe],
+  imports: [DatePipe, SecretariatNewRoverForm],
   templateUrl: './secretariat-enrollment-panel.html',
 })
 export class SecretariatEnrollmentPanel {
@@ -55,6 +56,8 @@ export class SecretariatEnrollmentPanel {
   protected readonly participant = signal<Participant | null>(null);
   protected readonly canCreate = signal(false);
   protected readonly rover = signal(false);
+  /** La última búsqueda confirmó que no existe nadie con ese CI: habilita el alta de Rover nuevo. */
+  protected readonly noMatch = signal(false);
   protected readonly message = signal('');
   private lookup: Subscription | undefined;
   private confirmation: Subscription | undefined;
@@ -129,18 +132,37 @@ export class SecretariatEnrollmentPanel {
       ci: this.ci().trim(), extension: this.extension() || null,
       firstName: values.get('firstName'), lastName: values.get('lastName'), phone: values.get('phone'), email: values.get('email'),
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => { this.confirming.set(false); this.busy.set(false); this.canCreate.set(false); this.message.set('Inscripción confirmada. La activación de acceso está pendiente.'); },
+      next: () => { this.confirming.set(false); this.busy.set(false); this.canCreate.set(false); this.noMatch.set(false); this.message.set('Inscripción confirmada. La activación de acceso está pendiente.'); },
       error: (error: unknown) => {
         this.confirming.set(false); this.busy.set(false);
         const type = error instanceof HttpErrorResponse ? error.error?.type : '';
-        if (type === 'urn:dsc:secretariat:identity-changed') { this.canCreate.set(false); this.message.set('El CI ya tiene coincidencias. Vuelve a buscar.'); }
+        if (type === 'urn:dsc:secretariat:identity-changed') { this.canCreate.set(false); this.noMatch.set(false); this.message.set('El CI ya tiene coincidencias. Vuelve a buscar.'); }
         else if (type === 'urn:dsc:enrollment:session-full') this.message.set('Sin cupo en esta convocatoria.');
         else if (type === 'urn:dsc:enrollment:enrollment-closed') this.message.set('La inscripción está cerrada.');
         else if (error instanceof HttpErrorResponse && error.status === 400) this.message.set('Revisa los datos obligatorios.');
-        else if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403)) { this.canCreate.set(false); this.message.set('La inscripción requiere una sesión activa de Secretaría.'); }
-        else { this.canCreate.set(false); this.message.set('El resultado de la confirmación es incierto. Verifica la inscripción antes de reintentar.'); }
+        else if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403)) { this.canCreate.set(false); this.noMatch.set(false); this.message.set('La inscripción requiere una sesión activa de Secretaría.'); }
+        else { this.canCreate.set(false); this.noMatch.set(false); this.message.set('El resultado de la confirmación es incierto. Verifica la inscripción antes de reintentar.'); }
       },
     });
+  }
+
+  /** Refleja el resultado del alta de Rover nuevo sin conservar datos personales. */
+  protected newRoverFinished(outcome: NewRoverOutcome): void {
+    this.noMatch.set(false);
+    if (outcome === 'enrolled') this.message.set('Rover inscrito.');
+    else if (outcome === 'person-exists')
+      this.message.set('Ya existe una persona con ese CI. Vuelve a buscar para inscribirla.');
+    else if (outcome === 'unauthorized' || outcome === 'forbidden') {
+      this.editCi('');
+      this.message.set(
+        outcome === 'unauthorized'
+          ? 'La sesión ha caducado. Inicia sesión nuevamente.'
+          : 'No tienes autorización para confirmar inscripciones.',
+      );
+    } else
+      this.message.set(
+        'El resultado de la confirmación es incierto. Verifica la inscripción antes de reintentar.',
+      );
   }
 
   /** Al cambiar de convocatoria elimina los datos de la consulta previa. */
@@ -223,6 +245,7 @@ export class SecretariatEnrollmentPanel {
         if (triedExtension) { this.message.set('No hay coincidencia con ese complemento. Verifica el CI antes de crear un perfil.'); return; }
         this.canCreate.set(true);
         this.message.set('No se encontró ninguna persona con los datos indicados.');
+        this.noMatch.set(true);
         return;
       }
       if (error.status === 401 || error.status === 403) {
@@ -242,6 +265,7 @@ export class SecretariatEnrollmentPanel {
     this.participant.set(null);
     this.canCreate.set(false);
     this.rover.set(false);
+    this.noMatch.set(false);
     this.message.set('');
     this.busy.set(false);
   }
