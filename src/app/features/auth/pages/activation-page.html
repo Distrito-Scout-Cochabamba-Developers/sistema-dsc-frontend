@@ -1,0 +1,84 @@
+<main class="grid min-h-dvh place-items-center bg-surface px-5 py-10 text-ink">
+  <section class="w-full max-w-md" aria-labelledby="activation-title">
+    <img
+      src="/assets/branding/dsc-grid-mark.svg"
+      width="44"
+      height="44"
+      alt="Distrito Scout Cochabamba"
+      class="mb-6"
+    />
+    <h1 id="activation-title" class="m-0 text-3xl font-bold tracking-tight">Activar cuenta</h1>
+
+    <div role="status" aria-atomic="true" class="text-ink">
+      @if (activated()) {
+        <p class="mt-4">Cuenta activada. Ya puedes iniciar sesión con tu nueva contraseña.</p>
+      } @else if (submitting()) {
+        <p class="mt-4">Activando tu cuenta…</p>
+      }
+    </div>
+
+    @if (!activated() && hasToken()) {
+      <p id="password-rules" class="my-4 text-sm text-muted">
+        Crea una contraseña de al menos 12 caracteres. El límite es de 72 bytes; las tildes y otros
+        símbolos pueden ocupar más de uno.
+      </p>
+      <form class="space-y-4" (submit)="activate($event, password, confirmation)" novalidate>
+        <div>
+          <label for="new-password" class="mb-1.5 block text-sm font-semibold"
+            >Nueva contraseña</label
+          >
+          <input
+            #password
+            id="new-password"
+            type="password"
+            autocomplete="new-password"
+            required
+            [readOnly]="submitting()"
+            [attr.aria-invalid]="invalidField() === 'password'"
+            [attr.aria-describedby]="
+              invalidField() === 'password' ? 'password-rules activation-error' : 'password-rules'
+            "
+            class="w-full rounded-md border border-muted bg-elevated px-3 py-3 focus-visible:outline-2 focus-visible:outline-dsc-dark"
+          />
+        </div>
+        <div>
+          <label for="confirm-password" class="mb-1.5 block text-sm font-semibold"
+            >Confirma la contraseña</label
+          >
+          <input
+            #confirmation
+            id="confirm-password"
+            type="password"
+            autocomplete="new-password"
+            required
+            [readOnly]="submitting()"
+            [attr.aria-invalid]="invalidField() === 'confirmation'"
+            [attr.aria-describedby]="invalidField() === 'confirmation' ? 'activation-error' : null"
+            class="w-full rounded-md border border-muted bg-elevated px-3 py-3 focus-visible:outline-2 focus-visible:outline-dsc-dark"
+          />
+        </div>
+        <p id="activation-error" role="alert" class="text-sm text-danger empty:sr-only">
+          {{ error() }}
+        </p>
+        <button
+          type="submit"
+          [disabled]="submitting()"
+          class="w-full rounded-md bg-dsc-dark px-4 py-3 text-sm font-semibold text-white hover:bg-dsc-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dsc-dark disabled:opacity-70"
+        >
+          Activar cuenta
+        </button>
+      </form>
+    } @else if (!activated()) {
+      <p class="mt-4">
+        El enlace no es válido. Usa el enlace de tu invitación o solicita otro a Secretaría.
+      </p>
+    }
+
+    <a
+      routerLink="/auth/login"
+      class="mt-6 inline-block font-semibold text-dsc-dark underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-dsc-dark"
+    >
+      Ir a iniciar sesión
+    </a>
+  </section>
+</main>
