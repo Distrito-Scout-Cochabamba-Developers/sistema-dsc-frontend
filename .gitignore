@@ -21,9 +21,6 @@ pnpm-debug.log
 # Cursor (local-only; skills personales)
 .cursor/
 
-# BMAD — preferencias personales del instalador (nombre de usuario, etc.)
-_bmad/
-
 # IDEs and editors
 .idea/
 .project

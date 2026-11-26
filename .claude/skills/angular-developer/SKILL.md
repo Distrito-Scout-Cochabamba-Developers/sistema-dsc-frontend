@@ -19,10 +19,10 @@ metadata:
 
 ## Project Integration (sistema-dsc-frontend)
 
-This repository has a binding development contract in `agents.md` (repo root) and a short system prompt in `.cloude/system-prompt.md`. **If this skill and the contract conflict, the contract wins.** Key local rules:
+This repository has a binding development contract in [agents.md](../../../agents.md). **If this skill and the contract conflict, the contract wins.** Key local rules:
 
 - **Package manager**: pnpm. Use `pnpm start`, `pnpm build`, `pnpm test`, and `pnpm dlx @angular/cli` instead of npm/npx.
-- **TypeScript-only**: no application `.js` files. Components use **inline** `template`/`styles` in the `.ts` file — never create `*.component.html` (`angular.json` schematics already enforce `inlineTemplate`/`inlineStyle`).
+- **Templates and styles**: follow the [template ADR](../../../docs/adr/0003-templates-separados-y-convenciones-v20.md) and the repository contract; CLI defaults do not override either.
 - **Architecture**: `core/` (singletons, no UI), `shared/` (dumb components, domain-agnostic), `features/` (lazy-loaded routes), `layout/` (shell). Path aliases: `@core/*`, `@shared/*`, `@features/*`, `@layout/*`.
 - **State**: Signals for local/UI state; RxJS for async streams. No global stores without an ADR in `docs/adr/`.
 - **Documentation**: JSDoc blocks are mandatory for every new service, component, public interface, guard, interceptor, and complex function.
