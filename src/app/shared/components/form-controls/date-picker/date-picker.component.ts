@@ -23,7 +23,8 @@ import { FormValueControl } from '@angular/forms/signals';
   selector: 'app-date-picker',
   standalone: true,
   templateUrl: './date-picker.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { class: 'block' },
 })
 export class DatePickerComponent implements FormValueControl<string> {
 
@@ -65,10 +66,13 @@ export class DatePickerComponent implements FormValueControl<string> {
     viewChild.required<ElementRef<HTMLInputElement>>('dateInput');
 
   /**
-   * Actualiza la fecha seleccionada.
+   * Actualiza la fecha seleccionada (evita duplicados entre `input` y `change`).
    */
   onDateChange(event: Event): void {
     const target = event.target as HTMLInputElement;
+    if (target.value === this.value()) {
+      return;
+    }
 
     this.value.set(target.value);
     this.dateChange.emit(target.value);

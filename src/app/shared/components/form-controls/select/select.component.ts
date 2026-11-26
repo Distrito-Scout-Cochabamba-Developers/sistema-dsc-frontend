@@ -29,12 +29,16 @@ export interface SelectOption {
   selector: 'app-select',
   standalone: true,
   templateUrl: './select.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { class: 'block' },
 })
 export class SelectComponent implements FormValueControl<string> {
 
   /** Identificador único del control interno. */
   readonly inputId = input.required<string>();
+
+  /** Nombre del campo para formularios HTML. */
+  readonly name = input<string>('');
 
   /** Etiqueta del selector. */
   readonly label = input.required<string>();
@@ -47,6 +51,9 @@ export class SelectComponent implements FormValueControl<string> {
 
   /** Texto de ayuda debajo del selector. */
   readonly hint = input<string>('');
+
+  /** Identificador externo para `aria-describedby`. */
+  readonly ariaDescribedBy = input<string | null>(null);
 
   /** Texto que se muestra cuando no hay selección. */
   readonly placeholder = input<string>('Seleccionar opción');

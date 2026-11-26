@@ -50,7 +50,8 @@ export type TextFieldIcon =
   selector: 'app-text-field',
   standalone: true,
   templateUrl: './text-field.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { class: 'block' },
 })
 export class TextFieldComponent implements FormValueControl<string> {
 
@@ -60,6 +61,7 @@ export class TextFieldComponent implements FormValueControl<string> {
 
   /** Identificador HTML único del elemento input interno. */
   readonly inputId = input.required<string>();
+  readonly name = input<string>('');
 
   /** Etiqueta descriptiva del campo. */
   readonly label = input.required<string>();
@@ -79,7 +81,7 @@ export class TextFieldComponent implements FormValueControl<string> {
 
   /** Tipo de entrada HTML. */
   readonly type = input<
-    'text' | 'email' | 'password' | 'search'
+    'text' | 'email' | 'password' | 'search' | 'tel' | 'number'
   >('text');
 
   /** Indica si el campo es obligatorio. */
@@ -93,6 +95,27 @@ export class TextFieldComponent implements FormValueControl<string> {
 
   /** Cantidad máxima de caracteres. */
   readonly maxLength = input<number | undefined>(undefined);
+
+  /** Sugerencia de teclado virtual (`numeric`, `tel`, etc.). */
+  readonly inputMode = input<string | null>(null);
+
+  /** Atributo HTML `autocomplete`. */
+  readonly autocomplete = input<string | null>(null);
+
+  /** Expresión regular HTML `pattern` (evita colisión con `FormValueControl.pattern`). */
+  readonly inputPattern = input<string | null>(null);
+
+  /** Valor mínimo para entradas numéricas (compatible con `FormValueControl.min`). */
+  readonly min = input<string | undefined>(undefined);
+
+  /** Incremento para entradas numéricas. */
+  readonly step = input<number | string | null>(null);
+
+  /** Identificadores adicionales para `aria-describedby`. */
+  readonly ariaDescribedBy = input<string | null>(null);
+
+  /** Anulación explícita de `aria-invalid` cuando la validación vive en el padre. */
+  readonly ariaInvalid = input<boolean | null>(null);
 
   // ==========================================
   // ESTADO DE SIGNAL FORMS
@@ -160,6 +183,24 @@ export class TextFieldComponent implements FormValueControl<string> {
   readonly hasPasswordToggle = computed(
     () => this.type() === 'password'
   );
+
+  /** Combina el hint interno con cualquier `aria-describedby` externo. */
+  readonly effectiveAriaDescribedBy = computed(() => {
+    const ids = [
+      this.hint() ? `${this.inputId()}-hint` : '',
+      this.ariaDescribedBy() ?? '',
+    ].filter(Boolean);
+    return ids.length ? ids.join(' ') : null;
+  });
+
+  /** Calcula `aria-invalid` priorizando el valor explícito del padre. */
+  readonly effectiveAriaInvalid = computed(() => {
+    const explicit = this.ariaInvalid();
+    if (explicit !== null) {
+      return explicit ? 'true' : null;
+    }
+    return this.status() === 'error' ? 'true' : null;
+  });
 
   // ==========================================
   // MÉTODOS

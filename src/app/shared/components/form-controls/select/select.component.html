@@ -15,7 +15,8 @@
     <select
       #selectElement
       [id]="inputId()"
-      [attr.aria-describedby]="hint() ? inputId() + '-hint' : null"
+      [attr.name]="name() || null"
+      [attr.aria-describedby]="ariaDescribedBy() || (hint() ? inputId() + '-hint' : null)"
       [value]="value()"
       [disabled]="disabled()"
       [required]="required()"

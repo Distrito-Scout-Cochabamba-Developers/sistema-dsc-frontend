@@ -2,9 +2,11 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   computed,
   input,
-  output
+  output,
+  viewChild
 } from '@angular/core';
 
 export type ButtonVariant =
@@ -34,7 +36,12 @@ export type ButtonType =
   selector: 'app-button',
   standalone: true,
   templateUrl: './button.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    class: 'inline-block',
+    '[class.block]': 'fullWidth()',
+    '[class.w-full]': 'fullWidth()',
+  },
 })
 export class ButtonComponent {
   // Texto visible del botón.
@@ -58,8 +65,18 @@ export class ButtonComponent {
   // Accesibilidad para botones sin texto visible.
   readonly ariaLabel = input<string>('');
 
+  // Estado de disclosure (menús, paneles): `aria-expanded` y `aria-controls`.
+  readonly ariaExpanded = input<boolean | null>(null);
+  readonly ariaControls = input<string>('');
+
+  // Botón conmutable (p. ej. selector de vista): `aria-pressed`. `null` lo omite.
+  readonly ariaPressed = input<boolean | null>(null);
+
   // Evento de clic.
   readonly clicked = output<MouseEvent>();
+
+  // Botón nativo, para devolver el foco desde el componente padre.
+  private readonly nativeButton = viewChild.required<ElementRef<HTMLButtonElement>>('nativeButton');
 
   // Clases base compartidas por todas las variantes.
   private readonly baseClasses =
@@ -73,14 +90,15 @@ export class ButtonComponent {
     lg: 'min-h-12 px-5 py-2.5 text-base'
   };
 
-  // Clases por variante y color.
+  // Clases por variante y color. El azul primario de texto y fondo es `dsc-primary-hover`
+  // (#006a9b, 5,9:1 con blanco): `dsc-primary` (#009ee2) solo llega a 3:1 y queda para bordes.
   private readonly variantClasses: Record<
     ButtonVariant,
     Record<ButtonColor, string>
   > = {
     solid: {
       primary:
-        'bg-dsc-primary text-white hover:bg-sky-700 focus-visible:ring-sky-500 disabled:bg-sky-200 disabled:text-white',
+        'bg-dsc-primary-hover text-white hover:bg-dsc-dark focus-visible:ring-sky-500 disabled:bg-sky-200 disabled:text-white',
       secondary:
         'bg-dsc-secondary text-white hover:bg-yellow-700 focus-visible:ring-yellow-500 disabled:bg-yellow-200 disabled:text-yellow-500',
       danger:
@@ -91,7 +109,7 @@ export class ButtonComponent {
 
     outline: {
       primary:
-        'border border-dsc-primary bg-transparent text-dsc-primary hover:bg-sky-50 focus-visible:ring-sky-500 disabled:border-slate-200 disabled:text-slate-400',
+        'border border-dsc-primary bg-transparent text-dsc-primary-hover hover:bg-sky-50 focus-visible:ring-sky-500 disabled:border-slate-200 disabled:text-slate-400',
       secondary:
         'border border-dsc-secondary bg-transparent text-dsc-secondary hover:bg-yellow-100 focus-visible:ring-yellow-500 disabled:border-yellow-200 disabled:text-yellow-400',
       danger:
@@ -102,7 +120,7 @@ export class ButtonComponent {
 
     text: {
       primary:
-        'bg-transparent text-dsc-primary hover:bg-sky-50 focus-visible:ring-sky-500 disabled:text-slate-400',
+        'bg-transparent text-dsc-primary-hover hover:bg-sky-50 focus-visible:ring-sky-500 disabled:text-slate-400',
       secondary:
         'bg-transparent text-dsc-secondary hover:bg-yellow-100 focus-visible:ring-yellow-500 disabled:text-yellow-400',
       danger:
@@ -139,6 +157,11 @@ export class ButtonComponent {
   readonly isDisabled = computed(() => {
     return this.disabled() || this.loading();
   });
+
+  /** Mueve el foco al botón nativo (p. ej. al cerrar un menú con Escape). */
+  focus(): void {
+    this.nativeButton().nativeElement.focus();
+  }
 
   onClick(event: MouseEvent): void {
     if (this.isDisabled()) {

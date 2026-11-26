@@ -22,7 +22,8 @@ import { FormValueControl } from '@angular/forms/signals';
   selector: 'app-textarea',
   standalone: true,
   templateUrl: './textarea.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { class: 'block' },
 })
 export class TextareaComponent implements FormValueControl<string> {
 

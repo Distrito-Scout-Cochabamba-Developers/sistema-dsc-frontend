@@ -14,6 +14,7 @@ export interface SummaryItem {
 @Component({
   selector: 'app-summary-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { class: 'block' },
   template: `
     <dl class="space-y-3 rounded-xl bg-surface p-4 text-sm">
       @for (item of items(); track item.label) {

@@ -50,7 +50,8 @@ export type BadgeSize = 'sm' | 'md' | 'lg';
   selector: 'app-badge',
   standalone: true,
   templateUrl: './badge.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { class: 'inline-block' },
 })
 export class BadgeComponent {
 
@@ -82,12 +83,12 @@ export class BadgeComponent {
     Record<BadgeColor, string>
   > = {
     solid: {
-      primary: 'bg-dsc-primary text-white',
-      secondary: 'bg-dsc-secondary text-white',
-      success: 'bg-emerald-600 text-white',
-      warning: 'bg-amber-500 text-white',
+      primary: 'bg-dsc-primary-hover text-white',
+      secondary: 'bg-dsc-secondary text-dsc-navy',
+      success: 'bg-emerald-700 text-white',
+      warning: 'bg-amber-700 text-white',
       danger: 'bg-[#BA1A1A] text-white',
-      info: 'bg-sky-600 text-white',
+      info: 'bg-sky-700 text-white',
       default: 'bg-dsc-default text-white',
     },
     soft: {
@@ -100,13 +101,13 @@ export class BadgeComponent {
       default: 'bg-slate-200 text-slate-700'
     },
     outline: {
-      primary: 'border border-dsc-primary text-dsc-primary',
+      primary: 'border border-dsc-primary text-dsc-primary-hover',
       secondary: 'border border-dsc-secondary text-dsc-secondary',
       success: 'border border-emerald-600 text-emerald-700',
       warning: 'border border-amber-500 text-amber-700',
       danger: 'border border-[#BA1A1A] text-[#BA1A1A]',
       info: 'border border-sky-600 text-sky-700',
-      default: 'border border-slate-600 text-slate-70'
+      default: 'border border-slate-600 text-slate-700'
     }
   };
 

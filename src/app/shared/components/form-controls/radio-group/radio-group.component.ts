@@ -29,7 +29,8 @@ export interface RadioOption {
   selector: 'app-radio-group',
   standalone: true,
   templateUrl: './radio-group.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { class: 'block' },
 })
 export class RadioGroupComponent implements FormValueControl<string> {
 

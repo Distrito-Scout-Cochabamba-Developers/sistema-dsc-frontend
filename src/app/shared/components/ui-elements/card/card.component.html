@@ -18,12 +18,12 @@
   }
 
   <div [class]="contentClasses()">
-    <ng-content></ng-content>
+    <ng-content />
   </div>
 
   @if (footer()) {
     <footer class="border-t border-slate-100 px-5 py-3">
-      <ng-content select="[card-footer]"></ng-content>
+      <ng-content select="[card-footer]" />
     </footer>
   }
 

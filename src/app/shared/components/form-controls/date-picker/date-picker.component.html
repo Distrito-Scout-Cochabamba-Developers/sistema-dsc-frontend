@@ -58,6 +58,7 @@
              disabled:bg-slate-100
              disabled:text-slate-400
              disabled:shadow-none"
+      (input)="onDateChange($event)"
       (change)="onDateChange($event)"
       (blur)="onBlur()"
     />

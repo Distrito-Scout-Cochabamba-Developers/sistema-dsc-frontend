@@ -22,7 +22,8 @@ import { FormValueControl } from '@angular/forms/signals';
   selector: 'app-tag-input',
   standalone: true,
   templateUrl: './tag-input.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { class: 'block' },
 })
 export class TagInputComponent implements FormValueControl<string[]> {
 

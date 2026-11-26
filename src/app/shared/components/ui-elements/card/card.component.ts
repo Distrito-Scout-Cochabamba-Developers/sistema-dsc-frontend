@@ -30,7 +30,8 @@ export type CardPadding = 'none' | 'sm' | 'md' | 'lg';
   selector: 'app-card',
   standalone: true,
   templateUrl: './card.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { class: 'block' },
 })
 export class CardComponent {
 

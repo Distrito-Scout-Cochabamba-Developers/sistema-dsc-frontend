@@ -20,7 +20,8 @@ import { FormCheckboxControl } from '@angular/forms/signals';
   selector: 'app-toggle',
   standalone: true,
   templateUrl: './toggle.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { class: 'block' },
 })
 export class ToggleComponent implements FormCheckboxControl {
 

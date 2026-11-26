@@ -10,6 +10,7 @@ import { RouterLink } from '@angular/router';
   selector: 'app-state-card',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink],
+  host: { class: 'block' },
   template: `
     <section class="rounded-2xl border border-danger/30 bg-danger-soft p-6 text-danger">
       <h1 class="text-xl font-bold">{{ title() }}</h1>

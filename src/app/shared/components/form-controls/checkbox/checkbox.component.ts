@@ -20,7 +20,8 @@ import { FormCheckboxControl } from '@angular/forms/signals';
   selector: 'app-checkbox',
   standalone: true,
   templateUrl: './checkbox.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { class: 'block' },
 })
 export class CheckboxComponent implements FormCheckboxControl {
 

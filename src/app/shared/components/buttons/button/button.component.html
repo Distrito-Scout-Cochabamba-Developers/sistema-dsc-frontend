@@ -1,9 +1,13 @@
 
 <button
+  #nativeButton
   [type]="type()"
   [class]="buttonClasses()"
   [disabled]="isDisabled()"
   [attr.aria-label]="ariaLabel() || null"
+  [attr.aria-expanded]="ariaExpanded() === null ? null : ariaExpanded()"
+  [attr.aria-controls]="ariaControls() || null"
+  [attr.aria-pressed]="ariaPressed() === null ? null : ariaPressed()"
   [attr.aria-busy]="loading() ? 'true' : null"
   (click)="onClick($event)"
 >
@@ -15,19 +19,19 @@
     ></span>
   } @else {
     <!-- Icono izquierdo -->
-    <ng-content select="[button-icon-left]"></ng-content>
+    <ng-content select="[button-icon-left]" />
   }
 
   <!-- Texto del botón -->
   @if (label()) {
-    <span>{{ loading() ? label() : label() }}</span>
+    <span>{{ label() }}</span>
   } @else {
-    <ng-content></ng-content>
+    <ng-content />
   }
 
   <!-- Icono derecho -->
   @if (!loading()) {
-    <ng-content select="[button-icon-right]"></ng-content>
+    <ng-content select="[button-icon-right]" />
   }
 </button>
 

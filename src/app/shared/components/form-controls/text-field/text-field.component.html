@@ -132,6 +132,7 @@
     <input
       #inputElement
       [id]="inputId()"
+      [attr.name]="name() || null"
       [type]="effectiveType()"
       [value]="value()"
       [placeholder]="placeholder()"
@@ -139,8 +140,13 @@
       [readOnly]="readonlyMode()"
       [disabled]="disabled()"
       [attr.maxlength]="maxLength() ?? null"
-      [attr.aria-invalid]="status() === 'error' ? 'true' : null"
-      [attr.aria-describedby]="hint() ? inputId() + '-hint' : null"
+      [attr.inputmode]="inputMode()"
+      [attr.autocomplete]="autocomplete()"
+      [attr.pattern]="inputPattern()"
+      [attr.min]="min() ?? null"
+      [attr.step]="step()"
+      [attr.aria-invalid]="effectiveAriaInvalid()"
+      [attr.aria-describedby]="effectiveAriaDescribedBy()"
 
       class="min-w-0 flex-1 bg-transparent py-2
             text-sm text-dsc-text outline-none
