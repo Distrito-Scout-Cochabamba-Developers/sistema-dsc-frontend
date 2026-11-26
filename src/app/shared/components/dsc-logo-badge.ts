@@ -8,13 +8,12 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
   selector: 'app-dsc-logo-badge',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <span
-      class="grid place-items-center rounded-full bg-dsc-navy font-bold text-white"
+    <img
+      src="/assets/branding/logo-dsc.png"
       [class]="sizeClasses()"
       aria-hidden="true"
-    >
-      DSC
-    </span>
+      alt=""
+    />
   `,
 })
 export class DscLogoBadge {
