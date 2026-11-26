@@ -6,6 +6,6 @@ Pendiente de producto (no bloquea el calendario):
 
 | Gap | Notas |
 | --- | ----- |
-| UI admin de convocatorias | El alta es `POST /api/v1/admin/modules/{id}/sessions` (Scalar). |
+| UI admin de programaciones | El alta es `POST /api/v1/admin/modules/{id}/sessions` (Scalar). |
 | Varios bloques / varios días | Una tarjeta; la grilla pinta el día de `startsAt`. |
 | Inscripción asistida por Secretaría | Historia 2.3, fuera de esta entrega. |

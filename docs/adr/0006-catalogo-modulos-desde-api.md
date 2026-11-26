@@ -1,4 +1,4 @@
-# 0006. Catálogo de módulos desde la API
+# 0006. Módulos de formación desde la API
 
 - Estado: Accepted
 - Fecha: 2026-10-16
@@ -17,6 +17,6 @@ El ADR 0004 resolvía metadatos de sesión en el cliente (cualquier `sessionId` 
 
 ## Consecuencias
 
-- El catálogo vacío es un estado válido (`[]`).
+- El catálogo de módulos vacío es un estado válido (`[]`).
 - Deep links rotos ya no fabrican una sesión local.
 - Hace falta semilla de `training_module` (y de tipos de contacto para el POST). El GET de convocatoria (fecha/horario) sigue pendiente.

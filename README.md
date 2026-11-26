@@ -48,7 +48,7 @@ App en http://localhost:4200. Detalle en el README de esa carpeta.
 
 `pnpm start` proxifica `/api` a `http://localhost:5090`. La API no declara CORS.
 
-Catálogo: http://localhost:4200/modulos (el formulario se abre al elegir un módulo).
+Catálogo de módulos: http://localhost:4200/modulos (el formulario se abre al elegir un módulo).
 
 Calendario: http://localhost:4200/calendario (público; inscripción con login). Ver [docs/features/calendario-modulos.md](./docs/features/calendario-modulos.md).
 
@@ -106,34 +106,7 @@ docs/features/      # Documentación por feature
 2. TypeScript `strict` + `strictTemplates`.
 3. JSDoc obligatorio en servicios, componentes, interfaces públicas y funciones complejas.
 4. Features con `loadChildren` / `loadComponent`.
-5. Agentes: leer `agents.md`, `.cloude/system-prompt.md`, `_bmad-output/project-context.md` y `docs/seguimiento.md` antes de codificar.
-
-## BMAD Method
-
-Framework de orquestación de agentes (planificación → implementación por historias). Instalado con **pnpm** (no npm/npx):
-
-```bash
-pnpm dlx bmad-method@latest install --yes \
-  --modules bmm \
-  --tools claude-code,cursor \
-  --communication-language Spanish \
-  --document-output-language Spanish \
-  --output-folder _bmad-output \
-  --set bmm.project_knowledge=docs \
-  --set bmm.user_skill_level=intermediate
-```
-
-| Ruta | Uso |
-| ---- | --- |
-| `_bmad/` | Core + BMM (agentes, workflows, config) |
-| `_bmad-output/` | PRDs, architecture, stories, sprint status |
-| `_bmad-output/project-context.md` | Contexto brownfield (apunta a `agents.md`) |
-| `.claude/skills/` | Skills BMAD para **Claude Code** (equipo) |
-| `.agents/skills/` | Skills BMAD para **Cursor** (compartidas) |
-| `.cloude/` | Contrato local (`system-prompt` + skill Angular) |
-| `.cursor/` | Solo local (gitignored) |
-
-Arranque: en Claude Code o Cursor, invocar **`bmad-help`**.
+5. Agentes: seguir el [contrato de desarrollo](./agents.md) y sus referencias según la tarea.
 
 ## Documentación para agentes
 
@@ -146,10 +119,9 @@ Arranque: en Claude Code o Cursor, invocar **`bmad-help`**.
 | [`docs/features/catalogo-admin-modulos.md`](./docs/features/catalogo-admin-modulos.md) | Admin `/admin/modulos` |
 | [`docs/features/asistencia-registro.md`](./docs/features/asistencia-registro.md) | Feature registro de asistencia |
 | [`docs/`](./docs/README.md) | Índice de documentación técnica |
-| [`_bmad-output/project-context.md`](./_bmad-output/project-context.md) | Contexto BMAD / brownfield |
-| [`.cloude/system-prompt.md`](./.cloude/system-prompt.md) | System prompt obligatorio |
-| [`.cloude/angular-developer/`](./.cloude/angular-developer/SKILL.md) | Skill de Angular compartida |
-| `_bmad/` | Workflows y agentes BMAD |
+| [`CODING_STANDARDS.md`](./CODING_STANDARDS.md) | Estándares de revisión de UI |
+| [`.claude/system-prompt.md`](./.claude/system-prompt.md) | Entrada al contrato para Claude |
+| [Skill Angular](./.claude/skills/angular-developer/SKILL.md) | Guía técnica compartida |
 | `docs/adr/` | Decisiones arquitectónicas |
 
 ## Licencia

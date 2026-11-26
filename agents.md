@@ -1,6 +1,6 @@
 # agents.md — Contrato de Desarrollo
 
-Documento normativo para humanos y agentes de IA (BMAD u otros). **Léelo completo antes de crear o modificar código en este repositorio.**
+Documento normativo para humanos y agentes de IA. **Léelo completo antes de crear o modificar código en este repositorio.**
 
 ---
 
@@ -165,26 +165,9 @@ Formato ADR sugerido: `docs/adr/NNNN-titulo-corto.md` (estado: Proposed | Accept
 
 ### 5.3 Archivos de contexto IA
 
-Antes de escribir código, el agente debe haber leído:
-
-1. Este archivo (`agents.md`)
-2. `.cloude/system-prompt.md`
-3. El `README.md` (arquitectura y convenciones)
-4. `_bmad-output/project-context.md` (si el flujo es BMAD)
-5. `docs/seguimiento.md` para saber qué está hecho y qué falta
-
-Para guía técnica de Angular por tema (signals, forms, DI, HTTP, routing, performance, testing, etc.), consultar la skill compartida `.cloude/angular-developer/SKILL.md` y sus `references/` (versión para Claude Code / equipo). Quienes usen Cursor pueden mantener una copia local en `.cursor/skills/angular-developer/` (ignorada por Git). Ante conflicto, este contrato prevalece sobre la skill y sobre BMAD.
-
-### BMAD Method
-
-El proyecto usa BMAD (módulo BMM) para planificación e implementación por historias.
-
-- Equipo (Claude Code): skills en `.claude/skills/`
-- Cursor (compartido): skills en `.agents/skills/`
-- Artefactos: `_bmad-output/`
-- Reinstalar / actualizar solo con **pnpm**: `pnpm dlx bmad-method@latest install`
-
-Primera acción recomendada: invocar `bmad-help`.
+- **UI:** Antes de modificar una pantalla, revisa los [estándares de UI](./CODING_STANDARDS.md) para localizar componentes compartidos y preparar la revisión móvil.
+- **Angular:** Consulta la [skill técnica](./.claude/skills/angular-developer/SKILL.md) para el tema que estés implementando. Este contrato prevalece sobre la skill.
+- **Contexto:** Consulta el [README](./README.md) para arquitectura y comandos, y el [seguimiento](./docs/seguimiento.md) para el estado del trabajo.
 
 ---
 
@@ -222,12 +205,12 @@ Cualquier generación que incumpla este contrato (especialmente ausencia de JSDo
 
 ### Issue tracker
 
-Track work items in Azure DevOps Boards (org: wimpi, project: Sistema Distrito Scout Cochabamba) via azure-devops MCP. See `docs/agents/issue-tracker.md`.
+For work items, follow the [Azure DevOps Boards workflow](./docs/agents/issue-tracker.md).
 
 ### Triage labels
 
-When triaging or publishing work items, use the Azure DevOps tags in `docs/agents/triage-labels.md`.
+When triaging or publishing work items, use the [canonical Azure DevOps tags](./docs/agents/triage-labels.md).
 
 ### Domain docs
 
-Use the single-context domain-docs layout. Read relevant glossary terms and ADRs before domain or architecture work; missing docs are fine. See `docs/agents/domain.md`.
+Before changing domain terminology or architecture, follow the [single-context domain guide](./docs/agents/domain.md) for glossary and ADR lookup.

@@ -8,7 +8,7 @@ Base local: `/api` (proxy `ng serve` → `http://localhost:5090`). JSON camelCas
 
 ### `GET /api/attendance/modules`
 
-Catálogo para `/modulos`. `200` → `TrainingModuleApiDto[]` (puede ser vacío).
+Catálogo de módulos para `/modulos`. `200` → `TrainingModuleApiDto[]` (puede ser vacío).
 
 ### `GET /api/attendance/modules/{code}`
 
@@ -21,8 +21,8 @@ Metadatos del módulo (`code` = `sessionToken` del POST). `200` → `TrainingMod
 | | |
 | - | - |
 | 200 | `ScoutLeaderApiDto` |
-| 404 | CI desconocido → registro parcial |
-| 400 | CI o extensión inválidos |
+| 404 | Carnet de Identidad desconocido → registro parcial |
+| 400 | Carnet de Identidad o extensión inválidos |
 
 ### `POST /api/attendance/register`
 

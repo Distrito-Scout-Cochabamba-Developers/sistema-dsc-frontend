@@ -21,5 +21,5 @@ El backend ya expone `POST /api/auth/login/email` (y `/login`, `/login/username`
 
 - En desarrollo el proxy debe reescribir la cookie a `localhost`.
 - «Cerrar sesión» es incompleto hasta que exista logout en API.
-- El perfil autenticado no prellena asistencia (no hay CI en `/me`).
+- El perfil autenticado no prellena asistencia (no hay Carnet de Identidad en `/me`).
 - Gaps: [auth-backend-gaps.md](../features/auth-backend-gaps.md).

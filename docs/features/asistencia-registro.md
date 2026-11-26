@@ -1,6 +1,6 @@
 # Feature: Registro de asistencia a módulo
 
-- **Estado:** Catálogo en `/modulos` (GET API). El formulario de asistencia solo se abre al elegir un módulo. Login **completado**. Registro **según rol** pendiente de API.
+- **Estado:** Catálogo de módulos en `/modulos` (GET API). El formulario de asistencia solo se abre al elegir un módulo. Login **completado**. Registro **según rol** pendiente de API.
 - **Rutas:** `/modulos` → `/asistencia/:sessionId`
 - **Demo:** `/asistencia/mod-liderazgo-20241024`
 - **Última actualización:** 2026-10-16
@@ -18,7 +18,7 @@ src/app/
 │   ├── models/attendance-api.models.ts
 │   └── services/training-modules.service.ts
 ├── features/modules/          # listado; click → /asistencia/:code
-├── features/attendance/       # formulario (no se muestra en el catálogo)
+├── features/attendance/       # formulario (no se muestra en el catálogo de módulos)
 └── layout/main-layout/
 ```
 
@@ -27,7 +27,7 @@ Listado: [modulos-catalogo.md](./modulos-catalogo.md). Contrato: [contrato-api-a
 ## Pendiente fuera de este frontend
 
 - [x] Auth real (login JWT Bearer + `/me`) — ver [auth-login.md](./auth-login.md)
-- [x] GET de catálogo / módulo por código (`GET /api/attendance/modules`)
+- [x] GET de catálogo de módulos / módulo por código (`GET /api/attendance/modules`)
 - [ ] QR generado por admin
 - [ ] CORS o reverse proxy en producción
 - [ ] Registro a módulos según rol (admin/secretaría vs. autoinscripción) — ver [asistencia-registro-por-rol.md](./asistencia-registro-por-rol.md)

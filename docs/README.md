@@ -1,6 +1,6 @@
 # Documentación técnica — Sistema DSC Frontend
 
-Índice de la documentación de proyecto (conocimiento de largo plazo para humanos y agentes BMAD).
+Índice de la documentación del proyecto para el equipo y los agentes.
 
 | Documento | Contenido |
 | --------- | --------- |
@@ -9,8 +9,8 @@
 | [features/auth-backend-gaps.md](./features/auth-backend-gaps.md) | Límites que quedan (logout, asistencia anónima) |
 | [features/modulos-catalogo.md](./features/modulos-catalogo.md) | Listado `/modulos`; el formulario solo al elegir un módulo |
 | [features/calendario-modulos.md](./features/calendario-modulos.md) | Calendario público `/calendario` e inscripción de dirigentes |
-| [features/busqueda-secretaria.md](./features/busqueda-secretaria.md) | Consulta de solo lectura por CI desde una convocatoria |
-| [features/calendario-backend-gaps.md](./features/calendario-backend-gaps.md) | GET/POST de convocatorias que faltan |
+| [features/busqueda-secretaria.md](./features/busqueda-secretaria.md) | Consulta de solo lectura por Carnet de Identidad desde una programación |
+| [features/calendario-backend-gaps.md](./features/calendario-backend-gaps.md) | GET/POST de programaciones que faltan |
 | [features/catalogo-admin-modulos.md](./features/catalogo-admin-modulos.md) | Admin `/admin/modulos` (ADMIN / secretaría) |
 | [features/catalogo-admin-backend-gaps.md](./features/catalogo-admin-backend-gaps.md) | POST/PUT y Authorize que faltan |
 | [features/asistencia-registro.md](./features/asistencia-registro.md) | Feature de registro de asistencia (frontend) |
@@ -24,9 +24,9 @@
 | Archivo | Rol |
 | ------- | --- |
 | [`agents.md`](../agents.md) | Contrato de desarrollo (prevalece) |
-| [`_bmad-output/project-context.md`](../_bmad-output/project-context.md) | Contexto BMAD brownfield |
-| [`.cloude/system-prompt.md`](../.cloude/system-prompt.md) | System prompt de agentes |
-| [`.cloude/angular-developer/`](../.cloude/angular-developer/SKILL.md) | Skill Angular compartida |
+| [`CODING_STANDARDS.md`](../CODING_STANDARDS.md) | Estándares de revisión de UI |
+| [`.claude/system-prompt.md`](../.claude/system-prompt.md) | Entrada al contrato para Claude |
+| [Skill Angular](../.claude/skills/angular-developer/SKILL.md) | Guía técnica compartida |
 
 ## Cómo mantener el seguimiento
 

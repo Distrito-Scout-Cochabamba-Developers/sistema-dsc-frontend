@@ -7,7 +7,7 @@
 
 ## Qué hace
 
-1. Vista **mensual** (grilla lun–dom, zona local) y vista **lista** de convocatorias próximas.
+1. Vista **mensual** (grilla lun–dom, zona local) y vista **lista** de programaciones próximas.
 2. Click en **Inscribirme** (sesión disponible) abre un modal nativo de confirmación.
 3. Tras un POST 201 la tarjeta pasa a **Inscrito** con Signals (sin recargar la página).
 4. Un **409 Conflict** muestra el `detail`. Si el mensaje no habla de inscripción duplicada, marca **Cupo lleno**.

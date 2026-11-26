@@ -19,6 +19,8 @@ If these files don't exist, proceed silently. Don't flag their absence or sugges
 
 When naming a domain concept, use the term as defined in `GLOSSARY.md`. If a needed concept isn't there yet, reconsider the wording or note the gap for domain modeling.
 
+Apply this to user-facing copy, routes, and states as well as code. When a shared term changes, update both the frontend `GLOSSARY.md` and `../sistema-dsc-backend/GLOSSARY.md` together.
+
 ## Flag ADR conflicts
 
 If a proposed change contradicts an existing ADR, surface the conflict explicitly rather than silently overriding it.

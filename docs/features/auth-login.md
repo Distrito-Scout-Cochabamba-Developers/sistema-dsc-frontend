@@ -65,4 +65,4 @@ Contraseña local (Docker / Compose): **`1234`** (`DSC_SEED_PASSWORD`). El seede
 
 ## Pendiente de API (no bloquea este login)
 
-Logout que invalide el token, Google, registro de cuenta, CI en `/me`, `[Authorize]` en asistencia. Ver [auth-backend-gaps.md](./auth-backend-gaps.md).
+Logout que invalide el token, Google, registro de cuenta, Carnet de Identidad en `/me`, `[Authorize]` en asistencia. Ver [auth-backend-gaps.md](./auth-backend-gaps.md).

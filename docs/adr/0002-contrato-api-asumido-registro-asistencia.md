@@ -6,7 +6,7 @@
 
 ## Contexto
 
-El ADR [0001](./0001-mocks-frontend-antes-de-api.md) autorizó implementar la feature `asistencia` con servicios mock en frontend mientras no existe backend (`sistema-dsc-backend` sigue siendo scaffold: `DSC.Domain`, `DSC.Application`, `DSC.Infrastructure` sin entidades reales). El PRD del backend (`_bmad-output/planning-artifacts/prd.md`) ya describe formalmente este alcance como **Módulo A: `FR-REG-01` a `FR-REG-06`**, pero no existe todavía una Architecture/Epic que traduzca esos requisitos a un contrato técnico (entidades, DTOs, endpoints).
+El ADR [0001](./0001-mocks-frontend-antes-de-api.md) autorizó implementar `asistencia` con servicios mock. Al tomar esta decisión, el backend aún era un scaffold y los requisitos de registro de asistencia (`FR-REG-01` a `FR-REG-06`) todavía no tenían un contrato técnico de entidades, DTO y endpoints.
 
 Como resultado, el frontend tomó decisiones de forma unilateral sobre la forma de los datos y las reglas de validación, únicamente para poder construir la UI. Este ADR existe para que esas decisiones queden **explícitas y revisables**, en vez de ocultas dentro de `core/services/*` y `core/utils/ci.utils.ts`, y sirvan de insumo para el ítem `B-01` de `docs/seguimiento.md`.
 
@@ -17,7 +17,7 @@ Como resultado, el frontend tomó decisiones de forma unilateral sobre la forma 
 | Método | Ruta propuesta | Uso | FR relacionado |
 | --- | --- | --- | --- |
 | `GET` | `/api/asistencia/sesiones/{sessionId}` | Resolver metadatos de la sesión de módulo desde el deep link/QR | `FR-REG-01` |
-| `GET` | `/api/adultos/{ci}` | Lookup de adulto del distrito por CI (autocompletado) | `FR-REG-03` |
+| `GET` | `/api/adultos/{ci}` | Lookup de adulto del distrito por Carnet de Identidad (autocompletado) | `FR-REG-03` |
 | `GET` | `/api/auth/session` | Recuperar perfil del dirigente autenticado (o 401) | `FR-REG-04` |
 | `POST` | `/api/asistencia/registros` | Registrar asistencia (completa o parcial) | `FR-REG-02`, `FR-REG-05`, `FR-REG-06` |
 
@@ -35,9 +35,9 @@ Implementación actual mock equivalente: `AdultosDirectoryService.getModuloSesio
 
 ### Reglas de validación asumidas (`core/utils/ci.utils.ts`)
 
-- **CI**: solo dígitos, longitud 7–10 (`CI_NUMBER_PATTERN` / `isValidCiNumber`).
+- **Carnet de Identidad**: solo dígitos, longitud 7–10 (`CI_NUMBER_PATTERN` / `isValidCiNumber`).
 - **Teléfono**: solo dígitos, longitud exacta 8 (`BOLIVIA_MOBILE_PATTERN` / `isValidBoliviaMobile`), asumiendo móvil boliviano.
-- **Extensión (departamento)**: catálogo cerrado y **hardcodeado en frontend** (`CI_EXTENSIONS`, 9 departamentos de Bolivia) — no proviene de ningún endpoint.
+- **Extensión (departamento)**: catálogo de módulos cerrado y **hardcodeado en frontend** (`CI_EXTENSIONS`, 9 departamentos de Bolivia) — no proviene de ningún endpoint.
 
 ## Preguntas abiertas para el Architect del backend
 
@@ -46,7 +46,7 @@ Estas son decisiones que el frontend NO puede tomar por sí solo y que este ADR 
 1. **Autenticación real**: el PRD (`NFR-SEC-01`) exige JWT Bearer con roles (`DD`, `SD`, `CAE`, `DS`, etc.). El mock actual (`AuthSessionService`) no tiene login real ni interceptor — falta decidir el flujo completo (login endpoint, almacenamiento de token, refresh).
 2. **Ciclo de vida del "Registro Parcial"** (`FR-REG-05` + `FR-SEC-02`/`FR-SEC-03`): el mock modela un campo `estado: 'completo' | 'parcial'`. El contrato real probablemente necesita más estados (ej. `'regularizado'`) y un endpoint para que Secretaría (`SD`) lo complete — no solo un valor de un solo sentido.
 3. **Generación del QR/enlace** (`FR-REG-01`): no está decidido si el backend genera y persiste el `sessionId`/QR (endpoint de creación de sesión para `SD`/`CAE`) o si es responsabilidad exclusiva del frontend generar un QR client-side apuntando a un `sessionId` ya creado manualmente.
-4. **Catálogo de extensiones/departamentos**: ¿debe venir de un endpoint (`GET /api/catalogos/extensiones`) en vez de estar hardcodeado en el frontend? Afecta mantenibilidad si cambia la taxonomía.
+4. **Catálogo de módulos de extensiones/departamentos**: ¿debe venir de un endpoint (`GET /api/catalogos/extensiones`) en vez de estar hardcodeado en el frontend? Afecta mantenibilidad si cambia la taxonomía.
 
 ## Consecuencias
 
