@@ -3,7 +3,7 @@
  * Las features se cargan de forma diferida; no importar features de forma eager.
  * Auth vive fuera del shell para coincidir con el login a pantalla completa.
  * `/admin/modulos` usa `authGuard` + `roleGuard` (ADMIN / DISTRICT_SECRETARY).
- * `/modulos`, `/calendario` y `/asistencia` siguen públicos.
+ * `/calendario` y `/asistencia` siguen públicos.
  */
 import { isDevMode } from '@angular/core';
 import { Routes } from '@angular/router';
@@ -33,11 +33,6 @@ export const routes: Routes = [
           import('@features/landing/landing.routes').then((m) => m.LANDING_ROUTES),
       },
       {
-        path: 'modulos',
-        loadChildren: () =>
-          import('@features/modules/modules.routes').then((m) => m.MODULES_ROUTES),
-      },
-      {
         path: 'calendario',
         loadChildren: () =>
           import('@features/training-calendar/training-calendar.routes').then(
@@ -46,6 +41,11 @@ export const routes: Routes = [
       },
       {
         path: 'secretaria/convocatorias',
+        redirectTo: 'secretaria/inscripciones',
+        pathMatch: 'full',
+      },
+      {
+        path: 'secretaria/inscripciones',
         canActivate: [roleGuard('DISTRICT_SECRETARY')],
         loadComponent: () =>
           import('@features/secretariat/secretariat-enrollment-panel').then(

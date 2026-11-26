@@ -1,129 +1,93 @@
-<div class="grid min-h-dvh grid-rows-[auto_1fr_auto] bg-surface text-ink">
-  <a
-    href="#contenido-principal"
-    class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-dsc focus:px-3 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
-  >
-    Saltar al contenido
-  </a>
-  <header class="sticky top-0 z-20 border-b border-border bg-elevated/95 backdrop-blur">
-    <div
-      class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-3 md:px-6"
-    >
-      <a class="flex items-center gap-2 no-underline" routerLink="/">
-        <app-dsc-logo-badge size="md" />
-        <span class="text-lg font-bold text-dsc-navy">DSC</span>
-      </a>
-
-      <nav
-        class="order-3 flex w-full flex-wrap items-center justify-center gap-x-4 gap-y-3 text-sm font-medium text-muted lg:order-none lg:w-auto"
-        aria-label="Principal"
-      >
-        <a
-          routerLink="/"
-          routerLinkActive="text-dsc border-b-2 border-dsc"
-          [routerLinkActiveOptions]="{ exact: true }"
-          class="border-b-2 border-transparent pb-0.5 text-ink no-underline hover:text-dsc"
-        >
-          Inicio
-        </a>
-        <a
-          routerLink="/calendario"
-          routerLinkActive="text-dsc border-b-2 border-dsc"
-          class="border-b-2 border-transparent pb-0.5 text-ink no-underline hover:text-dsc"
-        >
-          Calendario
-        </a>
-        <a
-          routerLink="/modulos"
-          routerLinkActive="text-dsc border-b-2 border-dsc"
-          class="border-b-2 border-transparent pb-0.5 text-ink no-underline hover:text-dsc"
-        >
-          Módulos
-        </a>
-        @if (auth.hasRole('DISTRICT_SECRETARY')) {
-          <a
-            routerLink="/secretaria/convocatorias"
-            routerLinkActive="text-dsc-dark border-b-2 border-dsc"
-            class="border-b-2 border-transparent pb-0.5 text-ink no-underline hover:text-dsc-dark focus-visible:ring-2 focus-visible:ring-dsc"
-          >Secretaría</a>
-        }
-        @if (canManageCatalog()) {
-          <a
-            routerLink="/admin/modulos"
-            routerLinkActive="text-dsc-dark border-b-2 border-dsc"
-            class="border-b-2 border-transparent pb-0.5 text-ink no-underline hover:text-dsc-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dsc focus-visible:ring-offset-2"
-          >
-            Catálogo
-          </a>
-        }
-        @if (canManageCurriculum()) {
-          <a
-            routerLink="/admin/requisitos-formacion"
-            routerLinkActive="text-dsc-dark border-b-2 border-dsc"
-            class="border-b-2 border-transparent pb-0.5 text-ink no-underline hover:text-dsc-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dsc focus-visible:ring-offset-2"
-          >
-            Requisitos de formación
-          </a>
-        }
-        <span
-          class="cursor-not-allowed border-b-2 border-transparent pb-0.5 text-ink/50"
-          aria-disabled="true"
-        >
-          Mapa
-        </span>
+﻿<div class="relative grid min-h-dvh grid-rows-[auto_1fr_auto] bg-surface text-ink">
+  <a href="#contenido-principal" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-dsc-dark focus:p-3 focus:text-white">Saltar al contenido</a>
+  <header class="sticky top-0 z-20 border-b border-border bg-elevated">
+    <div class="mx-auto flex max-w-[90rem] flex-wrap items-center justify-between gap-4 px-4 py-3 md:px-8">
+      <a routerLink="/" aria-label="Distrito Scout Cochabamba, inicio"><app-dsc-logo-badge size="md" /></a>
+      <!-- Con sesión, en móvil estos enlaces pasan al menú para que el encabezado quepa en una línea. -->
+      <nav class="items-center gap-5 text-sm font-medium" [class]="auth.isAuthenticated() ? 'hidden md:flex' : 'flex'" aria-label="Principal">
+        <a routerLink="/" routerLinkActive="text-dsc-dark underline decoration-2 underline-offset-8" ariaCurrentWhenActive="page" [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
+        <a routerLink="/calendario" routerLinkActive="text-dsc-dark underline decoration-2 underline-offset-8" ariaCurrentWhenActive="page">Calendario</a>
       </nav>
-
-      @if (auth.isAuthenticated()) {
-        <button
-          type="button"
-          class="rounded-lg bg-dsc-navy px-4 py-2 text-sm font-semibold text-white transition hover:bg-dsc-dark"
-          (click)="onLogout()"
-          aria-label="Cerrar sesión"
-        >
-          Cerrar sesión
-        </button>
-      } @else {
-        <a
-          class="rounded-lg bg-dsc-navy px-4 py-2 text-sm font-semibold text-white no-underline transition hover:bg-dsc-dark"
-          routerLink="/auth/login"
-          [queryParams]="{ returnUrl: router.url }"
-        >
-          Iniciar Sesión
-        </a>
-      }
-    </div>
-  </header>
-
-  <main id="contenido-principal" class="min-w-0" tabindex="-1">
-    <router-outlet />
-  </main>
-
-  <footer class="border-t border-border bg-elevated">
-    <div class="mx-auto grid max-w-6xl gap-8 px-4 py-10 md:grid-cols-3 md:px-6">
-      <div class="space-y-3">
-        <div class="flex items-center gap-2">
-          <app-dsc-logo-badge size="sm" />
-          <span class="font-bold text-dsc-navy">DSC</span>
-        </div>
-        <p class="max-w-xs text-sm leading-relaxed text-muted">
-          Plataforma integral para la gestión de membresía, formación y actividades del Distrito
-          Scout.
-        </p>
+      <div class="flex items-center gap-2">
+        @if (auth.isAuthenticated()) {
+          <app-button
+            #menuButton
+            class="md:hidden"
+            data-testid="mobile-menu-button"
+            variant="outline"
+            size="md"
+            [ariaExpanded]="menuOpen()"
+            [ariaControls]="mobileMenuId"
+            (clicked)="toggleMenu()"
+          >
+            <svg button-icon-left class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              @if (menuOpen()) {
+                <path d="M6 6l12 12M18 6L6 18" />
+              } @else {
+                <path d="M4 7h16M4 12h16M4 17h16" />
+              }
+            </svg>
+            Menú
+          </app-button>
+          <button type="button" class="rounded-lg bg-dsc-navy px-4 py-2 text-sm font-semibold text-white" (click)="onLogout()">Cerrar sesión</button>
+        } @else {
+          <a class="rounded-lg bg-dsc-navy px-4 py-2 text-sm font-semibold text-white" routerLink="/auth/login" [queryParams]="{ returnUrl: router.url }">Iniciar sesión</a>
+        }
       </div>
-
-      <app-footer-link-group
-        heading="Enlaces Rápidos"
-        [links]="['Sobre Nosotros', 'Contacto', 'Términos de Uso']"
-      />
-
-      <app-footer-link-group heading="Legal" [links]="['Privacidad', 'Políticas de Datos']" />
     </div>
-
-    <div
-      class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-4 text-xs text-muted md:px-6"
-    >
-      <span>© {{ currentYear }} Scout Organization. Siempre Listos.</span>
-      <span class="tracking-wide">DSC · Formación</span>
-    </div>
+    @if (auth.isAuthenticated()) {
+      <!-- Panel móvil: siempre en el DOM para que `aria-controls` apunte a un id existente. -->
+      <div [id]="mobileMenuId" class="border-t border-border px-4 md:hidden" data-testid="mobile-menu" [hidden]="!menuOpen()">
+        <ng-container *ngTemplateOutlet="navigation; context: { $implicit: true }" />
+      </div>
+    }
+  </header>
+  <div class="mx-auto flex w-full max-w-[90rem] flex-col md:flex-row">
+    @if (auth.isAuthenticated() && featureLinks().length > 0) {
+      <aside class="hidden md:block md:w-64 md:shrink-0 md:border-r md:border-border md:px-6 md:py-5">
+        <ng-container *ngTemplateOutlet="navigation; context: { $implicit: false }" />
+      </aside>
+    }
+    <main id="contenido-principal" class="min-w-0 flex-1" tabindex="-1"><router-outlet /></main>
+  </div>
+  <footer class="border-t border-border bg-elevated">
+    <div class="mx-auto flex max-w-[90rem] justify-center px-4 py-6 md:px-8"><img src="/assets/branding/logo-dsc.png" alt="Distrito Scout Cochabamba" class="h-16 w-16 object-contain" /></div>
   </footer>
 </div>
+
+<!-- Única fuente de enlaces (filtrados por permisos en `featureLinks`) para menú móvil y sidebar. -->
+<ng-template #navigation let-mobile>
+  @if (mobile) {
+    <!-- En móvil, Calendario va primero para acceder directo a las programaciones. -->
+    <nav class="flex flex-col py-2 text-sm font-medium" [class.border-b]="featureLinks().length > 0" [class.border-border]="featureLinks().length > 0" aria-label="Principal">
+      @for (link of primaryLinks; track link.path) {
+        <a
+          [routerLink]="link.path"
+          routerLinkActive="bg-dsc-soft text-dsc-dark"
+          ariaCurrentWhenActive="page"
+          [routerLinkActiveOptions]="{ exact: link.path === '/' }"
+          class="rounded-md px-2 py-3 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dsc"
+          data-testid="mobile-menu-primary-link"
+          (click)="closeMenu()"
+        >{{ link.label }}</a>
+      }
+    </nav>
+  }
+  @if (featureLinks().length > 0) {
+    <nav class="flex flex-col text-sm font-medium" [class]="mobile ? 'gap-1 py-2' : 'gap-1 py-4'" aria-label="Funcionalidades">
+      @for (link of featureLinks(); track link.path) {
+        <!-- El hover solo subraya: no cambia el color, así no tapa el estado activo. -->
+        <a
+          [routerLink]="link.path"
+          routerLinkActive="bg-dsc-soft text-dsc-dark"
+          ariaCurrentWhenActive="page"
+          class="rounded-md px-2 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dsc"
+          [class.py-3]="mobile"
+          [class.py-2]="!mobile"
+          [attr.data-testid]="mobile ? 'mobile-menu-link' : 'sidebar-link'"
+          (click)="closeMenu()"
+        >{{ link.label }}</a>
+      }
+    </nav>
+  }
+</ng-template>
