@@ -1,7 +1,14 @@
 /**
- * Tarjeta de convocatoria: estado, cupos y CTA de inscripción.
+ * Tarjeta de programación: estado, cupos y CTA de inscripción.
  */
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+
+import { ButtonComponent } from '@shared/components/buttons/button/button.component';
+import {
+  BadgeComponent,
+  type BadgeColor,
+  type BadgeVariant,
+} from '@shared/components/ui-elements/badge/badge.component';
 
 import {
   canEnroll,
@@ -14,6 +21,7 @@ import type { CalendarSessionApiDto, CalendarSessionBadge } from '../training-ca
 
 @Component({
   selector: 'app-training-calendar-session-card',
+  imports: [BadgeComponent, ButtonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <article
@@ -22,15 +30,12 @@ import type { CalendarSessionApiDto, CalendarSessionBadge } from '../training-ca
       [class.border-dsc/40]="badge() === 'enrolled'"
     >
       <div class="flex flex-wrap items-start justify-between gap-2">
-        <p class="m-0 text-xs font-semibold tracking-wide text-dsc">
+        <p class="m-0 text-xs font-semibold tracking-wide text-dsc-dark">
           {{ session().moduleTypeName }}
         </p>
-        <span
-          class="rounded-full px-2.5 py-0.5 text-xs font-semibold"
-          [class]="badgeClass()"
-        >
+        <app-badge size="sm" [variant]="badgeStyle().variant" [color]="badgeStyle().color">
           {{ sessionBadgeLabel(badge()) }}
-        </span>
+        </app-badge>
       </div>
       <h3 class="mt-2 m-0 text-lg font-bold text-ink">{{ session().moduleName }}</h3>
       <p class="mt-2 mb-0 text-sm text-muted">{{ formatSessionWhen(session().startsAt) }}</p>
@@ -40,22 +45,16 @@ import type { CalendarSessionApiDto, CalendarSessionBadge } from '../training-ca
       <p class="mt-2 mb-0 text-sm font-medium text-ink">{{ sessionSeatsLabel(session()) }}</p>
       <div class="mt-4 flex flex-1 items-end">
         @if (canEnroll(session())) {
-          <button
-            type="button"
-            class="rounded-lg bg-dsc px-4 py-2 text-sm font-semibold text-white transition hover:bg-dsc-dark"
-            (click)="enroll.emit(session())"
-          >
-            Inscribirme
-          </button>
+          <app-button (clicked)="enroll.emit(session())">Inscribirme</app-button>
         } @else if (badge() === 'enrolled') {
-          <p class="m-0 text-sm font-semibold text-dsc">Ya estás inscrito</p>
+          <p class="m-0 text-sm font-semibold text-dsc-dark">Ya estás inscrito</p>
         }
       </div>
     </article>
   `,
 })
 export class TrainingCalendarSessionCard {
-  /** Convocatoria a mostrar. */
+  /** Programación a mostrar. */
   readonly session = input.required<CalendarSessionApiDto>();
 
   /** El usuario quiere inscribirse. */
@@ -68,25 +67,25 @@ export class TrainingCalendarSessionCard {
   protected readonly sessionSeatsLabel = sessionSeatsLabel;
   protected readonly canEnroll = canEnroll;
 
-  protected readonly badgeClass = computed(() => this.classesFor(this.badge()));
+  protected readonly badgeStyle = computed(() => this.badgeStyleFor(this.badge()));
 
   /**
-   * Clases Tailwind de la insignia según estado.
+   * Variante y color del `app-badge` compartido según estado.
    *
    * @param badge - Estado visual.
    */
-  private classesFor(badge: CalendarSessionBadge): string {
+  private badgeStyleFor(badge: CalendarSessionBadge): { variant: BadgeVariant; color: BadgeColor } {
     switch (badge) {
       case 'available':
-        return 'bg-dsc-soft text-dsc-dark';
+        return { variant: 'soft', color: 'primary' };
       case 'enrolled':
-        return 'bg-dsc text-white';
+        return { variant: 'solid', color: 'primary' };
       case 'full':
-        return 'bg-warning-bg text-warning-ink';
+        return { variant: 'soft', color: 'warning' };
       case 'finished':
-        return 'bg-surface text-muted';
+        return { variant: 'soft', color: 'default' };
       case 'cancelled':
-        return 'bg-danger-soft text-danger';
+        return { variant: 'soft', color: 'danger' };
     }
   }
 }

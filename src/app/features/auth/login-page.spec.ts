@@ -131,7 +131,8 @@ describe('LoginPage', () => {
     );
   });
 
-  it('mantiene Google, registro y recuperación deshabilitados', () => {
+  // El login ya no muestra Google ni registro (cambio local en login-page.html); la recuperación sigue sin habilitarse.
+  it('no ofrece Google ni registro y mantiene la recuperación deshabilitada', () => {
     const fixture = createFixture();
     const buttons = Array.from(
       (fixture.nativeElement as HTMLElement).querySelectorAll('button'),
@@ -140,8 +141,8 @@ describe('LoginPage', () => {
     const forgot = buttons.find((button) => button.textContent?.includes('Olvidé'));
     const register = buttons.find((button) => button.textContent?.includes('Regístrate'));
 
-    expect(google?.disabled).toBe(true);
+    expect(google).toBeUndefined();
     expect(forgot?.disabled).toBe(true);
-    expect(register?.disabled).toBe(true);
+    expect(register).toBeUndefined();
   });
 });

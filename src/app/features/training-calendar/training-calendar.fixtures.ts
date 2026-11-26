@@ -1,5 +1,5 @@
 /**
- * Convocatorias de demostración mientras la API de calendario no exista.
+ * Programaciones de demostración mientras la API de calendario no exista.
  * Las fechas se anclan a `now` para que el mes en curso nunca quede vacío.
  */
 import type { CalendarSessionApiDto } from './training-calendar.models';

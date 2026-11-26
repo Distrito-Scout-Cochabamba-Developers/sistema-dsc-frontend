@@ -1,5 +1,5 @@
 /**
- * Rutas lazy del catálogo administrativo de módulos.
+ * Rutas lazy del catálogo de módulos administrativo de módulos.
  */
 import { Routes } from '@angular/router';
 

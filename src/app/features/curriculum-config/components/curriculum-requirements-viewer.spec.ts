@@ -36,11 +36,12 @@ describe('CurriculumRequirementsViewer', () => {
     expect(compiled.textContent).toContain('10 módulos (a elección del dirigente)');
     expect(compiled.textContent).toContain('Primeros auxilios');
     expect(compiled.textContent).toContain('Ciclo de programa');
-    const badges = compiled.querySelectorAll('span.bg-dsc-soft');
+    const badges = compiled.querySelectorAll('app-badge span');
     expect(badges.length).toBeGreaterThanOrEqual(2);
     for (const badge of badges) {
-      expect(badge.classList.contains('rounded-md')).toBe(true);
-      expect(badge.classList.contains('text-dsc-dark')).toBe(true);
+      if (badge.parentElement?.tagName.toLowerCase() === 'app-badge') {
+        expect(badge.classList.contains('rounded-md')).toBe(true);
+      }
     }
   });
 

@@ -1,5 +1,5 @@
 /**
- * Directorio de adultos: lookup por CI contra la API.
+ * Directorio de adultos: lookup por Carnet de Identidad contra la API.
  */
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
@@ -16,7 +16,7 @@ export class AdultDirectoryService {
   private readonly http = inject(HttpClient);
 
   /**
-   * Busca un adulto por CI (`GET api/attendance/lookup-ci/{ci}`).
+   * Busca un adulto por Carnet de Identidad (`GET api/attendance/lookup-ci/{ci}`).
    *
    * @param ci - Carnet de identidad numérico.
    * @param extension - Extensión departamental opcional.

@@ -1,5 +1,5 @@
 /**
- * Confirmación modal para eliminar un módulo del catálogo.
+ * Confirmación modal para eliminar un módulo del catálogo de módulos.
  */
 import {
   ChangeDetectionStrategy,
@@ -14,10 +14,12 @@ import {
 } from '@angular/core';
 
 import type { TrainingModuleApiDto } from '@core/models/attendance-api.models';
+import { ButtonComponent } from '@shared/components/buttons/button/button.component';
 
 @Component({
   selector: 'app-training-catalog-delete-dialog',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [ButtonComponent],
   templateUrl: './training-catalog-delete-dialog.html',
   styles: `
     :host {

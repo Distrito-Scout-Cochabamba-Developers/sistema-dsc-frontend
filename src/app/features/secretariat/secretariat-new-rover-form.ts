@@ -11,6 +11,8 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { apiUrl } from '@core/utils/api-url.utils';
+import { TextFieldComponent } from '@shared/components/form-controls/text-field/text-field.component';
+import { ButtonComponent } from '@shared/components/buttons/button/button.component';
 import {
   EXTENSION_REQUIRED_TYPE,
   enrollmentConflictMessage,
@@ -33,14 +35,15 @@ export type NewRoverOutcome =
 @Component({
   selector: 'app-secretariat-new-rover-form',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [TextFieldComponent, ButtonComponent],
   templateUrl: './secretariat-new-rover-form.html',
 })
 export class SecretariatNewRoverForm {
   private readonly http = inject(HttpClient);
   private readonly destroyRef = inject(DestroyRef);
-  /** Convocatoria elegida en el panel. */
+  /** Programación elegida en el panel. */
   readonly sessionId = input.required<string>();
-  /** CI ya buscado sin coincidencias. */
+  /** Carnet de Identidad ya buscado sin coincidencias. */
   readonly ci = input.required<string>();
   /** Complemento usado en la búsqueda, si lo hubo. */
   readonly extension = input<string>('');
@@ -86,7 +89,7 @@ export class SecretariatNewRoverForm {
     if (error.status === 401) return this.finished.emit('unauthorized');
     if (error.status === 403) return this.finished.emit('forbidden');
     if (error.status === 400) {
-      this.message.set('Revisa el CI, los nombres, los apellidos y el celular.');
+      this.message.set('Revisa el Carnet de Identidad, los nombres, los apellidos y el celular.');
       return;
     }
     if (error.status === 409) {

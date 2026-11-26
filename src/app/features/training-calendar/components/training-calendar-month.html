@@ -50,11 +50,11 @@
         [class.ring-dsc]="day.isoDate === todayIso"
         (click)="daySelected.emit(day.isoDate)"
       >
-        <span class="text-xs font-semibold" [class.text-dsc]="day.isoDate === todayIso">
+        <span class="text-xs font-semibold" [class.text-dsc-dark]="day.isoDate === todayIso">
           {{ day.date.getDate() }}
         </span>
         @if (daySessions.length > 0) {
-          <span class="mt-auto inline-flex size-5 items-center justify-center rounded-full bg-dsc text-[10px] font-bold text-white">
+          <span class="mt-auto inline-flex size-5 items-center justify-center rounded-full bg-dsc-dark text-[10px] font-bold text-white">
             {{ daySessions.length }}
           </span>
         }

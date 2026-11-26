@@ -63,7 +63,7 @@ export class TrainingLevelRequirementsService {
   /**
    * Lista los módulos disponibles para ser seleccionados como obligatorios elegibles.
    *
-   * @returns Observable con la lista de módulos formativos del catálogo.
+   * @returns Observable con la lista de módulos formativos del catálogo de módulos.
    */
   listEligibleModules(): Observable<readonly EligibleModuleDto[]> {
     return this.http.get<readonly EligibleModuleDto[]>(apiUrl('/api/attendance/modules'));

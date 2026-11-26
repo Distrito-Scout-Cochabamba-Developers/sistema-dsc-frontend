@@ -1,28 +1,13 @@
-<article
-  class="min-w-0 break-words rounded-2xl border border-border bg-elevated p-4 shadow-xs sm:p-6"
->
+<app-card variant="outlined" padding="lg">
   <div class="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
     <div>
-      <!-- Ref: Design System Badge (PR #8, tercer badge) -->
-      <span
-        class="inline-flex items-center rounded-md bg-dsc-soft px-2.5 py-1 text-xs font-medium text-dsc-dark"
-      >
-        Línea {{ trainingLineCode() }}
-      </span>
-      <h2 class="mt-1 text-lg font-bold text-ink">{{ levelName() }}</h2>
+      <app-badge [pill]="false" color="primary">Línea {{ trainingLineCode() }}</app-badge>
+      <h2 class="mt-2 mb-0 text-lg font-bold text-ink">{{ levelName() }}</h2>
     </div>
     @if (requirements()) {
-      <span
-        class="inline-flex items-center rounded-md bg-dsc-soft px-2.5 py-1 text-xs font-medium text-dsc-dark"
-      >
-        Configurado
-      </span>
+      <app-badge [pill]="false" color="success" [dot]="true">Configurado</app-badge>
     } @else if (!loading()) {
-      <span
-        class="inline-flex items-center rounded-md bg-dsc-soft px-2.5 py-1 text-xs font-medium text-dsc-dark"
-      >
-        Sin requisitos
-      </span>
+      <app-badge [pill]="false" color="warning" [dot]="true">Sin requisitos</app-badge>
     }
   </div>
 
@@ -75,7 +60,7 @@
       </div>
 
       <div>
-        <h3 class="text-xs font-semibold uppercase tracking-wider text-muted">
+        <h3 class="text-xs font-semibold tracking-wider text-muted uppercase">
           Módulos obligatorios elegibles ({{ requirements()?.mandatoryModules?.length ?? 0 }})
         </h3>
 
@@ -98,11 +83,9 @@
                     <p class="mt-0.5 text-xs text-muted">{{ mod.description }}</p>
                   }
                 </div>
-                <span
-                  class="shrink-0 rounded-md bg-dsc-soft px-2.5 py-1 text-xs font-medium text-dsc-dark"
-                >
+                <app-badge size="sm" [pill]="false" color="primary" class="shrink-0">
                   #{{ mod.id }}
-                </span>
+                </app-badge>
               </li>
             }
           </ul>
@@ -110,4 +93,4 @@
       </div>
     </div>
   }
-</article>
+</app-card>

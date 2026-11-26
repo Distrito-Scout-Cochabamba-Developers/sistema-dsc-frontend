@@ -1,6 +1,6 @@
 /**
  * Formulario de registro de asistencia: campos, validación, autocompletado
- * por CI y envío. Encapsula todo el estado propio del formulario (incluida
+ * por Carnet de Identidad y envío. Encapsula todo el estado propio del formulario (incluida
  * la insignia de sesión activa, porque "Cambiar Perfil" resetea ese mismo
  * modelo) para mantener `AttendancePage` como puro orquestador.
  */
@@ -63,7 +63,7 @@ export class AttendanceForm {
   private readonly registrationApi = inject(AttendanceRegistrationService);
   protected readonly auth = inject(AuthSessionService);
 
-  /** Extensiones de CI disponibles. */
+  /** Extensiones de Carnet de Identidad disponibles. */
   protected readonly extensions = CI_EXTENSIONS;
 
   protected readonly submitting = signal(false);
@@ -71,7 +71,7 @@ export class AttendanceForm {
   protected readonly submitRetryable = signal(false);
   protected readonly ciStatus = signal<CiLookupStatus>('idle');
   protected readonly lookupError = signal('');
-  /** `true` si el CI no estaba en el directorio (registro parcial). */
+  /** `true` si el Carnet de Identidad no estaba en el directorio (registro parcial). */
   private readonly partialFromDirectory = signal(false);
 
   protected readonly touchedCi = signal(false);
@@ -87,8 +87,8 @@ export class AttendanceForm {
   });
 
   protected readonly attendanceForm = form(this.attendanceModel, (p) => {
-    required(p.ci, { message: 'CI obligatorio' });
-    pattern(p.ci, CI_NUMBER_PATTERN, { message: 'CI numérico inválido' });
+    required(p.ci, { message: 'Carnet de Identidad obligatorio' });
+    pattern(p.ci, CI_NUMBER_PATTERN, { message: 'Carnet de Identidad numérico inválido' });
     required(p.fullName, { message: 'Nombre obligatorio' });
     required(p.extension, { message: 'Extensión obligatoria' });
     required(p.phone, { message: 'Teléfono obligatorio' });
@@ -117,7 +117,7 @@ export class AttendanceForm {
     this.watchCiLookup();
   }
 
-  /** Busca en el directorio distrital cada vez que el CI ingresado es válido. */
+  /** Busca en el directorio distrital cada vez que el Carnet de Identidad ingresado es válido. */
   private watchCiLookup(): void {
     toObservable(computed(() => this.attendanceModel().ci))
       .pipe(
@@ -171,7 +171,7 @@ export class AttendanceForm {
   }
 
   /**
-   * Repite el lookup de CI tras un error de red.
+   * Repite el lookup de Carnet de Identidad tras un error de red.
    */
   protected retryLookup(): void {
     const ci = this.attendanceModel().ci.trim();
@@ -277,7 +277,7 @@ export class AttendanceForm {
   private onLookupFailure(error: unknown): void {
     this.ciStatus.set('error');
     this.lookupError.set(
-      problemDetailMessage(error, 'No se pudo consultar el CI. Intenta de nuevo.'),
+      problemDetailMessage(error, 'No se pudo consultar el Carnet de Identidad. Intenta de nuevo.'),
     );
   }
 
@@ -297,7 +297,7 @@ export class AttendanceForm {
    * Mueve el foco al primer campo inválido.
    */
   private focusFirstInvalid(): void {
-    const fields: ReadonlyArray<{ id: string; invalid: boolean }> = [
+    const fields: readonly { id: string; invalid: boolean }[] = [
       { id: 'ci', invalid: this.attendanceForm.ci().invalid() },
       { id: 'fullName', invalid: this.attendanceForm.fullName().invalid() },
       { id: 'extension', invalid: this.attendanceForm.extension().invalid() },

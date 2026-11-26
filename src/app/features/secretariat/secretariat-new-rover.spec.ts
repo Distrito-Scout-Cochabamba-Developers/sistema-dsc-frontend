@@ -22,7 +22,7 @@ describe('Alta de Rover nuevo desde Secretaría (#160)', () => {
 
   afterEach(() => http.verify());
 
-  /** Abre el panel y deja una búsqueda sin coincidencias del CI ficticio 5556667. */
+  /** Abre el panel y deja una búsqueda sin coincidencias del Carnet de Identidad ficticio 5556667. */
   async function openWithNoMatch() {
     TestBed.inject(AuthSessionService).applyAuthenticatedProfile({
       id: 1,
@@ -36,20 +36,20 @@ describe('Alta de Rover nuevo desde Secretaría (#160)', () => {
     const root = harness.routeNativeElement!;
     http
       .expectOne({ method: 'GET', url: '/api/v1/calendar/sessions' })
-      .flush([{ id: 42, moduleName: 'Convocatoria ficticia', startsAt: '2026-11-29T10:00:00-04:00' }]);
+      .flush([{ id: 42, moduleName: 'Programación ficticia', startsAt: '2026-11-29T10:00:00-04:00' }]);
     http.expectOne({ method: 'GET', url: '/api/v1/secretariat/invitations/pending' }).flush([]);
     harness.detectChanges();
-    const select = root.querySelector<HTMLSelectElement>('select[name="session"]')!;
-    select.value = '42';
-    select.dispatchEvent(new Event('change'));
+    root.querySelector<HTMLButtonElement>('[aria-label="Módulos programados"] button')!.click();
     harness.detectChanges();
     const ci = root.querySelector<HTMLInputElement>('input[name="ci"]')!;
     ci.value = '5556667';
     ci.dispatchEvent(new Event('input'));
-    root.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true }));
+    ci.closest('form')!.dispatchEvent(new Event('submit', { cancelable: true }));
     http
       .expectOne({ method: 'POST', url: lookupPath })
       .flush({ type: 'urn:dsc:secretariat:participant-not-found' }, { status: 404, statusText: 'Not Found' });
+    harness.detectChanges();
+    root.querySelector<HTMLButtonElement>('[aria-label="Tipo de registro"] button')!.click();
     harness.detectChanges();
     return { harness, root };
   }
@@ -117,7 +117,7 @@ describe('Alta de Rover nuevo desde Secretaría (#160)', () => {
     request.flush({ enrollmentId: 7 }, { status: 201, statusText: 'Created' });
   });
 
-  it('pide el complemento cuando el CI del Rover existe con otro complemento', async () => {
+  it('pide el complemento cuando el Carnet de Identidad del Rover existe con otro complemento', async () => {
     const { harness, root } = await openWithNoMatch();
     type(root, 'firstName', 'Rover');
     type(root, 'lastName', 'Ficticio');
@@ -148,7 +148,7 @@ describe('Alta de Rover nuevo desde Secretaría (#160)', () => {
     expect(root.textContent).not.toContain('dato privado');
   });
 
-  it('pide buscar de nuevo si el CI ya existe y no ofrece crear otra persona', async () => {
+  it('pide buscar de nuevo si el Carnet de Identidad ya existe y no ofrece crear otra persona', async () => {
     const { harness, root } = await openWithNoMatch();
     type(root, 'firstName', 'Rover');
     type(root, 'lastName', 'Ficticio');
@@ -157,7 +157,7 @@ describe('Alta de Rover nuevo desde Secretaría (#160)', () => {
       .expectOne({ method: 'POST', url: createPath })
       .flush({ type: 'urn:dsc:enrollment:person-exists' }, { status: 409, statusText: 'Conflict' });
     harness.detectChanges();
-    expect(root.textContent).toContain('Ya existe una persona con ese CI');
+    expect(root.textContent).toContain('Ya existe una persona con ese Carnet de Identidad');
     expect(root.querySelector('form[name="new-rover"]')).toBeNull();
   });
 
@@ -184,7 +184,7 @@ describe('Alta de Rover nuevo desde Secretaría (#160)', () => {
     expect(root.querySelector<HTMLInputElement>('input[name="ci"]')!.value).toBe('');
   });
 
-  it('descarta el formulario si se edita el CI', async () => {
+  it('descarta el formulario si se edita el Carnet de Identidad', async () => {
     const { harness, root } = await openWithNoMatch();
     type(root, 'ci', '5556668');
     harness.detectChanges();

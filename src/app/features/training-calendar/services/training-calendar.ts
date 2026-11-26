@@ -1,5 +1,5 @@
 /**
- * Calendario de convocatorias e inscripción digital.
+ * Calendario de programaciones e inscripción digital.
  * Si `TRAINING_CALENDAR_API_ENABLED` es falso, usa fixtures con la misma forma.
  */
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
@@ -39,7 +39,7 @@ export class TrainingCalendarService {
   private demoSessions: CalendarSessionApiDto[] | null = null;
 
   /**
-   * Lista convocatorias en un rango. Sin `from`/`to` devuelve el set completo.
+   * Lista programaciones en un rango. Sin `from`/`to` devuelve el set completo.
    *
    * @param range - Filtro opcional ISO `YYYY-MM-DD`.
    */
@@ -65,7 +65,7 @@ export class TrainingCalendarService {
   /**
    * Inscribe al usuario autenticado. 409 si el cupo se agotó.
    *
-   * @param sessionId - Identificador de la convocatoria.
+   * @param sessionId - Identificador de la programación.
    */
   enroll(sessionId: number): Observable<CalendarEnrollmentApiDto> {
     if (!this.apiEnabled) {

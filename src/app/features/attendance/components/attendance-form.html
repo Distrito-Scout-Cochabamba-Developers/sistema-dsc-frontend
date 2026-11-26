@@ -16,7 +16,7 @@
         </p>
         <p class="mt-0.5 text-warning-ink/80">
           Confirma tu asistencia para acreditar esta formación. Completa
-          tus datos personales; el perfil de cuenta no incluye CI ni teléfono.
+          tus datos personales; el perfil de cuenta no incluye Carnet de Identidad ni teléfono.
         </p>
       </div>
     </div>
@@ -38,7 +38,7 @@
   <div class="space-y-5">
     <div>
       <label class="mb-1.5 block text-sm font-semibold text-ink" for="ci">
-        Carnet de Identidad (CI)
+        Carnet de Identidad (Carnet de Identidad)
       </label>
       <div class="relative">
         <input
@@ -63,7 +63,7 @@
       </div>
       @if (showCiError()) {
         <p id="ci-hint" class="mt-1.5 text-sm text-danger">
-          Ingresa un CI numérico válido (7 a 10 dígitos).
+          Ingresa un Carnet de Identidad numérico válido (7 a 10 dígitos).
         </p>
       } @else if (ciStatus() === 'found') {
         <p id="ci-hint" class="mt-1.5 text-sm font-medium text-dsc">
@@ -71,7 +71,7 @@
         </p>
       } @else if (ciStatus() === 'not-found') {
         <p id="ci-hint" class="mt-1.5 text-sm text-muted">
-          CI no encontrado en el distrito. Completa tus datos para un
+          Carnet de Identidad no encontrado en el distrito. Completa tus datos para un
           registro parcial.
         </p>
       } @else if (ciStatus() === 'error') {

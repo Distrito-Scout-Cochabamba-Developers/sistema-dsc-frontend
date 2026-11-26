@@ -8,7 +8,7 @@ import {
 
 describe('Mensajes compartidos de inscripción de Secretaría', () => {
   it.each([
-    ['urn:dsc:enrollment:session-full', 'Sin cupo en esta convocatoria.'],
+    ['urn:dsc:enrollment:session-full', 'Sin cupo en esta programación.'],
     ['urn:dsc:enrollment:enrollment-closed', 'La inscripción está cerrada.'],
     ['urn:dsc:enrollment:already-enrolled', 'La persona ya está inscrita.'],
   ])('traduce %s', (type, message) => {

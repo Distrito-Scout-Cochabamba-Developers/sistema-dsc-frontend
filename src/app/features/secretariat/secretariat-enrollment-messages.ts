@@ -5,15 +5,15 @@ import { HttpErrorResponse } from '@angular/common/http';
  * Secretaría. Ningún mensaje incluye datos personales ni el detalle devuelto por el servidor.
  */
 const ENROLLMENT_CONFLICT_MESSAGES: ReadonlyMap<string, string> = new Map([
-  ['urn:dsc:enrollment:session-full', 'Sin cupo en esta convocatoria.'],
+  ['urn:dsc:enrollment:session-full', 'Sin cupo en esta programación.'],
   ['urn:dsc:enrollment:enrollment-closed', 'La inscripción está cerrada.'],
   ['urn:dsc:enrollment:already-enrolled', 'La persona ya está inscrita.'],
 ]);
 
-/** El CI existe con otros complementos (o es ambiguo): el operador debe indicar el complemento. */
+/** El Carnet de Identidad existe con otros complementos (o es ambiguo): el operador debe indicar el complemento. */
 export const EXTENSION_REQUIRED_TYPE = 'urn:dsc:secretariat:extension-required';
 export const EXTENSION_REQUIRED_MESSAGE =
-  'Hay coincidencias con ese CI. Selecciona el complemento y vuelve a buscar.';
+  'Hay coincidencias con ese Carnet de Identidad. Selecciona el complemento y vuelve a buscar.';
 
 export const UNCERTAIN_RESULT_MESSAGE =
   'El resultado de la confirmación es incierto. Verifica la inscripción antes de reintentar.';

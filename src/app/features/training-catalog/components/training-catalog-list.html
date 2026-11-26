@@ -1,65 +1,67 @@
 <div class="flex flex-wrap items-center justify-between gap-3">
-  <p class="m-0 text-sm text-muted">{{ modules().length }} módulo(s) en el catálogo</p>
-  <button
-    type="button"
-    class="rounded-lg bg-dsc px-4 py-2 text-sm font-semibold text-white transition hover:bg-dsc-dark"
-    (click)="create.emit()"
-  >
-    Nuevo módulo
-  </button>
+  <p class="m-0 text-sm text-muted">{{ modules().length }} módulo(s) en el catálogo de módulos</p>
 </div>
 
-<div class="mt-4 overflow-x-auto rounded-2xl border border-border bg-elevated shadow-sm">
-  <table class="w-full min-w-[44rem] border-collapse text-left text-sm">
-    <thead class="border-b border-border bg-dsc-soft/60 text-xs tracking-wide text-dsc-dark uppercase">
-      <tr>
-        <th class="px-4 py-3 font-semibold">Nombre</th>
-        <th class="px-4 py-3 font-semibold">Líneas</th>
-        <th class="px-4 py-3 font-semibold">Descripción</th>
-        <th class="px-4 py-3 font-semibold">
-          <span class="sr-only">Acciones</span>
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (module of modules(); track module.id) {
-        <tr class="border-b border-border last:border-b-0">
-          <td class="px-4 py-3 font-medium text-ink">{{ module.name }}</td>
-          <td class="px-4 py-3 text-muted">{{ linesOf(module) }}</td>
-          <td class="max-w-xs truncate px-4 py-3 text-muted">
-            {{ module.description || '—' }}
-          </td>
-          <td class="px-4 py-3 text-right">
-            <div class="flex flex-wrap justify-end gap-3">
-              <button
-                type="button"
-                class="font-semibold text-dsc hover:underline"
-                (click)="openSession.emit(module)"
-              >
-                Abrir convocatoria
-              </button>
-              <button
-                type="button"
-                class="inline-flex size-9 items-center justify-center rounded-lg text-dsc transition hover:bg-dsc-soft"
-                aria-label="Editar"
-                title="Editar"
-                (click)="edit.emit(module)"
-              >
-                <ng-icon name="lucidePencil" size="18" />
-              </button>
-              <button
-                type="button"
-                class="inline-flex size-9 items-center justify-center rounded-lg text-danger transition hover:bg-danger-soft"
-                aria-label="Eliminar"
-                title="Eliminar"
-                (click)="remove.emit(module)"
-              >
-                <ng-icon name="lucideTrash2" size="18" />
-              </button>
-            </div>
-          </td>
-        </tr>
-      }
-    </tbody>
-  </table>
+<div class="mt-4">
+  <app-card variant="default" padding="none">
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[44rem] border-collapse text-left text-sm">
+        <thead class="border-b border-border bg-dsc-soft/60 text-xs tracking-wide text-dsc-dark uppercase">
+          <tr>
+            <th class="px-4 py-3 font-semibold">Nombre</th>
+            <th class="px-4 py-3 font-semibold">Líneas</th>
+            <th class="px-4 py-3 font-semibold">Descripción</th>
+            <th class="px-4 py-3 font-semibold">
+              <span class="sr-only">Acciones</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (module of modules(); track module.id) {
+            <tr class="border-b border-border last:border-b-0">
+              <td class="px-4 py-3 font-medium text-ink">{{ module.name }}</td>
+              <td class="px-4 py-3">
+                @if (module.trainingLines.length > 0) {
+                  <div class="flex flex-wrap gap-1.5">
+                    @for (line of module.trainingLines; track line.id) {
+                      <app-badge size="sm" [pill]="false" color="primary">{{ line.code }}</app-badge>
+                    }
+                  </div>
+                } @else {
+                  <span class="text-muted">{{ linesOf(module) }}</span>
+                }
+              </td>
+              <td class="max-w-xs truncate px-4 py-3 text-muted">
+                {{ module.description || '—' }}
+              </td>
+              <td class="px-4 py-3 text-right whitespace-nowrap">
+                <div class="flex flex-nowrap items-center justify-end gap-1">
+                  <app-button variant="text" size="sm" (clicked)="openSession.emit(module)">
+                    Programar módulo
+                  </app-button>
+                  <app-button
+                    variant="text"
+                    size="sm"
+                    ariaLabel="Editar"
+                    (clicked)="edit.emit(module)"
+                  >
+                    <ng-icon button-icon-left name="lucidePencil" size="18" />
+                  </app-button>
+                  <app-button
+                    variant="text"
+                    color="danger"
+                    size="sm"
+                    ariaLabel="Eliminar"
+                    (clicked)="remove.emit(module)"
+                  >
+                    <ng-icon button-icon-left name="lucideTrash2" size="18" />
+                  </app-button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </app-card>
 </div>

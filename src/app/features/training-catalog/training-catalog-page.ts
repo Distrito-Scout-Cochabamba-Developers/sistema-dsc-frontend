@@ -1,5 +1,5 @@
 /**
- * Administración del catálogo de módulos y alta de convocatorias
+ * Administración del catálogo de módulos de módulos y alta de programaciones
  * (solo ADMIN y DISTRICT_SECRETARY).
  */
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
@@ -9,7 +9,9 @@ import { forkJoin } from 'rxjs';
 
 import type { TrainingModuleApiDto } from '@core/models/attendance-api.models';
 import { isRetryableHttpError, problemDetailMessage } from '@core/utils/http-error.utils';
+import { ButtonComponent } from '@shared/components/buttons/button/button.component';
 import { StateCard } from '@shared/components/state-card';
+import { CardComponent } from '@shared/components/ui-elements/card/card.component';
 
 import { TrainingCatalogDeleteDialog } from './components/training-catalog-delete-dialog';
 import { TrainingCatalogFormModal } from './components/training-catalog-form-modal';
@@ -27,6 +29,8 @@ import type {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     RouterLink,
+    ButtonComponent,
+    CardComponent,
     StateCard,
     TrainingCatalogList,
     TrainingCatalogFormModal,
@@ -109,7 +113,7 @@ export class TrainingCatalogPage {
   }
 
   /**
-   * Abre el modal de convocatoria para un módulo del catálogo.
+   * Abre el modal de programación para un módulo del catálogo de módulos.
    *
    * @param module - Fila elegida.
    */
@@ -119,7 +123,7 @@ export class TrainingCatalogPage {
     this.sessionModule.set(module);
   }
 
-  /** Cierra el modal de convocatoria. */
+  /** Cierra el modal de programación. */
   protected closeSession(): void {
     this.sessionModule.set(null);
     this.sessionError.set('');
@@ -182,7 +186,7 @@ export class TrainingCatalogPage {
   }
 
   /**
-   * Publica una convocatoria con los bloques de horario.
+   * Publica una programación con los bloques de horario.
    *
    * @param draft - Fecha, horas e inscripción abierta.
    */
@@ -210,14 +214,14 @@ export class TrainingCatalogPage {
         next: () => {
           this.sessionSubmitting.set(false);
           this.sessionNotice.set(
-            `Convocatoria de «${module.name}» publicada. Ya aparece en el calendario.`,
+            `Programación de «${module.name}» publicada. Ya aparece en el calendario.`,
           );
           this.closeSession();
         },
         error: (err: unknown) => {
           this.sessionSubmitting.set(false);
           this.sessionError.set(
-            problemDetailMessage(err, 'No se pudo abrir la convocatoria. Intenta de nuevo.'),
+            problemDetailMessage(err, 'No se pudo abrir la programación. Intenta de nuevo.'),
           );
         },
       });

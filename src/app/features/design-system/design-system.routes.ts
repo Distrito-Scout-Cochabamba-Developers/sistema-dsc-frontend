@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 
 /**
- * Rutas internas del catálogo de componentes DSC.
+ * Rutas internas del catálogo de módulos de componentes DSC.
  *
  * Se cargan de manera diferida y únicamente
  * están disponibles cuando la aplicación

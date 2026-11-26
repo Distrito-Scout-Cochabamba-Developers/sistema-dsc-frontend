@@ -73,7 +73,7 @@ export function formatMonthTitle(year: number, monthIndex: number): string {
 }
 
 /**
- * Formatea fecha y hora de una convocatoria para tarjetas y el modal.
+ * Formatea fecha y hora de una programación para tarjetas y el modal.
  *
  * @param isoDateTime - Instante ISO-8601.
  */

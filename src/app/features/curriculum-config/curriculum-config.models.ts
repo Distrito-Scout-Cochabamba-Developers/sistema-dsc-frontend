@@ -65,7 +65,7 @@ export interface WriteTrainingLevelRequirementsDto {
 }
 
 /**
- * Línea de formación vinculada a un módulo del catálogo.
+ * Línea de formación vinculada a un módulo del catálogo de módulos.
  */
 export interface ModuleTrainingLineDto {
   /** Identificador numérico de la línea. */
@@ -79,7 +79,7 @@ export interface ModuleTrainingLineDto {
 }
 
 /**
- * Módulo disponible en el catálogo (`GET /api/attendance/modules`).
+ * Módulo disponible en el catálogo de módulos (`GET /api/attendance/modules`).
  */
 export interface EligibleModuleDto {
   /** Identificador numérico del módulo. */

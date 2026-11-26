@@ -18,7 +18,7 @@ import { ButtonComponent } from
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ButtonsComponent {
-  // Opciones de tamaños que se muestran en el catálogo.
+  // Opciones de tamaños que se muestran en el catálogo de módulos.
   readonly sizes = [
     { size: 'xs', name: 'Extra pequeño' },
     { size: 'sm', name: 'Pequeño' },

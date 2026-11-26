@@ -1,5 +1,5 @@
 /**
- * Catálogo de módulos de formación (`GET api/attendance/modules`).
+ * Módulos de formación de formación (`GET api/attendance/modules`).
  */
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';

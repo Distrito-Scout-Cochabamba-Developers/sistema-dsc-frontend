@@ -40,6 +40,29 @@ describe('TrainingCalendarPage', () => {
       expect(text).toContain('Lista');
     });
 
+    it('el diálogo toma su nombre accesible del título', () => {
+      const fixture = TestBed.createComponent(TrainingCalendarPage);
+      fixture.detectChanges();
+      const root = fixture.nativeElement as HTMLElement;
+      const dialog = root.querySelector('dialog')!;
+      const titleId = dialog.getAttribute('aria-labelledby');
+      expect(titleId).toBeTruthy();
+      expect(root.querySelector(`#${titleId}`)?.textContent).toContain('Confirmar inscripción');
+    });
+
+    it('en pantallas pequeñas arranca en la vista Lista', () => {
+      const original = globalThis.matchMedia;
+      globalThis.matchMedia = ((query: string) => ({ matches: true, media: query })) as typeof matchMedia;
+      try {
+        const fixture = TestBed.createComponent(TrainingCalendarPage);
+        fixture.detectChanges();
+        const pressed = (fixture.nativeElement as HTMLElement).querySelector('button[aria-pressed="true"]');
+        expect(pressed?.textContent).toContain('Lista');
+      } finally {
+        globalThis.matchMedia = original;
+      }
+    });
+
     it('abre el modal al pulsar Inscribirme y pide login si no hay sesión', () => {
       const fixture = TestBed.createComponent(TrainingCalendarPage);
       fixture.detectChanges();
@@ -139,7 +162,7 @@ describe('TrainingCalendarPage', () => {
       fixture.detectChanges();
 
       expect(textOf(fixture)).toContain('Sesión HTTP');
-      expect(textOf(fixture)).toContain('Abrir convocatoria');
+      expect(textOf(fixture)).toContain('Programar módulo');
 
       const enroll = [
         ...(fixture.nativeElement as HTMLElement).querySelectorAll('button'),
@@ -167,6 +190,10 @@ describe('TrainingCalendarPage', () => {
       fixture.detectChanges();
 
       expect(textOf(fixture)).toContain('Inscrito');
+      const status = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="enroll-notice"]');
+      expect(status?.closest('[role="status"]')).toBeTruthy();
+      expect(status?.textContent).toContain('Inscripción confirmada');
+      expect(status?.textContent).toContain(openSession.moduleName);
     });
 
     it('ante 409 marca cupo lleno y muestra el detalle', () => {

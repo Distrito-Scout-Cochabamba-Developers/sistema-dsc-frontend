@@ -1,7 +1,7 @@
 /**
  * Código de extensión (departamento) de Bolivia. Cerrado a los 9 departamentos
  * reales — ver preguntas abiertas del ADR 0002 sobre si esto debe migrar a un
- * catálogo servido por API.
+ * catálogo de módulos servido por API.
  */
 export type DepartmentCode = 'LP' | 'CB' | 'SC' | 'OR' | 'PT' | 'TJ' | 'CH' | 'BE' | 'PD';
 
@@ -30,7 +30,7 @@ export interface LeaderSession {
 }
 
 /**
- * Adulto del directorio distrital (lookup por CI).
+ * Adulto del directorio distrital (lookup por Carnet de Identidad).
  */
 export interface DistrictAdult {
   readonly ci: string;
@@ -40,7 +40,7 @@ export interface DistrictAdult {
 }
 
 /**
- * Extensiones de CI (departamentos de Bolivia).
+ * Extensiones de Carnet de Identidad (departamentos de Bolivia).
  */
 export interface CiExtensionOption {
   readonly code: DepartmentCode;

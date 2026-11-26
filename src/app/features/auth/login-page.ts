@@ -1,7 +1,6 @@
 /**
  * Pantalla de inicio de sesión (layout partido, sin shell DSC).
- * Conecta con `POST /api/v1/auth/login`; Google, registro y recuperación
- * se muestran deshabilitados porque la API no los expone.
+ * Conecta con `POST /api/v1/auth/login`; la recuperación aún no está disponible.
  */
 import { NgOptimizedImage } from '@angular/common';
 import {
@@ -13,7 +12,7 @@ import {
   signal,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormField, form, required, submit } from '@angular/forms/signals';
 import { firstValueFrom } from 'rxjs';
 
@@ -28,12 +27,12 @@ interface LoginFormModel {
 }
 
 /** Ruta pública del emblema (archivo en `public/assets/branding/`). */
-export const DISTRITO_EMBLEM_SRC = '/assets/branding/distrito-cochabamba-emblem.png';
+export const DISTRITO_EMBLEM_SRC = '/assets/branding/logo-dsc.png';
 
 @Component({
   selector: 'app-login-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormField, NgOptimizedImage, RouterLink],
+  imports: [FormField, NgOptimizedImage],
   templateUrl: './login-page.html',
 })
 export class LoginPage {
@@ -45,7 +44,6 @@ export class LoginPage {
   });
 
   protected readonly emblemSrc = DISTRITO_EMBLEM_SRC;
-  protected readonly currentYear = new Date().getFullYear();
   protected readonly submitting = signal(false);
   protected readonly submitError = signal('');
   protected readonly submitRetryable = signal(false);

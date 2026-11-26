@@ -12,12 +12,18 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
 import { problemDetailMessage } from '@core/utils/http-error.utils';
+import { ButtonComponent } from '@shared/components/buttons/button/button.component';
+import {
+  SelectComponent,
+  type SelectOption,
+} from '@shared/components/form-controls/select/select.component';
+import { TextFieldComponent } from '@shared/components/form-controls/text-field/text-field.component';
 import { StateCard } from '@shared/components/state-card';
+import { BadgeComponent } from '@shared/components/ui-elements/badge/badge.component';
+import { CardComponent } from '@shared/components/ui-elements/card/card.component';
 
 import { CurriculumRequirementsViewer } from './components/curriculum-requirements-viewer';
 import type {
@@ -31,7 +37,15 @@ import { TrainingLevelRequirementsService } from './services/training-level-requ
 @Component({
   selector: 'app-curriculum-config-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, RouterLink, StateCard, CurriculumRequirementsViewer],
+  imports: [
+    ButtonComponent,
+    SelectComponent,
+    TextFieldComponent,
+    BadgeComponent,
+    CardComponent,
+    StateCard,
+    CurriculumRequirementsViewer,
+  ],
   templateUrl: './curriculum-config-page.html',
 })
 export class CurriculumConfigPage implements OnInit {
@@ -47,16 +61,16 @@ export class CurriculumConfigPage implements OnInit {
   /** Código del nivel actualmente seleccionado en el selector. */
   protected readonly selectedLevelCode = signal<string>('');
 
-  /** Catálogo de módulos disponibles para selección. */
+  /** Módulos de formación disponibles para selección. */
   protected readonly eligibleModules = signal<readonly EligibleModuleDto[]>([]);
 
   /** Requisitos actuales guardados en backend para el nivel seleccionado. */
   protected readonly currentRequirements = signal<TrainingLevelRequirementsDto | null>(null);
 
-  /** Filtro de búsqueda textual para los módulos del catálogo. */
+  /** Filtro de búsqueda textual para los módulos del catálogo de módulos. */
   protected readonly moduleSearch = signal<string>('');
 
-  /** Estado de carga inicial (niveles y catálogo de módulos). */
+  /** Estado de carga inicial (niveles y catálogo de módulos de módulos). */
   protected readonly isLoadingInitial = signal<boolean>(true);
 
   /** Estado de carga de requisitos específicos del nivel seleccionado. */
@@ -86,7 +100,15 @@ export class CurriculumConfigPage implements OnInit {
     return this.levels().find((level) => level.code === code) ?? null;
   });
 
-  /** Módulos del catálogo filtrados por el término de búsqueda. */
+  /** Opciones formateadas para el selector compartido de niveles. */
+  protected readonly levelOptions = computed<SelectOption[]>(() =>
+    this.levels().map((level) => ({
+      value: level.code,
+      label: `${level.name} (${level.trainingLineCode})`,
+    })),
+  );
+
+  /** Módulos del catálogo de módulos filtrados por el término de búsqueda. */
   protected readonly filteredModules = computed<readonly EligibleModuleDto[]>(() => {
     const query = this.moduleSearch().trim().toLowerCase();
     const modules = this.eligibleModules();
@@ -142,7 +164,7 @@ export class CurriculumConfigPage implements OnInit {
   }
 
   /**
-   * Carga los niveles de formación y el catálogo de módulos elegibles.
+   * Carga los niveles de formación y el catálogo de módulos de módulos elegibles.
    */
   protected loadInitialData(): void {
     this.isLoadingInitial.set(true);
@@ -171,7 +193,7 @@ export class CurriculumConfigPage implements OnInit {
           this.errorMessage.set(
             problemDetailMessage(
               err,
-              'Error al cargar el catálogo de niveles o módulos. Verifica tu conexión e inténtalo de nuevo.',
+              'Error al cargar el catálogo de módulos de niveles o módulos. Verifica tu conexión e inténtalo de nuevo.',
             ),
           );
         },
@@ -252,11 +274,19 @@ export class CurriculumConfigPage implements OnInit {
     this.selectedModuleIds.set(updated);
   }
 
-  /**
-   * Desmarca todos los módulos seleccionados.
-   */
+  /** Desmarca todos los módulos seleccionados. */
   protected clearAllSelections(): void {
     this.selectedModuleIds.set(new Set());
+  }
+
+  /** Actualiza el total de módulos requeridos desde `app-text-field`. */
+  protected onTotalModulesInput(raw: string): void {
+    this.totalModulesCount.set(raw !== '' ? +raw : null);
+  }
+
+  /** Actualiza el mínimo obligatorio desde `app-text-field`. */
+  protected onMinMandatoryInput(raw: string): void {
+    this.minMandatoryModulesCount.set(raw !== '' ? +raw : null);
   }
 
   /**

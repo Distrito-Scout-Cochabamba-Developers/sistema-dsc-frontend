@@ -1,6 +1,6 @@
 /**
  * Perfil autenticado en la sesión de aplicación.
- * La API no entrega CI, teléfono ni nombre completo de dirigente.
+ * La API no entrega Carnet de Identidad, teléfono ni nombre completo de dirigente.
  */
 export interface AuthUserProfile {
   readonly id: number;

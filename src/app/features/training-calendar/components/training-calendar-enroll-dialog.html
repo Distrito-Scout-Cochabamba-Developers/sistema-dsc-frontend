@@ -1,14 +1,15 @@
 <dialog
   #dialog
   aria-modal="true"
+  aria-labelledby="enroll-dialog-title"
   class="fixed inset-0 z-50 m-auto h-fit max-h-[min(90dvh,40rem)] w-[min(calc(100%-2rem),32rem)] overflow-y-auto rounded-2xl border border-border bg-elevated p-0 shadow-xl backdrop:bg-ink/55"
   (close)="onNativeClose()"
 >
   <div class="p-6">
-    <h2 class="m-0 text-xl font-bold text-ink">Confirmar inscripción</h2>
+    <h2 id="enroll-dialog-title" class="m-0 text-xl font-bold text-ink">Confirmar inscripción</h2>
     <p class="mt-2 mb-0 text-sm text-muted">
       @if (authenticated()) {
-        Vas a reservar un cupo en esta convocatoria. La asistencia se acredita
+        Vas a reservar un cupo en esta programación. La asistencia se acredita
         aparte, el día del módulo.
       } @else {
         El calendario es público. Para inscribirte inicia sesión con tu cuenta de
@@ -24,32 +25,14 @@
       </p>
     }
 
-    <div class="mt-6 flex justify-end gap-3">
-      <button
-        type="button"
-        class="rounded-lg border border-border px-4 py-2 text-sm font-medium text-ink hover:bg-surface"
-        (click)="closed.emit()"
-        [disabled]="submitting()"
-      >
-        Cancelar
-      </button>
+    <div class="mt-6 flex flex-wrap justify-end gap-3">
+      <app-button variant="outline" [disabled]="submitting()" (clicked)="closed.emit()">Cancelar</app-button>
       @if (authenticated()) {
-        <button
-          type="button"
-          class="rounded-lg bg-dsc px-4 py-2 text-sm font-semibold text-white transition hover:bg-dsc-dark disabled:cursor-not-allowed disabled:opacity-70"
-          (click)="confirmed.emit()"
-          [disabled]="submitting()"
-        >
+        <app-button [loading]="submitting()" (clicked)="confirmed.emit()">
           {{ submitting() ? 'Inscribiendo…' : 'Confirmar inscripción' }}
-        </button>
+        </app-button>
       } @else {
-        <button
-          type="button"
-          class="rounded-lg bg-dsc px-4 py-2 text-sm font-semibold text-white transition hover:bg-dsc-dark"
-          (click)="loginRequested.emit()"
-        >
-          Iniciar sesión
-        </button>
+        <app-button (clicked)="loginRequested.emit()">Iniciar sesión</app-button>
       }
     </div>
   </div>

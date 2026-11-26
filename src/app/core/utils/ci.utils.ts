@@ -1,5 +1,5 @@
 /**
- * Opciones de extensión de CI (departamentos de Bolivia).
+ * Opciones de extensión de Carnet de Identidad (departamentos de Bolivia).
  */
 import type { CiExtensionOption, DepartmentCode } from '@core/models/attendance.models';
 
@@ -15,16 +15,16 @@ export const CI_EXTENSIONS: readonly CiExtensionOption[] = [
   { code: 'PD', label: 'Pando' },
 ] as const;
 
-/** Fuente única de verdad del formato de CI (7–10 dígitos, típico Bolivia). */
+/** Fuente única de verdad del formato de Carnet de Identidad (7–10 dígitos, típico Bolivia). */
 export const CI_NUMBER_PATTERN = /^\d{7,10}$/;
 
 /** Fuente única de verdad del formato de móvil boliviano (8 dígitos). */
 export const BOLIVIA_MOBILE_PATTERN = /^\d{8}$/;
 
 /**
- * Indica si el CI es numérico válido (7–10 dígitos, típico Bolivia).
+ * Indica si el Carnet de Identidad es numérico válido (7–10 dígitos, típico Bolivia).
  *
- * @param value - Texto del CI (sin extensión).
+ * @param value - Texto del Carnet de Identidad (sin extensión).
  * @returns `true` si solo contiene dígitos y tiene longitud válida.
  */
 export function isValidCiNumber(value: string): boolean {

@@ -1,5 +1,5 @@
 /**
- * Confirmación de inscripción a una convocatoria. Modal nativo `showModal`.
+ * Confirmación de inscripción a una programación. Modal nativo `showModal`.
  */
 import {
   ChangeDetectionStrategy,
@@ -14,6 +14,7 @@ import {
   viewChild,
 } from '@angular/core';
 
+import { ButtonComponent } from '@shared/components/buttons/button/button.component';
 import { SummaryList, type SummaryItem } from '@shared/components/summary-list';
 
 import { formatSessionWhen } from '../calendar-month.utils';
@@ -23,7 +24,7 @@ import type { CalendarSessionApiDto } from '../training-calendar.models';
 @Component({
   selector: 'app-training-calendar-enroll-dialog',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SummaryList],
+  imports: [ButtonComponent, SummaryList],
   templateUrl: './training-calendar-enroll-dialog.html',
   styles: `
     :host {

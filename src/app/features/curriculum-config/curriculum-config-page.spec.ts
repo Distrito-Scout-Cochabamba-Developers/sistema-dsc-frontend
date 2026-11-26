@@ -66,9 +66,7 @@ describe('CurriculumConfigPage', () => {
     await flushInitialLoad();
     const root: HTMLElement = fixture.nativeElement;
     expect(root.querySelector('h1')?.textContent?.trim()).toBe('Requisitos de formación');
-    expect(root.querySelector('[aria-current="page"]')?.textContent).toBe(
-      'Requisitos de formación',
-    );
+    expect(root.querySelector('nav[aria-label="Miga de pan"]')).toBeNull();
 
     const ids = Array.from(root.querySelectorAll('[id]'), (element) => element.id);
     expect(new Set(ids).size).toBe(ids.length);

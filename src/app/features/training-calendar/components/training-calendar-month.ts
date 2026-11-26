@@ -1,5 +1,5 @@
 /**
- * Grilla mensual de convocatorias. Emite el día elegido.
+ * Grilla mensual de programaciones. Emite el día elegido.
  */
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 
@@ -24,7 +24,7 @@ export class TrainingCalendarMonth {
   /** Mes 0–11. */
   readonly monthIndex = input.required<number>();
 
-  /** Convocatorias a pintar en la grilla. */
+  /** Programaciones a pintar en la grilla. */
   readonly sessions = input<readonly CalendarSessionApiDto[]>([]);
 
   /** Día ISO seleccionado (`YYYY-MM-DD`) o `null`. */

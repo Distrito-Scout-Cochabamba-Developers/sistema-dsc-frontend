@@ -1,5 +1,5 @@
 /**
- * Modal de creación/edición del catálogo. Emite el draft; la página persiste vía API.
+ * Modal de creación/edición del catálogo de módulos. Emite el draft; la página persiste vía API.
  */
 import {
   ChangeDetectionStrategy,
@@ -17,13 +17,17 @@ import {
 import { FormField, form, required, submit } from '@angular/forms/signals';
 
 import type { TrainingModuleApiDto } from '@core/models/attendance-api.models';
+import { ButtonComponent } from '@shared/components/buttons/button/button.component';
+import { CheckboxComponent } from '@shared/components/form-controls/checkbox/checkbox.component';
+import { TextFieldComponent } from '@shared/components/form-controls/text-field/text-field.component';
+import { TextareaComponent } from '@shared/components/form-controls/textarea/textarea.component';
 
 import type { CatalogTrainingLineDto, WriteTrainingModuleDto } from '../training-catalog.models';
 
 @Component({
   selector: 'app-training-catalog-form-modal',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormField],
+  imports: [FormField, ButtonComponent, CheckboxComponent, TextFieldComponent, TextareaComponent],
   templateUrl: './training-catalog-form-modal.html',
   styles: `
     :host {
@@ -118,10 +122,9 @@ export class TrainingCatalogFormModal {
    * Marca o desmarca una línea de formación.
    *
    * @param code - Código PJ / GI / AE.
-   * @param event - Change del checkbox.
+   * @param checked - Nuevo estado del checkbox.
    */
-  protected onLineToggle(code: string, event: Event): void {
-    const checked = (event.target as HTMLInputElement).checked;
+  protected onLineToggle(code: string, checked: boolean): void {
     this.formModel.update((draft) => {
       const next = new Set(draft.trainingLineCodes);
       if (checked) {

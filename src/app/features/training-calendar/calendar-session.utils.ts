@@ -9,7 +9,7 @@ import type {
 /**
  * Insignia de estado para la tarjeta. `Inscrito` gana si la sesión sigue vigente.
  *
- * @param session - Convocatoria.
+ * @param session - Programación.
  * @param now - Reloj de referencia.
  */
 export function sessionBadge(
@@ -38,7 +38,7 @@ export function sessionBadge(
 /**
  * Indica si el dirigente puede abrir el modal de inscripción.
  *
- * @param session - Convocatoria.
+ * @param session - Programación.
  * @param now - Reloj de referencia.
  */
 export function canEnroll(session: CalendarSessionApiDto, now: Date = new Date()): boolean {
@@ -68,7 +68,7 @@ export function sessionBadgeLabel(badge: CalendarSessionBadge): string {
 /**
  * Texto de cupos (`5 / 20` o `Sin cupo límite`).
  *
- * @param session - Convocatoria.
+ * @param session - Programación.
  */
 export function sessionSeatsLabel(session: CalendarSessionApiDto): string {
   if (session.capacity === null || session.remainingSeats === null) {

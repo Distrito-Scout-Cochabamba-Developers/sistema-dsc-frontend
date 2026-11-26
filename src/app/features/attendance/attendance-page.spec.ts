@@ -99,7 +99,7 @@ describe('AttendancePage', () => {
     expect(fixture.nativeElement.querySelector('#ci')).toBeTruthy();
   });
 
-  it('muestra el perfil autenticado sin prellenar CI (la API no envía datos de dirigente)', async () => {
+  it('muestra el perfil autenticado sin prellenar Carnet de Identidad (la API no envía datos de dirigente)', async () => {
     TestBed.inject(AuthSessionService).applyAuthenticatedProfile({
       id: 1,
       personId: 1,
@@ -119,7 +119,7 @@ describe('AttendancePage', () => {
     expect(textOf(fixture)).toContain('jperez');
   });
 
-  it('autocompleta nombre y extensión al ingresar un CI existente en el directorio (sin sesión activa)', async () => {
+  it('autocompleta nombre y extensión al ingresar un Carnet de Identidad existente en el directorio (sin sesión activa)', async () => {
     TestBed.inject(AuthSessionService).clearSession();
     const fixture = createComponent(SESSION_ID);
     flushModuleMeta(http);
@@ -148,7 +148,7 @@ describe('AttendancePage', () => {
     expect(textOf(fixture)).toContain('Perfil encontrado');
   });
 
-  it('ofrece registro parcial cuando el CI no existe en el directorio', async () => {
+  it('ofrece registro parcial cuando el Carnet de Identidad no existe en el directorio', async () => {
     TestBed.inject(AuthSessionService).clearSession();
     const fixture = createComponent(SESSION_ID);
     flushModuleMeta(http);
@@ -166,7 +166,7 @@ describe('AttendancePage', () => {
     expect(textOf(fixture)).toContain('registro parcial');
   });
 
-  it('valida que el CI debe ser numérico', async () => {
+  it('valida que el Carnet de Identidad debe ser numérico', async () => {
     TestBed.inject(AuthSessionService).clearSession();
     const fixture = createComponent(SESSION_ID);
     flushModuleMeta(http);
@@ -180,7 +180,7 @@ describe('AttendancePage', () => {
     await wait(50);
     fixture.detectChanges();
 
-    expect(textOf(fixture)).toContain('Ingresa un CI numérico válido');
+    expect(textOf(fixture)).toContain('Ingresa un Carnet de Identidad numérico válido');
   });
 
   it('valida que el teléfono debe tener 8 dígitos', async () => {

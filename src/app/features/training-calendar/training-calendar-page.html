@@ -1,74 +1,62 @@
-<section class="mx-auto max-w-6xl px-4 py-10 md:px-6">
-  <p class="w-fit rounded-full bg-dsc-soft px-3 py-1 text-xs font-bold tracking-wide text-dsc-dark">
-    FORMACIÓN
-  </p>
-  <div class="mt-4 flex flex-wrap items-start justify-between gap-4">
+<section class="mx-auto max-w-[90rem] space-y-6 px-4 py-6 md:px-8 md:py-10">
+  <header class="flex flex-wrap items-end justify-between gap-4 border-b border-border pb-5">
     <div>
       <h1 class="m-0 text-headline-lg font-bold tracking-tight text-ink md:text-headline-lg-desktop">
         Calendario de módulos
       </h1>
       <p class="mt-2 mb-0 max-w-2xl text-body text-muted">
-        Consulta las convocatorias del distrito. Cualquier persona puede verlas;
+        Consulta las programaciones del distrito. Cualquier persona puede verlas;
         inscribirse requiere iniciar sesión.
       </p>
     </div>
     <div class="flex flex-wrap items-center gap-3">
       @if (canOpenSessions()) {
         <a
-          class="rounded-lg bg-dsc px-4 py-2 text-sm font-semibold text-white no-underline transition hover:bg-dsc-dark"
+          class="inline-flex min-h-10 items-center rounded-lg border border-dsc-primary px-4 py-2 text-sm font-medium text-dsc-primary-hover no-underline transition hover:bg-sky-50"
           routerLink="/admin/modulos"
         >
-          Abrir convocatoria
+          Programar módulo
         </a>
       }
-    <div class="flex rounded-lg border border-border bg-elevated p-1" role="group" aria-label="Vista del calendario">
-      <button
-        type="button"
-        class="rounded-md px-3 py-1.5 text-sm font-semibold"
-        [class.bg-dsc]="viewMode() === 'month'"
-        [class.text-white]="viewMode() === 'month'"
-        [class.text-muted]="viewMode() !== 'month'"
-        (click)="setView('month')"
-      >
-        Mes
-      </button>
-      <button
-        type="button"
-        class="rounded-md px-3 py-1.5 text-sm font-semibold"
-        [class.bg-dsc]="viewMode() === 'list'"
-        [class.text-white]="viewMode() === 'list'"
-        [class.text-muted]="viewMode() !== 'list'"
-        (click)="setView('list')"
-      >
-        Lista
-      </button>
+      <!-- Selección por color + aria-pressed; el hover del activo solo oscurece su azul. -->
+      <div class="flex gap-1 rounded-lg border border-border bg-elevated p-1" role="group" aria-label="Vista del calendario">
+        <app-button
+          size="sm"
+          [variant]="viewMode() === 'list' ? 'solid' : 'text'"
+          [ariaPressed]="viewMode() === 'list'"
+          (clicked)="setView('list')"
+        >
+          Lista
+        </app-button>
+        <app-button
+          size="sm"
+          [variant]="viewMode() === 'month' ? 'solid' : 'text'"
+          [ariaPressed]="viewMode() === 'month'"
+          (clicked)="setView('month')"
+        >
+          Mes
+        </app-button>
+      </div>
     </div>
-    </div>
-  </div>
+  </header>
 
   @if (usingFixtures) {
     <p class="mt-4 rounded-xl border border-dsc/30 bg-dsc-soft px-4 py-3 text-sm text-dsc-dark" role="status">
       Vista preparada para la API. Mientras no existan
       <code class="font-mono text-xs">GET/POST /api/v1/calendar/sessions</code>,
-      se muestran convocatorias de demostración.
+      se muestran programaciones de demostración.
     </p>
   }
 
   @if (loading()) {
-    <p class="mt-8 text-sm text-muted" role="status">Cargando calendario…</p>
+    <p class="mt-6 text-sm text-muted" role="status">Cargando calendario…</p>
   } @else if (error()) {
     <div class="mt-8">
       <app-state-card title="No se pudo cargar el calendario" ctaLabel="Volver al inicio" ctaLink="/">
         {{ error() }}
       </app-state-card>
       @if (retryable()) {
-        <button
-          type="button"
-          class="mt-4 text-sm font-semibold text-dsc underline"
-          (click)="retry()"
-        >
-          Reintentar
-        </button>
+        <app-button class="mt-4 inline-block" variant="outline" (clicked)="retry()">Reintentar</app-button>
       }
     </div>
   } @else {
@@ -86,24 +74,22 @@
       </div>
     }
 
-    <div class="mt-8">
+    <div [class]="viewMode() === 'month' ? 'mt-8' : 'mt-6'">
       <div class="mb-4 flex flex-wrap items-baseline justify-between gap-2">
         <h2 class="m-0 text-lg font-bold text-ink">
-          {{ selectedIsoDate() ? 'Convocatorias del día' : 'Módulos próximos' }}
+          {{ selectedIsoDate() ? 'Programaciones del día' : 'Módulos próximos' }}
         </h2>
         @if (selectedIsoDate()) {
-          <button type="button" class="text-sm font-semibold text-dsc underline" (click)="clearDayFilter()">
-            Ver todos
-          </button>
+          <app-button variant="text" size="sm" (clicked)="clearDayFilter()">Ver todos</app-button>
         }
       </div>
 
       @if (upcoming().length === 0) {
         <p class="rounded-2xl border border-border bg-elevated p-6 text-sm text-muted">
-          No hay convocatorias próximas en este filtro.
+          No hay programaciones próximas en este filtro.
           @if (canOpenSessions()) {
-            <a class="ml-1 font-semibold text-dsc no-underline hover:underline" routerLink="/admin/modulos">
-              Abrir una desde el catálogo
+            <a class="ml-1 font-semibold text-dsc-dark underline-offset-4 hover:underline" routerLink="/admin/modulos">
+              Abrir una desde el catálogo de módulos
             </a>
           }
         </p>
@@ -118,6 +104,21 @@
       }
     </div>
   }
+
+  <!-- Región viva siempre presente: el lector de pantalla anuncia la confirmación al rellenarse. -->
+  <div class="pointer-events-none fixed inset-x-4 bottom-4 z-40 md:inset-x-auto md:right-6 md:w-96" role="status" aria-live="polite">
+    @if (enrollNotice()) {
+      <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-dsc-success/40 bg-elevated p-4 shadow-lg" data-testid="enroll-notice">
+        <svg class="mt-0.5 h-5 w-5 shrink-0 text-dsc-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M5 12.5l4.5 4.5L19 7.5" />
+        </svg>
+        <p class="m-0 flex-1 text-sm font-medium text-ink">{{ enrollNotice() }}</p>
+        <app-button variant="text" size="xs" ariaLabel="Cerrar confirmación" (clicked)="dismissNotice()">
+          Cerrar
+        </app-button>
+      </div>
+    }
+  </div>
 
   <app-training-calendar-enroll-dialog
     [open]="pending() !== null"

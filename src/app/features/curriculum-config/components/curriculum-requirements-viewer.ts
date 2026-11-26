@@ -5,13 +5,15 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
 import { SummaryList, type SummaryItem } from '@shared/components/summary-list';
+import { BadgeComponent } from '@shared/components/ui-elements/badge/badge.component';
+import { CardComponent } from '@shared/components/ui-elements/card/card.component';
 
 import type { ModuleRequirementsDto } from '../curriculum-config.models';
 
 @Component({
   selector: 'app-curriculum-requirements-viewer',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SummaryList],
+  imports: [SummaryList, BadgeComponent, CardComponent],
   templateUrl: './curriculum-requirements-viewer.html',
 })
 export class CurriculumRequirementsViewer {

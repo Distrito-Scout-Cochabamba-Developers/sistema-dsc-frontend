@@ -10,7 +10,7 @@ const FALLBACK_MODULE_IMAGE =
   'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80';
 
 /**
- * Adapta el DTO de catálogo a la vista del formulario de asistencia.
+ * Adapta el DTO de catálogo de módulos a la vista del formulario de asistencia.
  *
  * @param dto - Módulo persistido en la API.
  */

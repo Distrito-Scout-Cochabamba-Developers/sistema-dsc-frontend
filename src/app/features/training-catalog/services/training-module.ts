@@ -1,5 +1,5 @@
 /**
- * Servicio del catálogo administrativo (`/api/v1/admin/modules`).
+ * Servicio del catálogo de módulos administrativo (`/api/v1/admin/modules`).
  * Requiere JWT con rol ADMIN o DISTRICT_SECRETARY (el interceptor adjunta Bearer).
  */
 import { HttpClient } from '@angular/common/http';
@@ -20,7 +20,7 @@ export class TrainingModuleService {
   private readonly http = inject(HttpClient);
 
   /**
-   * Lista el catálogo (`GET /api/v1/admin/modules`).
+   * Lista el catálogo de módulos (`GET /api/v1/admin/modules`).
    */
   list(): Observable<readonly TrainingModuleApiDto[]> {
     return this.http.get<TrainingModuleApiDto[]>(apiUrl('/api/v1/admin/modules'));
@@ -62,9 +62,9 @@ export class TrainingModuleService {
   }
 
   /**
-   * Abre una convocatoria con fecha y horas (`POST .../modules/{id}/sessions`).
+   * Abre una programación con fecha y horas (`POST .../modules/{id}/sessions`).
    *
-   * @param moduleId - Módulo del catálogo.
+   * @param moduleId - Módulo del catálogo de módulos.
    * @param body - Horarios y estado de inscripción.
    */
   createSession(

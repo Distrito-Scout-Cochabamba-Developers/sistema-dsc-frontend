@@ -5,7 +5,7 @@
 import { test, expect, type Page } from '@playwright/test';
 
 const SESSION_PATH = '/asistencia/SCOUT_METHOD_AND_PROGRAM';
-const CI_ERROR = 'Ingresa un CI numérico válido (7 a 10 dígitos).';
+const CI_ERROR = 'Ingresa un Carnet de Identidad numérico válido (7 a 10 dígitos).';
 const PHONE_ERROR = 'Ingresa un móvil de 8 dígitos.';
 
 async function fillAndBlur(page: Page, selector: string, value: string): Promise<void> {
@@ -30,7 +30,7 @@ const phoneCases: { value: string; valid: boolean; label: string }[] = [
 test('flujo de registro digital de asistencia', async ({ page }) => {
   await page.goto(SESSION_PATH);
 
-  await test.step('exige Nombre, CI, Extensión y Teléfono', async () => {
+  await test.step('exige Nombre, Carnet de Identidad, Extensión y Teléfono', async () => {
     await expect(page.locator('#ci')).toHaveValue('');
 
     await page.getByRole('button', { name: 'Registrar Asistencia' }).click();
@@ -46,7 +46,7 @@ test('flujo de registro digital de asistencia', async ({ page }) => {
   });
 
   for (const { value, valid, label } of ciCases) {
-    await test.step(`CI ${label} -> ${valid ? 'válido' : 'inválido'}`, async () => {
+    await test.step(`Carnet de Identidad ${label} -> ${valid ? 'válido' : 'inválido'}`, async () => {
       await fillAndBlur(page, '#ci', value);
       if (valid) {
         await expect(page.getByText(CI_ERROR)).not.toBeVisible();
@@ -67,7 +67,7 @@ test('flujo de registro digital de asistencia', async ({ page }) => {
     });
   }
 
-  await test.step('autocompleta con un CI que ya existe en el distrito', async () => {
+  await test.step('autocompleta con un Carnet de Identidad que ya existe en el distrito', async () => {
     await page.locator('#ci').fill('22334455');
     await expect(page.getByText('Perfil encontrado')).toBeVisible();
     await expect(page.locator('#fullName')).toHaveValue('Ana Rojas');
@@ -82,11 +82,11 @@ test('muestra "Sesión no válida" con un código inexistente', async ({ page })
 
 // Bug: el backend espera la tabla "ModuleAttendances", que no existe en el
 // schema real (usa training_module_enrollment). Falla al guardar la asistencia.
-test.fixme('registro de un CI nuevo (parcial)', async ({ page }) => {
+test.fixme('registro de un Carnet de Identidad nuevo (parcial)', async ({ page }) => {
   const uniqueCi = `9${Date.now().toString().slice(-7)}`;
   await page.goto(SESSION_PATH);
   await page.locator('#ci').fill(uniqueCi);
-  await expect(page.getByText('CI no encontrado en el distrito')).toBeVisible();
+  await expect(page.getByText('Carnet de Identidad no encontrado en el distrito')).toBeVisible();
 
   await page.locator('#fullName').fill('Playwright Test');
   await page.locator('#extension').selectOption('LP');

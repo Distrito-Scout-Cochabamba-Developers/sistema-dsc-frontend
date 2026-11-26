@@ -43,9 +43,9 @@ describe('TrainingCatalogPage', () => {
     fixture.detectChanges();
 
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
-    expect(text).toContain('Catálogo de módulos');
+    expect(text).toContain('Módulos de formación');
     expect(text).toContain('Módulo de Liderazgo y Servicio');
-    expect(text).toContain('Abrir convocatoria');
+    expect(text).toContain('Programar módulo');
     expect(text).not.toContain('Carnet de Identidad');
   });
 
@@ -60,14 +60,14 @@ describe('TrainingCatalogPage', () => {
       {
         title: 'Error',
         status: 500,
-        detail: 'El catálogo no está disponible.',
+        detail: 'El catálogo de módulos no está disponible.',
       },
       { status: 500, statusText: 'Server Error' },
     );
     fixture.detectChanges();
 
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
-    expect(text).toContain('El catálogo no está disponible.');
+    expect(text).toContain('El catálogo de módulos no está disponible.');
   });
 
   it('abre el modal de edición con el módulo elegido', () => {
@@ -88,7 +88,7 @@ describe('TrainingCatalogPage', () => {
     expect(name?.value).toBe('Módulo de Liderazgo y Servicio');
   });
 
-  it('abre el modal de convocatoria y publica fecha y horas', () => {
+  it('abre el modal de programación y publica fecha y horas', () => {
     const fixture = TestBed.createComponent(TrainingCatalogPage);
     fixture.detectChanges();
     flushCatalog();
@@ -97,14 +97,14 @@ describe('TrainingCatalogPage', () => {
     const buttons = [
       ...(fixture.nativeElement as HTMLElement).querySelectorAll('button'),
     ] as HTMLButtonElement[];
-    buttons.find((button) => button.textContent?.includes('Abrir convocatoria'))?.click();
+    buttons.find((button) => button.textContent?.includes('Programar módulo'))?.click();
     fixture.detectChanges();
 
     const dialogs = [
       ...(fixture.nativeElement as HTMLElement).querySelectorAll('dialog'),
     ] as HTMLDialogElement[];
     const sessionDialog = dialogs.find((dialog) =>
-      dialog.textContent?.includes('Abrir convocatoria'),
+      dialog.textContent?.includes('Programar módulo'),
     );
     expect(sessionDialog).toBeTruthy();
 
@@ -137,7 +137,7 @@ describe('TrainingCatalogPage', () => {
     fixture.detectChanges();
 
     expect((fixture.nativeElement as HTMLElement).textContent).toContain(
-      'Convocatoria de «Módulo de Liderazgo y Servicio» publicada',
+      'Programación de «Módulo de Liderazgo y Servicio» publicada',
     );
   });
 

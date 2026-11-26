@@ -10,7 +10,7 @@ import {
 } from '@angular/router';
 
 /**
- * Layout interno del catálogo DSC.
+ * Layout interno del catálogo de módulos DSC.
  *
  * Proporciona navegación entre las páginas
  * de documentación de los componentes.

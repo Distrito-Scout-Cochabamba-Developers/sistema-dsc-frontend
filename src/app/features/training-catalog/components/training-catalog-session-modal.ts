@@ -1,5 +1,5 @@
 /**
- * Modal para abrir una convocatoria: fecha y horas sobre un módulo del catálogo.
+ * Modal para programar módulo: fecha y horas sobre un módulo del catálogo de módulos.
  */
 import {
   ChangeDetectionStrategy,
@@ -16,6 +16,9 @@ import {
 import { FormField, form, required, submit } from '@angular/forms/signals';
 
 import type { TrainingModuleApiDto } from '@core/models/attendance-api.models';
+import { ButtonComponent } from '@shared/components/buttons/button/button.component';
+import { CheckboxComponent } from '@shared/components/form-controls/checkbox/checkbox.component';
+import { DatePickerComponent } from '@shared/components/form-controls/date-picker/date-picker.component';
 
 import type { ConvocatoriaDraft } from '../training-catalog.models';
 
@@ -37,7 +40,7 @@ function defaultDate(): string {
 @Component({
   selector: 'app-training-catalog-session-modal',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormField],
+  imports: [FormField, ButtonComponent, CheckboxComponent, DatePickerComponent],
   templateUrl: './training-catalog-session-modal.html',
   styles: `
     :host {
@@ -51,7 +54,7 @@ export class TrainingCatalogSessionModal {
   /** Controla visibilidad del `<dialog>`. */
   readonly open = input(false);
 
-  /** Módulo del catálogo sobre el que se abre la convocatoria. */
+  /** Módulo del catálogo de módulos sobre el que se abre la programación. */
   readonly module = input<TrainingModuleApiDto | null>(null);
 
   /** Error RFC 7807 de un intento de crear. */
@@ -155,7 +158,7 @@ export class TrainingCatalogSessionModal {
   }
 
   /**
-   * Cambia si la convocatoria admite inscripción.
+   * Cambia si la programación admite inscripción.
    *
    * @param event - Change del checkbox.
    */

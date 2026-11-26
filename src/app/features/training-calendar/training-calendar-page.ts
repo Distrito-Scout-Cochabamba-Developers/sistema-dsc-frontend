@@ -1,5 +1,5 @@
 /**
- * Calendario público de convocatorias: vista mensual, lista de próximos
+ * Calendario público de programaciones: vista mensual, lista de próximos
  * e inscripción digital del dirigente autenticado.
  */
 import {
@@ -17,9 +17,15 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { TRAINING_CATALOG_ROLES } from '@core/models/auth-roles';
 import { AuthSessionService } from '@core/services/auth-session.service';
 import { isRetryableHttpError, problemDetailMessage } from '@core/utils/http-error.utils';
+import { ButtonComponent } from '@shared/components/buttons/button/button.component';
 import { StateCard } from '@shared/components/state-card';
 
-import { isoDateTimeToLocalDate, shiftMonth, startOfLocalDay } from './calendar-month.utils';
+import {
+  formatSessionWhen,
+  isoDateTimeToLocalDate,
+  shiftMonth,
+  startOfLocalDay,
+} from './calendar-month.utils';
 import { canEnroll } from './calendar-session.utils';
 import { TrainingCalendarEnrollDialog } from './components/training-calendar-enroll-dialog';
 import { TrainingCalendarMonth } from './components/training-calendar-month';
@@ -34,6 +40,7 @@ import type {
   selector: 'app-training-calendar-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    ButtonComponent,
     RouterLink,
     StateCard,
     TrainingCalendarEnrollDialog,
@@ -54,13 +61,16 @@ export class TrainingCalendarPage {
   protected readonly loading = signal(true);
   protected readonly error = signal('');
   protected readonly retryable = signal(false);
-  protected readonly viewMode = signal<CalendarViewMode>('month');
+  /** En pantallas pequeñas arranca en lista: la primera programación queda a la vista sin recorrer el mes. */
+  protected readonly viewMode = signal<CalendarViewMode>(defaultViewMode());
   protected readonly year = signal(this.now.getFullYear());
   protected readonly monthIndex = signal(this.now.getMonth());
   protected readonly selectedIsoDate = signal<string | null>(null);
   protected readonly pending = signal<CalendarSessionApiDto | null>(null);
   protected readonly enrollError = signal('');
   protected readonly submitting = signal(false);
+  /** Confirmación de la última inscripción, anunciada con `role="status"`. */
+  protected readonly enrollNotice = signal('');
 
   protected readonly usingFixtures = this.calendar.isUsingFixtures();
   protected readonly isAuthenticated = this.auth.isAuthenticated;
@@ -142,14 +152,20 @@ export class TrainingCalendarPage {
   /**
    * Abre el modal si la sesión admite inscripción.
    *
-   * @param session - Convocatoria elegida.
+   * @param session - Programación elegida.
    */
   protected openEnroll(session: CalendarSessionApiDto): void {
     if (!canEnroll(session)) {
       return;
     }
     this.enrollError.set('');
+    this.enrollNotice.set('');
     this.pending.set(session);
+  }
+
+  /** Oculta la confirmación de inscripción. */
+  protected dismissNotice(): void {
+    this.enrollNotice.set('');
   }
 
   /** Cierra el modal de confirmación. */
@@ -186,6 +202,9 @@ export class TrainingCalendarPage {
           this.replaceSession(result.session);
           this.submitting.set(false);
           this.pending.set(null);
+          this.enrollNotice.set(
+            `Inscripción confirmada: ${result.session.moduleName} · ${formatSessionWhen(result.session.startsAt)}`,
+          );
         },
         error: (err: unknown) => {
           this.submitting.set(false);
@@ -208,7 +227,7 @@ export class TrainingCalendarPage {
   }
 
   /**
-   * Pide el listado de convocatorias (API o fixtures).
+   * Pide el listado de programaciones (API o fixtures).
    */
   private load(): void {
     this.loading.set(true);
@@ -249,7 +268,7 @@ export class TrainingCalendarPage {
   /**
    * Marca cupo lleno tras un 409 concurrente.
    *
-   * @param sessionId - Convocatoria agotada.
+   * @param sessionId - Programación agotada.
    */
   private markFull(sessionId: number): void {
     this.sessions.update((items) =>
@@ -273,4 +292,10 @@ export class TrainingCalendarPage {
       });
     }
   }
+}
+
+/** Vista inicial: lista bajo el breakpoint `md` de Tailwind (48rem); mes en escritorio. */
+function defaultViewMode(): CalendarViewMode {
+  const media = globalThis.matchMedia?.('(max-width: 47.99rem)');
+  return media?.matches ? 'list' : 'month';
 }

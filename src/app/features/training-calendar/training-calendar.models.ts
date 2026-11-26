@@ -1,9 +1,9 @@
 /**
  * Contratos del calendario (`GET /api/v1/calendar/sessions`).
- * `moduleCode` es el id del módulo en texto (el catálogo ya no tiene `code`).
+ * `moduleCode` es el id del módulo en texto (el catálogo de módulos ya no tiene `code`).
  */
 
-/** Estado de convocatoria alineado a `TrainingModuleSessionStatus`. */
+/** Estado de programación alineado a `TrainingModuleSessionStatus`. */
 export type CalendarSessionStatus =
   | 'SCHEDULED'
   | 'OPEN'
